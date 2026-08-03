@@ -37,4 +37,5 @@ jobs:
 
     - name: Run Pytest
       run: |
+        cp .env.example .env
         python -m pytest tests -q
