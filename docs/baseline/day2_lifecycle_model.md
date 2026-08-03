@@ -107,3 +107,9 @@ That means the editorial backend can now say not only what state an item is in, 
 All content responses now expose `status_changed_at`, `status_changed_by_id`, and `status_change_reason`. They are `null` until a real status transition occurs; resubmitting the same status does not overwrite the existing audit evidence. The existing `PUT /api/v1/blogs/{blog_id}` remains the single blog update endpoint.
 
 The local React admin dashboard now supports the same workflow for Blog, News, Project, Insight, and Case Study editors: all lifecycle states, permission-aware valid transition choices, an optional status-change reason, coloured state badges, and a lifecycle-details panel. The form retains existing saved values when editing, so the regular update flow continues to submit the current values alongside any changed value.
+
+## CI/CD Pipeline Automation & Cross-Environment Hardening
+
+To enforce the validity of this lifecycle model in a production environment, full Continuous Integration (CI) pipelines were added via GitHub Actions:
+- **Frontend CI (`frontend-ci.yml`):** Runs `npm run build` and automatically resolves a deep-rooted Windows-to-Linux Git case sensitivity bug by forcefully migrating the `Lib` folder to `utils`.
+- **Backend CI (`backend-ci.yml`):** Runs the full `pytest` regression suite. Bypasses `.env` file parsing entirely by injecting native mock variables, and permanently resolves the Day 1 P0 bug by spinning up a native `postgres:15` service container within the cloud runner (instead of relying on SQLite).

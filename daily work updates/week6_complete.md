@@ -79,6 +79,18 @@ The existing update flow remains unchanged. The status audit fields (`status_cha
 
 The local admin dashboard now supports the full Day 2 lifecycle across all five content types, including valid status choices, permission-aware transition controls, status reasons, lifecycle audit display, and status-badge colours.
 
+### CI/CD Pipeline Automation & Cross-Environment Hardening
+
+Successfully implemented and hardened GitHub Actions pipelines for both the frontend and backend to guarantee production-readiness.
+
+- **Frontend CI/CD Resilience:** 
+  - Fixed a critical Windows-vs-Linux case sensitivity bug in Git (tracking `Lib` vs `lib`) by forcefully renaming the core directory to `utils` and updating 20 component imports.
+  - Fixed Vite 5 TypeScript resolution by adding `baseUrl` and `paths` mappings natively into `tsconfig.app.json`.
+- **Backend CI/CD Resilience:** 
+  - Bypassed `.env` file parsing entirely by injecting a robust `env:` block natively into the CI runner, preventing Pydantic initialization crashes.
+  - **Resolved Day 1 P0 Bug:** Configured a native `postgres:15` service container inside GitHub Actions so Pytest runs against real PostgreSQL instead of SQLite, allowing `ARRAY` column types to compile perfectly.
+  - Added missing test-only dependencies (`fakeredis`) to the CI runner pipeline.
+
 ---
 
 ## Day 3 — Revision History, Transactions & Audit Trail

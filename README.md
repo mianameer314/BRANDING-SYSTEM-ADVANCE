@@ -66,6 +66,7 @@ Explore the comprehensive system documentation suite below. Click any card to na
 | 🛡️ **Admin User Guide** | Complete User Manual for Content Editors | [Read Admin Manual](docs/admin/admin-user-guide.md) |
 | 💻 **Developer Guide** | System Architecture, Codebase & Nuxt Plugins | [Read Tech Guide](docs/developer/developer-guide.md) |
 | 🚢 **Deployment Guide** | Railway Backend & Vercel Frontend Deployments | [Read Deploy Guide](docs/deployment/deployment-guide.md) |
+| 🛡️ **Git & Monitoring** | Git Workflows, Safety Nets & Server Health Scripts | [Read Git & Monitoring Guide](docs/deployment/git_and_monitoring_workflow.md) |
 | 🧪 **Regression Report** | Final E2E Staging Testing Sign-off | [Read QA Report](docs/regression_report.md) |
 
 </div>
