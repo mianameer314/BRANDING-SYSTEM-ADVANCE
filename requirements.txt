@@ -1,0 +1,37 @@
+# ── Web Framework ─────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+python-multipart
+
+# ── Database ──────────────────────────────────────────────────
+sqlalchemy
+psycopg2-binary
+alembic
+
+# ── Validation / Config ──────────────────────────────────────
+pydantic[email]
+pydantic-settings
+
+# ── Authentication ────────────────────────────────────────────
+PyJWT
+passlib[bcrypt]
+bcrypt==4.0.1
+
+# ── Utilities ─────────────────────────────────────────────────
+python-slugify
+requests
+httpx
+
+# ── Storage / Media ──────────────────────────────────────────
+Pillow
+filetype
+boto3
+
+# ── Rate Limiting ────────────────────────────────────────────
+redis>=5.0.0
+fastapi-limiter==0.1.6
+
+# ── Testing ───────────────────────────────────────────────────
+pytest
+httpx
+pytest-asyncio
