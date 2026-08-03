@@ -1,6 +1,6 @@
 import { axiosInstance } from '@/api/axios';
 import { API } from '@/api/endpoints';
-import { buildFormData, tagsStringToJson } from '@/lib/formdata';
+import { buildFormData, tagsStringToJson } from '@/utils/formdata';
 import type { PaginatedResponse } from '@/types/api.types';
 import type { InsightOut, InsightListParams } from './types';
 import type { InsightFormData } from '@/features/shared/forms/schemas';

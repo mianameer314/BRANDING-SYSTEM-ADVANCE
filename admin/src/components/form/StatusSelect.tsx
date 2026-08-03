@@ -4,7 +4,7 @@ import type { FieldError } from 'react-hook-form';
 import type { ContentStatus } from '@/types/api.types';
 import { usePermission } from '@/features/auth/hooks/usePermission';
 import { statusVariants } from '@/components/shared/StatusBadge';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 
 interface StatusSelectProps {
  value: ContentStatus;

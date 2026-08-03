@@ -10,7 +10,7 @@
  */
 import { useRef, useState } from 'react';
 import { Upload, X } from 'lucide-react';
-import { resolveImageUrl } from '@/lib/utils';
+import { resolveImageUrl } from '@/utils/utils';
 
 interface ImageUploadFieldProps {
  label: string;

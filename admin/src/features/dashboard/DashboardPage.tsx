@@ -4,7 +4,7 @@ import { useNews } from '@/features/news/hooks';
 import { useProjects } from '@/features/projects/hooks';
 import { useInsights } from '@/features/insights/hooks';
 import { useCaseStudies } from '@/features/case-studies/hooks';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { Link } from 'react-router-dom';
 import { CountUp } from '@/components/ui/CountUp';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { forwardRef } from 'react';
 
 

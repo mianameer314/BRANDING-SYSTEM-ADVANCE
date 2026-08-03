@@ -4,7 +4,7 @@ import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/utils/utils';
 import type { UserOut } from './types';
 import { ChevronLeft, ChevronRight, Plus, Edit2, UserX, UserCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';

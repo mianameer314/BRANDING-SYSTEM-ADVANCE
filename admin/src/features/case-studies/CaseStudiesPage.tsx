@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { formatDate, truncate } from '@/lib/utils';
+import { formatDate, truncate } from '@/utils/utils';
 import type { CaseStudyOut } from './types';
 import { ChevronLeft, ChevronRight, Star, Plus, Edit2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';

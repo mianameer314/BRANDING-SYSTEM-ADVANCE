@@ -1,6 +1,6 @@
 import { axiosInstance } from '@/api/axios';
 import { API } from '@/api/endpoints';
-import { buildFormData, tagsStringToJson } from '@/lib/formdata';
+import { buildFormData, tagsStringToJson } from '@/utils/formdata';
 import type { PaginatedResponse } from '@/types/api.types';
 import type { ProjectOut, ProjectListParams } from './types';
 import type { ProjectFormData } from '@/features/shared/forms/schemas';

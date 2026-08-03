@@ -10,7 +10,7 @@
  */
 import { useRef, useState, useEffect } from 'react';
 import { Images, X } from 'lucide-react';
-import { resolveImageUrl } from '@/lib/utils';
+import { resolveImageUrl } from '@/utils/utils';
 
 interface GalleryUploadFieldProps {
  currentGalleryUrls?: string[] | null;

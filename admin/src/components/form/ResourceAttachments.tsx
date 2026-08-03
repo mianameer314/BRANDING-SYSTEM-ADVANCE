@@ -17,7 +17,7 @@ import {
 import type { ContentType, ResourceOut } from '@/features/resources/types';
 import { PermissionGuard } from '@/features/auth/components/PermissionGuard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/utils/utils';
 import type { AxiosProgressEvent } from 'axios';
 
 interface ResourceAttachmentsProps {

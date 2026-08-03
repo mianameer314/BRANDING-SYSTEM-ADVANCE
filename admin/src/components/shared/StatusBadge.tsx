@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import type { ContentStatus } from '@/types/api.types';
 
 export const statusVariants: Record<ContentStatus, { dot: string; text: string; bg: string }> = {

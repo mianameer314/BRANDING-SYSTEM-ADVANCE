@@ -10,7 +10,7 @@ import {
   Webhook,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import type { Permission } from '@/types/permissions';
 import Logo from '@/assets/logo.svg';
 
