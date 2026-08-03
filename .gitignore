@@ -34,3 +34,24 @@ venv.bak/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
+
+# Testing & Databases
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite3
+
+# Uploaded Media
+storage/
+
+# Workspace IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary / Scratch Files
+clean_tasks.txt
+plan_dump.txt
+week6_explanation.md
