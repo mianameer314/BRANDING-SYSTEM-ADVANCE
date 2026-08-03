@@ -1,0 +1,52 @@
+html {
+  scroll-behavior: smooth;
+}
+.lh-0 {
+  line-height: 0;
+}
+.lh-in {
+  line-height: inherit;
+}
+
+.text-deconraion-none {
+  text-decoration: none;
+}
+
+.hover-opacity-100 {
+  &:hover {
+    opacity: 1 !important;
+  }
+
+}
+
+.w-64 {
+  width: 64px;
+}
+
+.hover-primary-title {
+  &:hover {
+    .title {
+      color: rgb(var(--v-theme-primary));
+    }
+  }
+}
+
+.obj-cover {
+  object-fit: cover;
+}
+.hover-primary-link{
+  &:hover{
+     color: rgb(var(--v-theme-primary)) !important;
+  }
+}
+
+.list-style-none{
+  list-style: none;
+  margin-left: 0;
+}
+
+.hover-opacity-1{
+  &:hover{
+    opacity: 1 !important;
+  }
+}

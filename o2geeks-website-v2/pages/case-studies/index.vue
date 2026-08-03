@@ -1,0 +1,4 @@
+<template>
+  <CaseStudiesProjectBanner />
+  <CaseStudies />
+</template>

@@ -1,0 +1,4 @@
+<template>
+    <NewsNewsGridBlogBanner/>
+    <NewsNewsGrid/>
+</template>

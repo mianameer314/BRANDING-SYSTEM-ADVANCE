@@ -1,0 +1,57 @@
+.dark {
+    .v-chip--variant-outlined {
+        border: thin solid rgba(var(--v-theme-white), 0.2);
+    }
+
+    .carousel__pagination .carousel__pagination-button--active {
+        background-color: rgb(var(--v-theme-white));
+    }
+
+    .here-from {
+        &.bg-secondary {
+            background-color: rgba(var(--v-theme-accent), 0.5) !important;
+        }
+    }
+
+    .faq-panels .v-expansion-panel:last-child {
+        border-bottom: 1px solid rgba(var(--v-theme-white), 0.1);
+    }
+
+    .brand-served .second-ring {
+        border: 1px solid rgba(var(--v-theme-white), 0.1);
+    }
+
+    .brand-served .first-ring {
+        border: 1px solid rgba(var(--v-theme-white), 0.1);
+    }
+
+    .primary-icon {
+        display: block;
+    }
+
+    .dark-icon {
+        display: none;
+    }
+
+    .marquee-tag {
+        img {
+            filter: invert(1);
+        }
+    }
+
+    .btn-secondary {
+        background-color: rgb(var(--v-theme-white));
+        color: rgb(var(--v-theme-secondary));
+        &:hover {
+            background-color: transparent;
+            border: 1px solid rgb(var(--v-theme-white));
+            color: rgb(var(--v-theme-white));
+        }
+    }
+    .leagal{
+        .text-black{
+            color: rgb(var(--v-theme-primary)) !important;
+        }
+    }
+
+}

@@ -1,0 +1,52 @@
+# Nuxt dev/build outputs
+.nuxt
+.output
+dist/
+public/_nuxt/
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Nuxt Content
+.content/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Deployments
+.vercel/
+.netlify/
+.serverless/

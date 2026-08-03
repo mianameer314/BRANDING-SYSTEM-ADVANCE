@@ -1,0 +1,151 @@
+.v-btn {
+  text-transform: capitalize;
+  letter-spacing: 0;
+  font-weight: 600;
+
+  &.v-btn--size-large {
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+// Button css
+.interactive-button {
+  position: relative; // Needed for absolute children
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgb(var(--v-theme-primary));
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  overflow: hidden;
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
+  width: fit-content;
+  padding: 15px 58px 15px 30px;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: rgb(var(--v-theme-secondary));
+    border: 1px solid white;
+  }
+
+  .label {
+    position: relative;
+    z-index: 1;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: rgb(var(--v-theme-secondary));
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+    padding-inline-end: 15px;
+  }
+
+  &:hover .label {
+    color: white;
+    transform: translateX(2.5rem);
+  }
+
+  .icon {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translate(-115%, -50%);
+    z-index: 0;
+    transition: transform 0.4s ease, left 0.4s ease;
+
+  }
+
+  &:hover .icon {
+    left: 0;
+    transform: translate(15%, -50%) rotate(45deg);
+  }
+}
+
+
+.interactive-button-small {
+  position: relative; // Needed for absolute children
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgb(var(--v-theme-primary));
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  overflow: hidden;
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
+  width: fit-content;
+  padding: 8px 15px 8px 20px;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: rgb(var(--v-theme-secondary));
+    border: 1px solid white;
+  }
+
+  .label {
+    position: relative;
+    z-index: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(var(--v-theme-secondary));
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+    padding-inline-start: 30px;
+  }
+
+  &:hover .label {
+    color: white;
+    transform: translateX(-30px);
+  }
+
+  .icon {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translate(0%, -50%);
+    z-index: 0;
+    transition: left 0.4s ease, transform 0.4s ease;
+
+  }
+
+  &:hover .icon {
+    left: calc(100% - 35px);
+    transform: translate(0%, -50%) rotate(45deg);
+  }
+}
+
+.v-chip--variant-outlined {
+  border: thin solid rgb(var(--v-theme-muted));
+}
+
+.elevation-10 {
+  box-shadow: 0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03) !important;
+}
+
+.btn-secondary {
+  padding: 15px 20px;
+  background-color: rgb(var(--v-theme-secondary));
+  height: auto !important;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: transparent;
+    border: 1px solid rgb(var(--v-theme-secondary));
+    color: rgb(var(--v-theme-secondary));
+  }
+}
+
+.v-field--variant-underlined .v-label.v-field-label {
+  top: 12px;
+}
+.v-expansion-panel{
+  background-color: transparent;
+}
+.faq-panels .v-expansion-panel {
+    border-bottom: 0;
+}
+.faq-panels .v-expansion-panel:last-child {
+  border-bottom: 1px solid rgba(var(--v-theme-secondary),0.1);
+}

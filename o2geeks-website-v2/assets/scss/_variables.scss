@@ -1,0 +1,155 @@
+@use 'sass:math';
+@use 'sass:map';
+@use 'sass:meta';
+@use 'vuetify/lib/styles/tools/functions' as *;
+
+// Custom Variables
+// colors
+$white: #fff !default;
+
+// cards
+$card-title-size: 18px !default;
+
+$body-font-family: 'Manrope' !default;
+$border-radius-root: 8px !default;
+$btn-font-weight: 400 !default;
+$btn-letter-spacing: 0 !default;
+
+// Global Shadow
+$box-shadow: 0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+
+// Global Radius as per breakeven point
+
+@forward 'vuetify/settings' with ($color-pack: false !default,
+    // Global font size and border radius
+    $font-size-root: 1rem,
+    $button-height: 40px,
+    $border-radius-root: $border-radius-root !default,
+    $body-font-family: $body-font-family,
+    $heading-font-family: $body-font-family !default,
+    // 👉 Typography
+    $typography: ('h1': ('size':128px,
+            'weight': 700,
+            'line-height':128px,
+            'font-family': inherit),
+        'h2': ('size': 48px,
+            'weight': 700,
+            'line-height': 60px,
+            'font-family': inherit),
+        'h3': ('size': 36px,
+            'weight': 700,
+            'line-height': 36px,q   
+            'font-family': inherit),
+        'h4': ('size': 28px,
+            'weight': 700,
+            'line-height': 36px,
+            'font-family': inherit),
+        'h5': ('size': 24px,
+            'weight':700,
+            'line-height': 34px,
+            'font-family': inherit),
+        'h6': ('size': 18px,
+            'weight': 600,
+            'line-height': 1.2rem,
+            'font-family': inherit),
+        'subtitle-1': ('size': 18px,
+            'weight': 400,
+            'line-height': 28px,
+            'letter-spacing': 0,
+            'font-family': inherit),
+        'subtitle-2': ('size': 16px,
+            'line-height': 24px,
+            'letter-spacing': 0,
+            'font-family': inherit),
+        'body-1': ('size': 1.125rem,
+            /*18px*/
+            'weight': 400,
+            'line-height': 1.75rem,
+            'letter-spacing': 0,
+            'font-family': inherit),
+        'body-2': ('size': 1.063rem,
+            /*17px*/
+            'weight': 400,
+            'letter-spacing': 0,
+            'font-family': inherit),
+
+        'caption': ('size': 1.75rem,
+            /*28 px*/
+            'weight': 400,
+            'letter-spacing': 0,
+            'line-height':inherit,
+            'font-family': inherit),
+        'overline': ('size': 0.75rem,
+            'weight': 500,
+            'font-family': inherit,
+            'letter-spacing': 0,
+            'text-transform': uppercase)) !default,
+
+    $utilities: ("max-width": (property: max-width,
+            responsive: true,
+            class: mw,
+            values: (auto: auto,
+                430: 430px,
+                460: 460px,
+                512:512px,
+                575:575px,
+                670:670px,
+            )),
+        "height": (property: height,
+            responsive: true,
+            class: h,
+            values: (auto: auto,
+                65:65px,
+            )),
+        "min-height": (property: height,
+            responsive: true,
+            class: min-h,
+            values: (auto: auto,
+                100:100vh,
+
+            )),
+        "z-index": (property: z-index,
+            responsive: true,
+            class:z,
+            values: (auto: auto,
+                1:1,
+                5:5,
+                10:10,
+                999:999,
+
+            )),
+        "padding-top": (property: padding-top,
+            responsive: true,
+            class:pt,
+            values: (auto: auto,
+                160:160px,
+                100:100px,
+                95:95px,
+                50:50px,
+
+            )),
+
+        "font-size": (property: font-size,
+            responsive: true,
+            class:text,
+            values: (auto: auto,
+                60:60px,
+            )),
+
+
+    ),
+
+    // 👉 Rounded
+    $rounded: (0: 0,
+        'sm': $border-radius-root * 0.5,
+        null: $border-radius-root,
+        'md': $border-radius-root * 1,
+        'lg': $border-radius-root * 2,
+        'xl': $border-radius-root * 6,
+        'shaped': 25px,
+        'shaped-large':32px,
+        'pill': 9999px,
+        'circle': 50%),
+
+
+);

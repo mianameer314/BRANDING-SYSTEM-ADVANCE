@@ -1,0 +1,4 @@
+<template>
+    <InsightsInsightsGridBlogBanner/>
+    <InsightsInsightsGrid/>
+</template>
