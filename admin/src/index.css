@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --radius: 0.5rem;
+}
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+
+  :root {
+    --background: #F4F8FA;
+    --foreground: #1f2a2e;
+    --card: #ffffff;
+    --card-foreground: #1f2a2e;
+    --popover: #ffffff;
+    --popover-foreground: #1f2a2e;
+    --primary: #C1FF72;
+    --primary-foreground: #1f2a2e;
+    --secondary: #1f2a2e;
+    --secondary-foreground: #ffffff;
+    --muted: #E0E0E0;
+    --muted-foreground: #1f2a2eb3;
+    --accent: #ffffff;
+    --accent-foreground: #1f2a2e;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --success: #10b981;
+    --success-foreground: #ffffff;
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+    --info: #3b82f6;
+    --info-foreground: #ffffff;
+    --border: #e0e6eb;
+    --input: #e0e6eb;
+    --ring: #C1FF72;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .interactive-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--primary);
+    border-radius: 9999px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+    width: fit-content;
+    padding: 15px 58px 15px 30px;
+    border: 1px solid transparent;
+  }
+
+  .interactive-button:hover {
+    background-color: var(--secondary);
+    border: 1px solid white;
+  }
+
+  .interactive-button .label {
+    position: relative;
+    z-index: 1;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--secondary);
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+    padding-inline-end: 15px;
+  }
+
+  .interactive-button:hover .label {
+    transform: translateX(10px);
+    color: var(--card);
+  }
+
+  .interactive-button-small {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--primary);
+    border-radius: 9999px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+    width: fit-content;
+    padding: 10px 40px 10px 20px;
+    border: 1px solid transparent;
+  }
+
+  .interactive-button-small:hover {
+    background-color: var(--secondary);
+    border: 1px solid white;
+  }
+
+  .interactive-button-small .label {
+    position: relative;
+    z-index: 1;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-foreground);
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+
+  .interactive-button-small:hover .label {
+    transform: translateX(5px);
+    color: var(--card);
+  }
+
+  .interactive-button .icon {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translate(-115%, -50%);
+    z-index: 0;
+    transition: transform 0.4s ease, left 0.4s ease;
+    color: white;
+  }
+
+  .interactive-button:hover .icon {
+    left: 0;
+    transform: translate(15%, -50%) rotate(45deg);
+  }
+
+  .interactive-button-small {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--primary);
+    border-radius: 9999px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+    width: fit-content;
+    padding: 8px 15px 8px 20px;
+    border: 1px solid transparent;
+  }
+
+  .interactive-button-small:hover {
+    background-color: var(--secondary);
+    border: 1px solid white;
+  }
+
+  .interactive-button-small .label {
+    position: relative;
+    z-index: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--secondary);
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+    padding-inline-start: 30px;
+  }
+
+  .interactive-button-small:hover .label {
+    color: white;
+    transform: translateX(-30px);
+  }
+
+  .interactive-button-small .icon {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translate(0%, -50%);
+    z-index: 0;
+    transition: left 0.4s ease, transform 0.4s ease;
+    color: white;
+  }
+
+  .interactive-button-small:hover .icon {
+    left: calc(100% - 35px);
+    transform: translate(0%, -50%) rotate(45deg);
+  }
+
+  /* O2Geeks 3D Animations & Cards */
+  .o2-card {
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+  }
+  .o2-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  .o2-card-3d {
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+  }
+  .o2-card-3d:hover {
+    transform: translateY(-5px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(192, 242, 0, 0.15), 0 12px 28px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-secondary {
+    padding: 15px 20px;
+    background-color: var(--secondary);
+    height: auto !important;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+  }
+
+  .btn-secondary:hover {
+    background-color: transparent;
+    border: 1px solid var(--secondary);
+    color: var(--secondary);
+  }
+}
+
+@layer utilities {
+  .animate-page-transition {
+    animation: pageTransition 0.3s ease-out forwards;
+  }
+}
+
+@keyframes pageTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
