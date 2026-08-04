@@ -7,11 +7,14 @@ from sqlalchemy.orm import Session
 from app.models.resource import Resource
 from app.schemas.resource import ResourceCreate, ResourceUpdate
 from app.services.content_validator import validate_content_exists
+from app.services.revision_history import record_audit_event
 
 
 def create_resource(
     db: Session,
     data: ResourceCreate,
+    *,
+    actor_id: int | None = None,
 ) -> Resource:
     """
     Create a downloadable resource.
@@ -30,6 +33,11 @@ def create_resource(
     resource = Resource(**data.model_dump())
 
     db.add(resource)
+    db.flush()
+    record_audit_event(
+        db, event_type="media.created", subject_type="resource", subject_id=resource.id,
+        actor_id=actor_id, details={"content_type": data.content_type, "content_id": data.content_id, "file_name": data.file_name},
+    )
     db.commit()
     db.refresh(resource)
 
@@ -55,6 +63,8 @@ def update_resource(
     db: Session,
     resource_id: int,
     data: ResourceUpdate,
+    *,
+    actor_id: int | None = None,
 ) -> Resource | None:
     """
     Update a resource.
@@ -87,6 +97,10 @@ def update_resource(
     for field, value in update_data.items():
         setattr(resource, field, value)
 
+    record_audit_event(
+        db, event_type="media.updated", subject_type="resource", subject_id=resource.id,
+        actor_id=actor_id, details={"changed_fields": sorted(update_data)},
+    )
     db.commit()
     db.refresh(resource)
 
@@ -96,6 +110,8 @@ def update_resource(
 def delete_resource(
     db: Session,
     resource_id: int,
+    *,
+    actor_id: int | None = None,
 ) -> bool:
     """
     Delete a resource.
@@ -106,6 +122,10 @@ def delete_resource(
     if resource is None:
         return False
 
+    record_audit_event(
+        db, event_type="media.deleted", subject_type="resource", subject_id=resource.id,
+        actor_id=actor_id, details={"content_type": resource.content_type, "content_id": resource.content_id, "file_name": resource.file_name},
+    )
     db.delete(resource)
     db.commit()
 
@@ -144,6 +164,7 @@ def create_resource_from_upload(
     content_id: int,
     file_url: str,
     file_name: str,
+    actor_id: int | None = None,
 ) -> Resource:
     """
     Create a resource from a file upload.
@@ -164,6 +185,11 @@ def create_resource_from_upload(
     )
 
     db.add(resource)
+    db.flush()
+    record_audit_event(
+        db, event_type="media.created", subject_type="resource", subject_id=resource.id,
+        actor_id=actor_id, details={"content_type": content_type, "content_id": content_id, "file_name": file_name},
+    )
     db.commit()
     db.refresh(resource)
 
@@ -176,6 +202,7 @@ def update_resource_file(
     *,
     file_url: str,
     file_name: str,
+    actor_id: int | None = None,
 ) -> Resource | None:
     """
     Update only the file_url and file_name of a resource.
@@ -190,6 +217,10 @@ def update_resource_file(
     resource.file_url = file_url
     resource.file_name = file_name
 
+    record_audit_event(
+        db, event_type="media.replaced", subject_type="resource", subject_id=resource.id,
+        actor_id=actor_id, details={"file_name": file_name},
+    )
     db.commit()
     db.refresh(resource)
 

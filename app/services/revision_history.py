@@ -1,0 +1,220 @@
+"""Shared transactional revision-history and audit-event helpers."""
+from datetime import date, datetime
+from typing import Any
+
+from fastapi import HTTPException, status
+from sqlalchemy import DateTime, func
+from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import Session
+
+from app.models.audit_event import AuditEvent
+from app.models.blog import Blog
+from app.models.case_study import CaseStudy
+from app.models.content_revision import ContentRevision
+from app.models.insight import Insight
+from app.models.news import News
+from app.models.project import Project
+from app.services.content_lifecycle import apply_content_status_metadata
+
+
+CONTENT_MODELS = {
+    "blog": Blog,
+    "news": News,
+    "project": Project,
+    "insight": Insight,
+    "case_study": CaseStudy,
+}
+
+MODEL_CONTENT_TYPES = {model: content_type for content_type, model in CONTENT_MODELS.items()}
+
+
+def _json_value(value: Any) -> Any:
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    return value
+
+
+def content_snapshot(content) -> dict[str, Any]:
+    """Return a JSON-safe snapshot of persisted model columns only."""
+    return {
+        column.key: _json_value(getattr(content, column.key))
+        for column in inspect(content).mapper.columns
+    }
+
+
+def content_type_for(content) -> str:
+    try:
+        return MODEL_CONTENT_TYPES[type(content)]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported revision content model: {type(content)!r}") from exc
+
+
+def get_content_model(content_type: str):
+    model = CONTENT_MODELS.get(content_type)
+    if model is None:
+        allowed = ", ".join(CONTENT_MODELS)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported content_type '{content_type}'. Allowed: {allowed}.",
+        )
+    return model
+
+
+def record_audit_event(
+    db: Session,
+    *,
+    event_type: str,
+    subject_type: str,
+    subject_id: int | None,
+    actor_id: int | None,
+    details: dict | None = None,
+) -> AuditEvent:
+    """Stage an append-only audit event in the caller's current transaction."""
+    event = AuditEvent(
+        event_type=event_type,
+        subject_type=subject_type,
+        subject_id=subject_id,
+        actor_id=actor_id,
+        details=details,
+    )
+    db.add(event)
+    return event
+
+
+def record_content_revision(
+    db: Session,
+    content,
+    *,
+    action: str,
+    actor_id: int | None,
+    changed_fields: list[str] | None = None,
+    status_reason: str | None = None,
+    restored_from_revision_id: int | None = None,
+) -> ContentRevision:
+    """Stage the next immutable version and its audit event in one transaction."""
+    db.flush()
+    content_type = content_type_for(content)
+    next_version = (
+        db.query(func.coalesce(func.max(ContentRevision.version), 0))
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content.id,
+        )
+        .scalar()
+        + 1
+    )
+    revision = ContentRevision(
+        content_type=content_type,
+        content_id=content.id,
+        version=next_version,
+        action=action,
+        snapshot=content_snapshot(content),
+        changed_fields=sorted(changed_fields) if changed_fields else None,
+        actor_id=actor_id,
+        status_reason=status_reason,
+        restored_from_revision_id=restored_from_revision_id,
+    )
+    db.add(revision)
+    record_audit_event(
+        db,
+        event_type=f"content.{action}",
+        subject_type=content_type,
+        subject_id=content.id,
+        actor_id=actor_id,
+        details={"version": next_version, "changed_fields": revision.changed_fields},
+    )
+    return revision
+
+
+def ensure_content_baseline(db: Session, content, *, actor_id: int | None = None) -> ContentRevision | None:
+    """Snapshot legacy content before its first Day 3 mutation."""
+    db.flush()
+    content_type = content_type_for(content)
+    exists = (
+        db.query(ContentRevision.id)
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content.id,
+        )
+        .first()
+    )
+    if exists is None:
+        return record_content_revision(db, content, action="baseline", actor_id=actor_id)
+    return None
+
+
+def list_content_revisions(
+    db: Session, content_type: str, content_id: int, *, page: int = 1, per_page: int = 20
+) -> dict:
+    model = get_content_model(content_type)
+    if db.query(model.id).filter(model.id == content_id).first() is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
+    query = (
+        db.query(ContentRevision)
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content_id,
+        )
+        .order_by(ContentRevision.version.desc())
+    )
+    total = query.count()
+    return {
+        "items": query.offset((page - 1) * per_page).limit(per_page).all(),
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+def restore_content_revision(
+    db: Session,
+    *,
+    content_type: str,
+    content_id: int,
+    version: int,
+    actor_id: int,
+    reason: str | None = None,
+):
+    """Restore a prior snapshot and record the restore as a new immutable revision."""
+    model = get_content_model(content_type)
+    content = db.query(model).filter(model.id == content_id).first()
+    if content is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
+
+    revision = (
+        db.query(ContentRevision)
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content_id,
+            ContentRevision.version == version,
+        )
+        .first()
+    )
+    if revision is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Revision not found")
+
+    protected = {"id", "created_at", "updated_at", "status_changed_at", "status_changed_by_id", "status_change_reason"}
+    for field, value in revision.snapshot.items():
+        if field not in protected:
+            column = model.__table__.columns.get(field)
+            if value is not None and column is not None and isinstance(column.type, DateTime):
+                value = datetime.fromisoformat(value)
+            setattr(content, field, value)
+
+    apply_content_status_metadata(
+        content,
+        actor_id=actor_id,
+        reason=reason or f"Restored revision {version}",
+    )
+    record_content_revision(
+        db,
+        content,
+        action="restored",
+        actor_id=actor_id,
+        changed_fields=[field for field in revision.snapshot if field not in protected],
+        status_reason=content.status_change_reason,
+        restored_from_revision_id=revision.id,
+    )
+    db.commit()
+    db.refresh(content)
+    return content

@@ -95,9 +95,9 @@ Successfully implemented and hardened GitHub Actions pipelines for both the fron
 
 ## Day 3 — Revision History, Transactions & Audit Trail
 
-**Status:** Not started
+**Status:** Implementation complete; final full-suite verification pending.
 
-To be updated after revision/audit schemas, transactional operations, and rollback tests are complete.
+Added shared immutable `content_revisions` and append-only `audit_events` tables, transactional revision capture for all five content types, safe restore endpoints, operational audit events for media/user-role/webhook actions, revision-history dashboard panels, migration, and rollback tests. Existing content receives a baseline snapshot before its first Day 3 edit, preserving the pre-edit version. See [Day 3 model](../docs/baseline/day3_revision_audit_model.md), [revision/audit flow diagram](../docs/baseline/day3_revision_audit_diagram.svg), and [lifecycle transition diagram](../docs/baseline/day2_lifecycle_transition_diagram.svg).
 
 ---
 

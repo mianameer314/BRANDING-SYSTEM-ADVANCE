@@ -8,6 +8,7 @@ from app.core.permissions import UserRole
 from app.core.security import hash_password
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRegister, UserUpdate
+from app.services.revision_history import record_audit_event
 
 
 # ---------------------------------------------------------
@@ -46,6 +47,11 @@ def register_user(db: Session, data: UserRegister) -> User:
     )
 
     db.add(user)
+    db.flush()
+    record_audit_event(
+        db, event_type="user.registered", subject_type="user", subject_id=user.id,
+        actor_id=None, details={"email": user.email},
+    )
     db.commit()
     db.refresh(user)
 
@@ -87,6 +93,11 @@ def create_user(
     )
 
     db.add(user)
+    db.flush()
+    record_audit_event(
+        db, event_type="user.created", subject_type="user", subject_id=user.id,
+        actor_id=current_user.id, details={"email": user.email, "role": user.role},
+    )
     db.commit()
     db.refresh(user)
 
@@ -166,6 +177,11 @@ def update_user(
     for field, value in update_data.items():
         setattr(target_user, field, value)
 
+    record_audit_event(
+        db, event_type="permission.role_changed" if "role" in update_data else "user.updated",
+        subject_type="user", subject_id=target_user.id,
+        actor_id=current_user.id, details={"changed_fields": sorted(update_data)},
+    )
     db.commit()
     db.refresh(target_user)
 

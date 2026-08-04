@@ -23,7 +23,7 @@ export function LifecycleDetails({ audit }: LifecycleDetailsProps) {
    : 'Not recorded yet';
 
  return (
- <section className="border-t border-border pt-5 text-sm">
+ <section className="mt-6 rounded-xl border border-border bg-white p-5 text-sm shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
  <h2 className="font-medium text-foreground">Lifecycle details</h2>
  <dl className="mt-3 space-y-2 text-muted-foreground">
  <div><dt className="inline font-medium text-foreground">Last changed:</dt> <dd className="inline">{formatDate(audit.status_changed_at)}</dd></div>

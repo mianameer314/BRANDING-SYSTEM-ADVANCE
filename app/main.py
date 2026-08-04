@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.v1 import auth, blogs, case_studies, insights, news, projects, users, interactions, resources, preview, ai, webhooks
+from app.api.v1 import ai, audit, auth, blogs, case_studies, insights, interactions, news, preview, projects, resources, users, webhooks
 from app.core.config import settings
 
 from sqlalchemy import text
@@ -71,6 +71,10 @@ tags_metadata = [
     {
         "name": "Webhooks",
         "description": "Manage outbound webhooks for publish events.",
+    },
+    {
+        "name": "Audit & Revisions",
+        "description": "Immutable content revisions and operational audit events.",
     },
     {
         "name": "System",
@@ -165,6 +169,7 @@ app.include_router(resources.router, prefix=API_V1_PREFIX, responses=COMMON_RESP
 app.include_router(preview.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 app.include_router(ai.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 app.include_router(webhooks.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
+app.include_router(audit.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 
 @app.get("/", tags=["System"])
 def root():

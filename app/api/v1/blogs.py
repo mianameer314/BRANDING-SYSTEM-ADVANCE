@@ -320,7 +320,7 @@ def delete_blog(
         storage.delete_file(res.file_url)
         resource_service.delete_resource(db, res.id)
 
-    success = blog_service.delete_blog(db, blog_id)
+    success = blog_service.delete_blog(db, blog_id, actor_id=admin.id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

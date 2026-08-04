@@ -39,7 +39,7 @@ def create_webhook(
     admin: AdminDep
 ):
     """Register a new webhook."""
-    return webhook_service.create_webhook(db, data)
+    return webhook_service.create_webhook(db, data, actor_id=admin.id)
 
 
 @router.get("", response_model=PaginatedResponse[WebhookOut])
@@ -75,7 +75,7 @@ def update_webhook(
     admin: AdminDep
 ):
     """Update a webhook."""
-    webhook = webhook_service.update_webhook(db, webhook_id, data)
+    webhook = webhook_service.update_webhook(db, webhook_id, data, actor_id=admin.id)
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
     return webhook
@@ -88,7 +88,7 @@ def delete_webhook(
     admin: AdminDep
 ):
     """Delete a webhook."""
-    success = webhook_service.delete_webhook(db, webhook_id)
+    success = webhook_service.delete_webhook(db, webhook_id, actor_id=admin.id)
     if not success:
         raise HTTPException(status_code=404, detail="Webhook not found")
 

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950" role="img" aria-labelledby="title desc">
+  <title id="title">Day 3 Revision History and Audit Flow</title>
+  <desc id="desc">An editor change is validated, saved with an immutable revision and audit event in one database transaction. A restore uses an older revision and creates a new restore revision without deleting history.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1"><stop stop-color="#102a43"/><stop offset="1" stop-color="#1d4e89"/></linearGradient>
+    <linearGradient id="service" x1="0" x2="1"><stop stop-color="#146c94"/><stop offset="1" stop-color="#0b4f6c"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#102a43" flood-opacity=".16"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10z" fill="#58708a"/></marker>
+    <style>.title{font:700 35px Arial;fill:#fff}.subtitle{font:400 17px Arial;fill:#d9e6f2}.section{font:700 18px Arial;fill:#102a43;letter-spacing:1px}.node{font:700 21px Arial;fill:#102a43}.body{font:400 16px Arial;fill:#486581}.white{font:700 23px Arial;fill:#fff}.whitebody{font:400 16px Arial;fill:#d7eef9}.label{font:600 14px Arial;fill:#334e68}.small{font:400 14px Arial;fill:#627d98}</style>
+  </defs>
+  <rect width="1600" height="950" fill="#f5f8fc"/>
+  <rect width="1600" height="115" fill="url(#header)"/>
+  <text x="70" y="52" class="title">Day 3 — Revision History &amp; Audit Trail</text>
+  <text x="70" y="83" class="subtitle">Every change is recoverable, attributable, and stored with its audit evidence.</text>
+
+  <text x="70" y="165" class="section">NORMAL EDIT OR STATUS CHANGE</text>
+  <g filter="url(#shadow)"><rect x="70" y="210" width="270" height="145" rx="18" fill="#fff" stroke="#bed2e5" stroke-width="2"/><text x="105" y="260" class="node">Admin Dashboard</text><text x="105" y="292" class="body">Editor changes title, media,</text><text x="105" y="317" class="body">or lifecycle status + reason</text></g>
+  <g filter="url(#shadow)"><rect x="490" y="185" width="350" height="195" rx="22" fill="url(#service)"/><text x="665" y="245" text-anchor="middle" class="white">FastAPI Service</text><text x="665" y="282" text-anchor="middle" class="whitebody">RBAC + lifecycle validation</text><text x="665" y="312" text-anchor="middle" class="whitebody">revision + audit orchestration</text><text x="665" y="342" text-anchor="middle" class="whitebody">one commit boundary</text></g>
+  <path d="M340 282 H485" fill="none" stroke="#58708a" stroke-width="3" marker-end="url(#arrow)"/><text x="410" y="262" text-anchor="middle" class="label">validated request</text>
+  <g filter="url(#shadow)"><rect x="1010" y="160" width="510" height="250" rx="18" fill="#fff" stroke="#bed2e5" stroke-width="2"/><text x="1045" y="210" class="node">PostgreSQL — One Transaction</text><rect x="1040" y="235" width="210" height="125" rx="12" fill="#e6f7f1" stroke="#8bd7bf"/><text x="1060" y="275" class="label">1. Content row</text><text x="1060" y="305" class="small">current saved content</text><text x="1060" y="330" class="small">Blog / News / Project / etc.</text><rect x="1280" y="235" width="210" height="125" rx="12" fill="#edf4ff" stroke="#9cbfe8"/><text x="1300" y="275" class="label">2. Evidence rows</text><text x="1300" y="305" class="small">immutable revision snapshot</text><text x="1300" y="330" class="small">append-only audit event</text></g>
+  <path d="M840 282 H1005" fill="none" stroke="#58708a" stroke-width="3" marker-end="url(#arrow)"/><text x="922" y="262" text-anchor="middle" class="label">commit all or roll back all</text>
+  <text x="1010" y="442" class="small">If any insert fails, PostgreSQL rolls back the content edit, revision, and audit event together.</text>
+
+  <line x1="70" y1="495" x2="1530" y2="495" stroke="#bed2e5" stroke-width="2"/>
+  <text x="70" y="550" class="section">RESTORE A PRIOR VERSION — HISTORY IS NEVER DELETED</text>
+  <g filter="url(#shadow)"><rect x="70" y="595" width="320" height="165" rx="18" fill="#fff" stroke="#bed2e5" stroke-width="2"/><text x="105" y="643" class="node">Revision History Panel</text><text x="105" y="675" class="body">Version 1: original copy</text><text x="105" y="700" class="body">Version 2: current changed copy</text><text x="105" y="725" class="body">Admin chooses Version 1</text></g>
+  <path d="M390 677 H530" fill="none" stroke="#58708a" stroke-width="3" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)"><rect x="535" y="595" width="350" height="165" rx="18" fill="#fff7e6" stroke="#f1c46b" stroke-width="2"/><text x="570" y="643" class="node">Controlled Restore</text><text x="570" y="675" class="body">Publish permission required</text><text x="570" y="700" class="body">Snapshot is copied back to content</text><text x="570" y="725" class="body">Restore reason is recorded</text></g>
+  <path d="M885 677 H1025" fill="none" stroke="#58708a" stroke-width="3" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)"><rect x="1030" y="570" width="490" height="215" rx="18" fill="#fff" stroke="#bed2e5" stroke-width="2"/><text x="1065" y="620" class="node">New Version 3 — Restored</text><text x="1065" y="654" class="body">Content now matches Version 1</text><text x="1065" y="684" class="body">Versions 1 and 2 still remain intact</text><text x="1065" y="714" class="body">Audit identifies who restored it and why</text><text x="1065" y="750" class="label">Result: recover safely without losing the change trail</text></g>
+  <text x="70" y="865" class="small">Coverage: content revisions, content lifecycle changes, media resource actions, user/role actions, webhook configuration, and webhook delivery outcomes.</text>
+</svg>

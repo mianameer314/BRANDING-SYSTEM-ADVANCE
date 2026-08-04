@@ -14,6 +14,8 @@ from app.models.comment import Comment
 from app.models.resource import Resource
 from app.models.webhook import Webhook
 from app.models.webhook_log import WebhookLog
+from app.models.content_revision import ContentRevision
+from app.models.audit_event import AuditEvent
 
 __all__ = [
     "User",
@@ -28,4 +30,6 @@ __all__ = [
     "Resource",
     "Webhook",
     "WebhookLog",
+    "ContentRevision",
+    "AuditEvent",
 ]

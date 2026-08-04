@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.models.webhook import Webhook
 from app.models.webhook_log import WebhookLog
 from app.db.session import SessionLocal
+from app.services.revision_history import record_audit_event
 
 logger = logging.getLogger(__name__)
 
@@ -100,5 +101,13 @@ async def dispatch_publish_event(
                     log_entry.error_message = str(e)
                 
                 db.add(log_entry)
+                record_audit_event(
+                    db,
+                    event_type="integration.webhook_delivered" if log_entry.success else "integration.webhook_failed",
+                    subject_type="webhook",
+                    subject_id=hook.id,
+                    actor_id=None,
+                    details={"content_type": content_type, "content_id": content_id, "status_code": log_entry.response_status},
+                )
         
         db.commit()

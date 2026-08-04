@@ -17,6 +17,7 @@ import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormRichText } from '@/components/form/FormRichText';
 import { StatusSelect } from '@/components/form/StatusSelect';
 import { LifecycleDetails } from '@/components/form/LifecycleDetails';
+import { RevisionHistory } from '@/components/form/RevisionHistory';
 import { TechInput } from '@/components/form/TechInput';
 import { ImageUploadField } from '@/components/form/ImageUploadField';
 import { FormActions } from '@/components/form/FormActions';
@@ -238,6 +239,7 @@ export default function ProjectFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
+                {isEdit && existing && <RevisionHistory contentType="project" contentId={existing.id} />}
                 <FormField label="Category" placeholder="e.g. Web Development" error={errors.category} {...register('category')} />
                 <TechInput error={errors.technologies} {...register('technologies')} />
                 <FormField label="Project URL" type="url" placeholder="https://..." error={errors.project_url} {...register('project_url')} />

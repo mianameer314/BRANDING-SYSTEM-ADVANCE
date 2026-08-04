@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.api.deps import DbDep
 from app.core.permissions import require_permission
 from app.models.user import User
+from app.services.revision_history import record_audit_event
 from app.schemas.common import PaginatedResponse
 from app.schemas.user import UserCreate, UserOut, UserUpdate
 from app.services import user as user_service
@@ -149,6 +150,11 @@ def deactivate_user(
         )
 
     user.is_active = False
+
+    record_audit_event(
+        db, event_type="user.deactivated", subject_type="user", subject_id=user.id,
+        actor_id=current_user.id, details=None,
+    )
 
     db.commit()
 

@@ -17,6 +17,7 @@ import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormRichText } from '@/components/form/FormRichText';
 import { StatusSelect } from '@/components/form/StatusSelect';
 import { LifecycleDetails } from '@/components/form/LifecycleDetails';
+import { RevisionHistory } from '@/components/form/RevisionHistory';
 import { TechInput } from '@/components/form/TechInput';
 import { ImageUploadField } from '@/components/form/ImageUploadField';
 import { FormActions } from '@/components/form/FormActions';
@@ -275,6 +276,7 @@ export default function CaseStudyFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
+                {isEdit && existing && <RevisionHistory contentType="case_study" contentId={existing.id} />}
                 <TechInput error={errors.technologies} {...register('technologies')} />
                 <div className="flex items-center gap-3">
                   <input id="is_featured" type="checkbox" className="h-4 w-4 rounded border-border bg-input text-primary focus:ring-primary" {...register('is_featured')} />

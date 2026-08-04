@@ -373,7 +373,7 @@ def delete_case_study(case_study_id: int, db: DbDep, admin: DeleteDep):
         storage.delete_file(res.file_url)
         resource_service.delete_resource(db, res.id)
 
-    success = case_study_service.delete_case_study(db, case_study_id)
+    success = case_study_service.delete_case_study(db, case_study_id, actor_id=admin.id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

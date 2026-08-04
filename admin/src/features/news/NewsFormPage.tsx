@@ -17,6 +17,7 @@ import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormRichText } from '@/components/form/FormRichText';
 import { StatusSelect } from '@/components/form/StatusSelect';
 import { LifecycleDetails } from '@/components/form/LifecycleDetails';
+import { RevisionHistory } from '@/components/form/RevisionHistory';
 import { ImageUploadField } from '@/components/form/ImageUploadField';
 import { FormActions } from '@/components/form/FormActions';
 import { ResourceAttachments } from '@/components/form/ResourceAttachments';
@@ -221,6 +222,7 @@ export default function NewsFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
+                {isEdit && existing && <RevisionHistory contentType="news" contentId={existing.id} />}
                 <div className="flex items-center gap-3">
                   <input id="is_featured" type="checkbox" className="h-4 w-4 rounded border-border bg-input text-primary focus:ring-primary" {...register('is_featured')} />
                   <label htmlFor="is_featured" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">Featured News</label>

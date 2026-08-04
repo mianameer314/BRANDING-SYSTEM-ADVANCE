@@ -12,6 +12,7 @@ from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.utils.slug import ensure_unique_slug, generate_slug
 from app.services.interactions_helper import apply_interaction_annotations, format_interaction_results
 from app.services.content_lifecycle import apply_content_status_metadata, apply_content_status_transition, validate_initial_status
+from app.services.revision_history import ensure_content_baseline, record_content_revision
 
 
 def list_projects(
@@ -111,6 +112,10 @@ def create_project(db: Session, data: ProjectCreate, *, status_actor_id: int | N
     apply_content_status_metadata(project, actor_id=status_actor_id, reason=status_reason)
 
     db.add(project)
+    record_content_revision(
+        db, project, action="created", actor_id=status_actor_id,
+        changed_fields=["*"], status_reason=status_reason,
+    )
     db.commit()
     db.refresh(project)
     
@@ -126,7 +131,10 @@ def update_project(db: Session, project_id: int, data: ProjectUpdate, *, status_
     if project is None:
         return None
 
+    ensure_content_baseline(db, project, actor_id=status_actor_id)
+
     update_data = data.model_dump(exclude_unset=True)
+    revision_action = "updated"
 
     if "name" in update_data and update_data["name"] != project.name:
         new_slug = generate_slug(update_data["name"])
@@ -138,19 +146,31 @@ def update_project(db: Session, project_id: int, data: ProjectUpdate, *, status_
         update_data["status"] = apply_content_status_transition(project, update_data["status"])
         if update_data["status"] != previous_status:
             apply_content_status_metadata(project, actor_id=status_actor_id, reason=status_reason)
+            revision_action = "status_changed"
+
+    changed_fields = []
+    if "name" in update_data and update_data["name"] != project.name:
+        changed_fields.append("slug")
 
     for field, value in update_data.items():
-        setattr(project, field, value)
-
+        if getattr(project, field) != value:
+            changed_fields.append(field)
+            setattr(project, field, value)
+    record_content_revision(
+        db, project, action=revision_action, actor_id=status_actor_id,
+        changed_fields=changed_fields, status_reason=status_reason if revision_action == "status_changed" else None,
+    )
     db.commit()
     return get_project_by_id(db, project_id, include_drafts=True)
 
 
-def delete_project(db: Session, project_id: int) -> bool:
+def delete_project(db: Session, project_id: int, *, actor_id: int | None = None) -> bool:
     """Delete a project by ID. Returns True if found and deleted."""
     project = db.query(Project).filter(Project.id == project_id).first()
     if project is None:
         return False
+    ensure_content_baseline(db, project, actor_id=actor_id)
+    record_content_revision(db, project, action="deleted", actor_id=actor_id, changed_fields=["*"])
     db.delete(project)
     db.commit()
     return True

@@ -270,7 +270,7 @@ def delete_insight(insight_id: int, db: DbDep, admin: DeleteDep):
         storage.delete_file(res.file_url)
         resource_service.delete_resource(db, res.id)
 
-    success = insight_service.delete_insight(db, insight_id)
+    success = insight_service.delete_insight(db, insight_id, actor_id=admin.id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -8,9 +8,10 @@ from app.models.webhook import Webhook
 from app.models.webhook_log import WebhookLog
 from app.schemas.webhook import WebhookCreate, WebhookUpdate
 from app.schemas.common import PaginatedResponse
+from app.services.revision_history import record_audit_event
 
 
-def create_webhook(db: Session, data: WebhookCreate) -> Webhook:
+def create_webhook(db: Session, data: WebhookCreate, *, actor_id: int | None = None) -> Webhook:
     # Auto-generate a secure random secret for HMAC signing
     new_secret = secrets.token_hex(32)
     
@@ -22,6 +23,11 @@ def create_webhook(db: Session, data: WebhookCreate) -> Webhook:
         secret=new_secret
     )
     db.add(webhook)
+    db.flush()
+    record_audit_event(
+        db, event_type="integration.webhook_created", subject_type="webhook", subject_id=webhook.id,
+        actor_id=actor_id, details={"event": webhook.event, "content_types": webhook.content_types},
+    )
     db.commit()
     db.refresh(webhook)
     return webhook
@@ -54,7 +60,7 @@ def list_webhooks(
     )
 
 
-def update_webhook(db: Session, webhook_id: int, data: WebhookUpdate) -> Webhook | None:
+def update_webhook(db: Session, webhook_id: int, data: WebhookUpdate, *, actor_id: int | None = None) -> Webhook | None:
     webhook = get_webhook(db, webhook_id)
     if not webhook:
         return None
@@ -67,17 +73,25 @@ def update_webhook(db: Session, webhook_id: int, data: WebhookUpdate) -> Webhook
         
     for field, value in update_data.items():
         setattr(webhook, field, value)
-        
+
+    record_audit_event(
+        db, event_type="integration.webhook_updated", subject_type="webhook", subject_id=webhook.id,
+        actor_id=actor_id, details={"changed_fields": sorted(update_data)},
+    )
     db.commit()
     db.refresh(webhook)
     return webhook
 
 
-def delete_webhook(db: Session, webhook_id: int) -> bool:
+def delete_webhook(db: Session, webhook_id: int, *, actor_id: int | None = None) -> bool:
     webhook = get_webhook(db, webhook_id)
     if not webhook:
         return False
         
+    record_audit_event(
+        db, event_type="integration.webhook_deleted", subject_type="webhook", subject_id=webhook.id,
+        actor_id=actor_id, details={"event": webhook.event},
+    )
     db.delete(webhook)
     db.commit()
     return True

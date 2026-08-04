@@ -17,6 +17,7 @@ import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormRichText } from '@/components/form/FormRichText';
 import { StatusSelect } from '@/components/form/StatusSelect';
 import { LifecycleDetails } from '@/components/form/LifecycleDetails';
+import { RevisionHistory } from '@/components/form/RevisionHistory';
 import { TagsInput } from '@/components/form/TagsInput';
 import { ImageUploadField } from '@/components/form/ImageUploadField';
 import { FormActions } from '@/components/form/FormActions';
@@ -230,6 +231,7 @@ export default function BlogFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
+                {isEdit && existing && <RevisionHistory contentType="blog" contentId={existing.id} />}
                 <FormField label="Category" placeholder="e.g. Technology" error={errors.category} {...register('category')} />
                 <TagsInput error={errors.tags} {...register('tags')} />
                 <ImageUploadField label="Cover Image" currentImageUrl={isEdit ? existing?.cover_image : null} onFileChange={setCoverImageFile} onRemoveChange={setRemoveCoverImage} />

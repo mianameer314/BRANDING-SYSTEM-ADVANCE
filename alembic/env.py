@@ -24,7 +24,7 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 # ── Import all models so Base.metadata sees every table ───────
 from app.db.session import Base
-from app.models import Blog, CaseStudy, Insight, News, Project, User 
+from app.models import AuditEvent, Blog, CaseStudy, ContentRevision, Insight, News, Project, User
 
 target_metadata = Base.metadata
 

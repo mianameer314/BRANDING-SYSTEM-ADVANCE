@@ -48,6 +48,7 @@ def create_resource(
             content_id=content_id,
             file_url=file_url,
             file_name=file_name,
+            actor_id=admin.id,
         )
 
         storage.clear_pending()
@@ -107,7 +108,7 @@ def update_resource(
         new_url, new_name = storage.replace_file(existing.file_url, file, "resources")
 
         resource = resource_service.update_resource_file(
-            db, resource_id, file_url=new_url, file_name=new_name
+            db, resource_id, file_url=new_url, file_name=new_name, actor_id=admin.id
         )
 
         storage.clear_pending()
@@ -136,7 +137,7 @@ def delete_resource(resource_id: int, db: DbDep, admin: AdminDep):
         raise HTTPException(status_code=404, detail="Resource not found")
 
     old_url = resource.file_url
-    deleted = resource_service.delete_resource(db, resource_id)
+    deleted = resource_service.delete_resource(db, resource_id, actor_id=admin.id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Resource not found")
 

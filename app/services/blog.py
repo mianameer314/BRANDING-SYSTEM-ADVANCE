@@ -12,6 +12,7 @@ from app.schemas.blog import BlogCreate, BlogUpdate
 from app.utils.slug import ensure_unique_slug, generate_slug
 from app.services.interactions_helper import apply_interaction_annotations, format_interaction_results
 from app.services.content_lifecycle import apply_content_status_metadata, apply_content_status_transition, validate_initial_status
+from app.services.revision_history import ensure_content_baseline, record_content_revision
 
 
 def list_blogs(
@@ -126,6 +127,10 @@ def create_blog(db: Session, data: BlogCreate, *, status_actor_id: int | None = 
     apply_content_status_metadata(blog, actor_id=status_actor_id, reason=status_reason)
 
     db.add(blog)
+    record_content_revision(
+        db, blog, action="created", actor_id=status_actor_id,
+        changed_fields=["*"], status_reason=status_reason,
+    )
     db.commit()
     db.refresh(blog)
     
@@ -148,7 +153,10 @@ def update_blog(db: Session, blog_id: int, data: BlogUpdate, *, status_actor_id:
     if blog is None:
         return None
 
+    ensure_content_baseline(db, blog, actor_id=status_actor_id)
+
     update_data = data.model_dump(exclude_unset=True)
+    revision_action = "updated"
 
     # Re-generate slug if title changed
     if "title" in update_data and update_data["title"] != blog.title:
@@ -162,17 +170,27 @@ def update_blog(db: Session, blog_id: int, data: BlogUpdate, *, status_actor_id:
         update_data["status"] = apply_content_status_transition(blog, update_data["status"])
         if update_data["status"] != previous_status:
             apply_content_status_metadata(blog, actor_id=status_actor_id, reason=status_reason)
+            revision_action = "status_changed"
+
+    changed_fields = []
+    if "title" in update_data and update_data["title"] != getattr(blog, "title", None):
+        changed_fields.append("slug")
 
     for field, value in update_data.items():
-        setattr(blog, field, value)
-
+        if getattr(blog, field) != value:
+            changed_fields.append(field)
+            setattr(blog, field, value)
+    record_content_revision(
+        db, blog, action=revision_action, actor_id=status_actor_id,
+        changed_fields=changed_fields, status_reason=status_reason if revision_action == "status_changed" else None,
+    )
     db.commit()
     
     # Re-fetch to get correct interaction counts for response
     return get_blog_by_id(db, blog_id, include_drafts=True)
 
 
-def delete_blog(db: Session, blog_id: int) -> bool:
+def delete_blog(db: Session, blog_id: int, *, actor_id: int | None = None) -> bool:
     """
     Delete a blog post by ID.
 
@@ -182,6 +200,8 @@ def delete_blog(db: Session, blog_id: int) -> bool:
     if blog is None:
         return False
 
+    ensure_content_baseline(db, blog, actor_id=actor_id)
+    record_content_revision(db, blog, action="deleted", actor_id=actor_id, changed_fields=["*"])
     db.delete(blog)
     db.commit()
     return True

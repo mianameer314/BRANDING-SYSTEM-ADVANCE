@@ -72,6 +72,10 @@ export const API = {
  update: (id: number) => `/webhooks/${id}`,
  delete: (id: number) => `/webhooks/${id}`,
  logs: (id: number) => `/webhooks/${id}/logs`,
- test: (id: number) => `/webhooks/${id}/test`,
+  test: (id: number) => `/webhooks/${id}/test`,
+ },
+ audit: {
+   revisions: (contentType: string, contentId: number) => `/audit/content/${contentType}/${contentId}/revisions`,
+   restore: (contentType: string, contentId: number, version: number) => `/audit/content/${contentType}/${contentId}/revisions/${version}/restore`,
  },
 } as const;

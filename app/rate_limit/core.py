@@ -57,7 +57,7 @@ async def init_rate_limiter() -> None:
 
 async def close_rate_limiter() -> None:
     """
-    Gracefully close the Redis connection on application shutdown.
+    Gracefully close the Redis connection and clear global limiter state.
     """
     global redis_client
 
@@ -69,6 +69,12 @@ async def close_rate_limiter() -> None:
             logger.warning("Rate Limiter: Error closing Redis connection: %s", e)
         finally:
             redis_client = None
+
+    # FastAPILimiter is process-global. Clear it even in fail-open mode so a
+    # subsequent app lifecycle cannot reuse a stale Redis connection.
+    from fastapi_limiter import FastAPILimiter
+    FastAPILimiter.redis = None
+    FastAPILimiter.lua_sha = None
 
 
 def get_redis_client() -> aioredis.Redis | None:

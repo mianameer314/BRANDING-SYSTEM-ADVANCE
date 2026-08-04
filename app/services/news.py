@@ -12,6 +12,7 @@ from app.schemas.news import NewsCreate, NewsUpdate
 from app.utils.slug import ensure_unique_slug, generate_slug
 from app.services.interactions_helper import apply_interaction_annotations, format_interaction_results
 from app.services.content_lifecycle import apply_content_status_metadata, apply_content_status_transition, validate_initial_status
+from app.services.revision_history import ensure_content_baseline, record_content_revision
 
 
 def list_news(
@@ -126,6 +127,10 @@ def create_news(db: Session, data: NewsCreate, *, status_actor_id: int | None = 
     apply_content_status_metadata(news, actor_id=status_actor_id, reason=status_reason)
 
     db.add(news)
+    record_content_revision(
+        db, news, action="created", actor_id=status_actor_id,
+        changed_fields=["*"], status_reason=status_reason,
+    )
     db.commit()
     db.refresh(news)
     
@@ -147,7 +152,10 @@ def update_news(db: Session, news_id: int, data: NewsUpdate, *, status_actor_id:
     if news is None:
         return None
 
+    ensure_content_baseline(db, news, actor_id=status_actor_id)
+
     update_data = data.model_dump(exclude_unset=True)
+    revision_action = "updated"
 
     # Re-generate slug if headline changed
     if "headline" in update_data and update_data["headline"] != news.headline:
@@ -161,15 +169,25 @@ def update_news(db: Session, news_id: int, data: NewsUpdate, *, status_actor_id:
         update_data["status"] = apply_content_status_transition(news, update_data["status"])
         if update_data["status"] != previous_status:
             apply_content_status_metadata(news, actor_id=status_actor_id, reason=status_reason)
+            revision_action = "status_changed"
+
+    changed_fields = []
+    if "headline" in update_data and update_data["headline"] != getattr(news, "headline", None):
+        changed_fields.append("slug")
 
     for field, value in update_data.items():
-        setattr(news, field, value)
-
+        if getattr(news, field) != value:
+            changed_fields.append(field)
+            setattr(news, field, value)
+    record_content_revision(
+        db, news, action=revision_action, actor_id=status_actor_id,
+        changed_fields=changed_fields, status_reason=status_reason if revision_action == "status_changed" else None,
+    )
     db.commit()
     return get_news_by_id(db, news_id, include_drafts=True)
 
 
-def delete_news(db: Session, news_id: int) -> bool:
+def delete_news(db: Session, news_id: int, *, actor_id: int | None = None) -> bool:
     """
     Delete a news article by ID.
 
@@ -179,6 +197,8 @@ def delete_news(db: Session, news_id: int) -> bool:
     if news is None:
         return False
 
+    ensure_content_baseline(db, news, actor_id=actor_id)
+    record_content_revision(db, news, action="deleted", actor_id=actor_id, changed_fields=["*"])
     db.delete(news)
     db.commit()
     return True

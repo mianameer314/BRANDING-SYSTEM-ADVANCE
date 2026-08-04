@@ -12,6 +12,7 @@ from app.schemas.case_study import CaseStudyCreate, CaseStudyUpdate
 from app.utils.slug import ensure_unique_slug, generate_slug
 from app.services.interactions_helper import apply_interaction_annotations, format_interaction_results
 from app.services.content_lifecycle import apply_content_status_metadata, apply_content_status_transition, validate_initial_status
+from app.services.revision_history import ensure_content_baseline, record_content_revision
 
 
 def list_case_studies(
@@ -119,6 +120,10 @@ def create_case_study(db: Session, data: CaseStudyCreate, *, status_actor_id: in
     apply_content_status_metadata(case_study, actor_id=status_actor_id, reason=status_reason)
 
     db.add(case_study)
+    record_content_revision(
+        db, case_study, action="created", actor_id=status_actor_id,
+        changed_fields=["*"], status_reason=status_reason,
+    )
     db.commit()
     db.refresh(case_study)
     
@@ -134,7 +139,10 @@ def update_case_study(db: Session, case_study_id: int, data: CaseStudyUpdate, *,
     if case_study is None:
         return None
 
+    ensure_content_baseline(db, case_study, actor_id=status_actor_id)
+
     update_data = data.model_dump(exclude_unset=True)
+    revision_action = "updated"
 
     if "title" in update_data and update_data["title"] != case_study.title:
         new_slug = generate_slug(update_data["title"])
@@ -146,6 +154,7 @@ def update_case_study(db: Session, case_study_id: int, data: CaseStudyUpdate, *,
         update_data["status"] = apply_content_status_transition(case_study, update_data["status"])
         if update_data["status"] != previous_status:
             apply_content_status_metadata(case_study, actor_id=status_actor_id, reason=status_reason)
+            revision_action = "status_changed"
 
     # Convert metrics Pydantic models to dicts if present
     if "metrics" in update_data and update_data["metrics"] is not None:
@@ -153,18 +162,29 @@ def update_case_study(db: Session, case_study_id: int, data: CaseStudyUpdate, *,
             m if isinstance(m, dict) else m for m in update_data["metrics"]
         ]
 
-    for field, value in update_data.items():
-        setattr(case_study, field, value)
+    changed_fields = []
+    if "title" in update_data and update_data["title"] != getattr(case_study, "title", None):
+        changed_fields.append("slug")
 
+    for field, value in update_data.items():
+        if getattr(case_study, field) != value:
+            changed_fields.append(field)
+            setattr(case_study, field, value)
+    record_content_revision(
+        db, case_study, action=revision_action, actor_id=status_actor_id,
+        changed_fields=changed_fields, status_reason=status_reason if revision_action == "status_changed" else None,
+    )
     db.commit()
     return get_case_study_by_id(db, case_study_id, include_drafts=True)
 
 
-def delete_case_study(db: Session, case_study_id: int) -> bool:
+def delete_case_study(db: Session, case_study_id: int, *, actor_id: int | None = None) -> bool:
     """Delete a case study by ID. Returns True if found and deleted."""
     case_study = db.query(CaseStudy).filter(CaseStudy.id == case_study_id).first()
     if case_study is None:
         return False
+    ensure_content_baseline(db, case_study, actor_id=actor_id)
+    record_content_revision(db, case_study, action="deleted", actor_id=actor_id, changed_fields=["*"])
     db.delete(case_study)
     db.commit()
     return True

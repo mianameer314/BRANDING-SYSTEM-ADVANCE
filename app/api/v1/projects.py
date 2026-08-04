@@ -343,7 +343,7 @@ def delete_project(project_id: int, db: DbDep, admin: DeleteDep):
         storage.delete_file(res.file_url)
         resource_service.delete_resource(db, res.id)
 
-    success = project_service.delete_project(db, project_id)
+    success = project_service.delete_project(db, project_id, actor_id=admin.id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

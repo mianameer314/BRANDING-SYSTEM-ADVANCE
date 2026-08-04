@@ -24,41 +24,9 @@ Only `published` remains publicly visible. Existing public listing and slug endp
 
 ## Allowed Transitions
 
-```mermaid
-stateDiagram-v2
-    [*] --> draft
-    [*] --> in_review
-    [*] --> published
+![Controlled editorial lifecycle transition diagram](day2_lifecycle_transition_diagram.svg)
 
-    draft --> in_review
-    draft --> published
-    draft --> archived
-
-    in_review --> draft
-    in_review --> changes_requested
-    in_review --> approved
-
-    changes_requested --> draft
-    changes_requested --> in_review
-    changes_requested --> archived
-
-    approved --> changes_requested
-    approved --> scheduled
-    approved --> published
-    approved --> archived
-
-    scheduled --> approved
-    scheduled --> published
-    scheduled --> archived
-
-    published --> unpublished
-    published --> archived
-
-    unpublished --> draft
-    unpublished --> archived
-
-    archived --> draft
-```
+Direct SVG is used instead of Mermaid so the diagram renders consistently in VS Code, GitHub, and Markdown preview tools.
 
 ## Permission Boundary
 
