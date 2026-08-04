@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 
 import { listRevisions, restoreRevision } from '@/features/audit/api';
 import { usePermission } from '@/features/auth/hooks/usePermission';
+import { useUser } from '@/features/users/hooks';
 import type { ContentRevision } from '@/features/audit/types';
 
 interface RevisionHistoryProps {
@@ -19,6 +20,60 @@ function formatDate(value: string) {
 
 function actionLabel(action: string) {
  return action.replaceAll('_', ' ');
+}
+
+function getActionTextColor(action: string) {
+  if (action === 'created') return 'text-green-600 font-semibold';
+  if (action === 'updated') return 'text-blue-600 font-semibold';
+  if (action === 'restored') return 'text-purple-600 font-semibold';
+  if (action === 'status_changed') return 'text-amber-600 font-semibold';
+  if (action === 'deleted') return 'text-destructive font-semibold';
+  return 'text-foreground font-semibold';
+}
+
+interface RevisionItemProps {
+  revision: ContentRevision;
+  canRestore: boolean;
+  onRestore: (revision: ContentRevision) => void;
+  isPending: boolean;
+}
+
+function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionItemProps) {
+  const { data: user, isLoading } = useUser(revision.actor_id || 0);
+
+  const changedByDisplay = revision.actor_id
+    ? isLoading 
+      ? `Loading...` 
+      : user 
+        ? user.full_name 
+        : `Unknown User (ID: ${revision.actor_id})`
+    : 'System';
+
+  const actionColor = getActionTextColor(revision.action);
+
+  return (
+    <li className="rounded-md border border-border bg-white p-3 text-xs shadow-sm transition-all hover:shadow-md">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="font-semibold text-foreground">
+            Version {revision.version} <span className="text-muted-foreground font-normal mx-1">·</span> <span className={`capitalize ${actionColor}`}>{actionLabel(revision.action)}</span>
+          </p>
+          <p className="mt-1 text-muted-foreground">{formatDate(revision.created_at)}</p>
+          <div className="mt-2 space-y-1">
+            <p className="text-foreground"><span className="font-medium text-muted-foreground">Changed by:</span> {changedByDisplay}</p>
+            {revision.changed_fields && revision.changed_fields.length > 0 && <p className="text-foreground"><span className="font-medium text-muted-foreground">Changes:</span> {revision.changed_fields.join(', ')}</p>}
+            {revision.status_reason && <p className="text-foreground"><span className="font-medium text-muted-foreground">Reason:</span> {revision.status_reason}</p>}
+          </div>
+        </div>
+        {canRestore && (
+          <button type="button" onClick={() => onRestore(revision)} disabled={isPending} className="inline-flex shrink-0 items-center gap-1.5 rounded border border-border bg-white px-2.5 py-1.5 font-medium text-foreground shadow-sm hover:bg-muted disabled:opacity-50 transition-colors">
+            <RotateCcw className="h-3.5 w-3.5" />
+            Restore
+          </button>
+        )}
+      </div>
+    </li>
+  );
 }
 
 export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps) {
@@ -54,7 +109,7 @@ export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps
  };
 
  return (
- <section className="mt-6 rounded-xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+ <section className="rounded-xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
  <div className="flex items-center gap-2">
  <History className="h-4 w-4 text-primary" />
  <h2 className="font-medium text-foreground">Revision history</h2>
@@ -64,19 +119,9 @@ export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps
  {isLoading && <p className="mt-3 text-xs text-muted-foreground">Loading revision history…</p>}
  {isError && <p className="mt-3 text-xs text-destructive">Revision history could not be loaded.</p>}
  {!isLoading && !isError && data?.items.length === 0 && <p className="mt-3 text-xs text-muted-foreground">No revisions recorded yet.</p>}
- <ul className="mt-3 max-h-[500px] space-y-2 overflow-y-auto pr-2">
+ <ul className="mt-3 max-h-[500px] grid grid-cols-1 gap-4 sm:grid-cols-2 overflow-y-auto pr-2">
  {data?.items.map((revision) => (
- <li key={revision.id} className="rounded-md border border-border bg-white p-2 text-xs">
- <div className="flex items-start justify-between gap-2">
- <div>
- <p className="font-medium capitalize text-foreground">Version {revision.version} · {actionLabel(revision.action)}</p>
- <p className="mt-0.5 text-muted-foreground">{formatDate(revision.created_at)} · User {revision.actor_id ?? 'system'}</p>
- {revision.changed_fields && <p className="mt-1 text-muted-foreground">Changed: {revision.changed_fields.join(', ')}</p>}
- {revision.status_reason && <p className="mt-1 text-muted-foreground">Reason: {revision.status_reason}</p>}
- </div>
- {canRestore && <button type="button" onClick={() => restore(revision)} disabled={restoreMutation.isPending} className="inline-flex shrink-0 items-center gap-1 rounded border border-border px-2 py-1 font-medium text-foreground hover:bg-muted disabled:opacity-50"><RotateCcw className="h-3 w-3" />Restore</button>}
- </div>
- </li>
+  <RevisionItem key={revision.id} revision={revision} canRestore={canRestore} onRestore={restore} isPending={restoreMutation.isPending} />
  ))}
  </ul>
 

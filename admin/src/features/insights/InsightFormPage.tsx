@@ -195,7 +195,13 @@ export default function InsightFormPage() {
   };
 
   if (isEdit && isLoading) return <LoadingState message="Loading insight..." />;
-  if (isEdit && isError) return <ErrorState message="Insight not found." />;
+  if (isEdit && isError) {
+    return <div className="p-8 text-center text-destructive">Failed to load insight for editing.</div>;
+  }
+
+  if (isEdit && isLoading) {
+    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading insight details...</div>;
+  }
 
   return (
     <>
@@ -221,6 +227,11 @@ export default function InsightFormPage() {
                 <FormTextarea label="Excerpt" rows={3} placeholder="A short summary (max 300 chars)" error={errors.excerpt} {...register('excerpt')} />
                 <hr className="border-border my-4" />
                 <ResourceAttachments contentType="insight" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
+                {isEdit && existing && (
+                  <div className="mt-8 flex flex-col gap-6">
+                    <RevisionHistory contentType="insight" contentId={existing.id} />
+                  </div>
+                )}
               </>
             }
             sideColumn={
@@ -231,7 +242,6 @@ export default function InsightFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
-                {isEdit && existing && <RevisionHistory contentType="insight" contentId={existing.id} />}
                 <FormField label="Category" placeholder="e.g. Technology" error={errors.category} {...register('category')} />
                 <TagsInput error={errors.tags} {...register('tags')} />
                 <ImageUploadField label="Cover Image" currentImageUrl={isEdit ? existing?.cover_image : null} onFileChange={setCoverImageFile} onRemoveChange={setRemoveCoverImage} />

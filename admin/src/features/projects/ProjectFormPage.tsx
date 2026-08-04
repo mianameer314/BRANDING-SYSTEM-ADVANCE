@@ -202,7 +202,13 @@ export default function ProjectFormPage() {
   };
 
   if (isEdit && isLoading) return <LoadingState message="Loading project..." />;
-  if (isEdit && isError) return <ErrorState message="Project not found." />;
+  if (isEdit && isError) {
+    return <div className="p-8 text-center text-destructive">Failed to load project for editing.</div>;
+  }
+
+  if (isEdit && isLoading) {
+    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading project details...</div>;
+  }
 
   return (
     <>
@@ -229,6 +235,11 @@ export default function ProjectFormPage() {
                 <GalleryUploadField currentGalleryUrls={isEdit ? existing?.gallery : null} onGalleryChange={({ existingUrls, newFiles }) => { setKeptGalleryUrls(existingUrls); setGalleryFiles(newFiles); }} />
                 <hr className="border-border my-4" />
                 <ResourceAttachments contentType="project" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
+                {isEdit && existing && (
+                  <div className="mt-8 flex flex-col gap-6">
+                    <RevisionHistory contentType="project" contentId={existing.id} />
+                  </div>
+                )}
               </>
             }
             sideColumn={
@@ -239,7 +250,6 @@ export default function ProjectFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
-                {isEdit && existing && <RevisionHistory contentType="project" contentId={existing.id} />}
                 <FormField label="Category" placeholder="e.g. Web Development" error={errors.category} {...register('category')} />
                 <TechInput error={errors.technologies} {...register('technologies')} />
                 <FormField label="Project URL" type="url" placeholder="https://..." error={errors.project_url} {...register('project_url')} />

@@ -218,7 +218,13 @@ export default function CaseStudyFormPage() {
   };
 
   if (isEdit && isLoading) return <LoadingState message="Loading case study..." />;
-  if (isEdit && isError) return <ErrorState message="Case study not found." />;
+  if (isEdit && isError) {
+    return <div className="p-8 text-center text-destructive">Failed to load case study for editing.</div>;
+  }
+
+  if (isEdit && isLoading) {
+    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading case study details...</div>;
+  }
 
   return (
     <>
@@ -266,6 +272,11 @@ export default function CaseStudyFormPage() {
                 <GalleryUploadField currentGalleryUrls={isEdit ? existing?.gallery : null} onGalleryChange={({ existingUrls, newFiles }) => { setKeptGalleryUrls(existingUrls); setGalleryFiles(newFiles); }} />
                 <hr className="border-border my-4" />
                 <ResourceAttachments contentType="case_study" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
+                {isEdit && existing && (
+                  <div className="mt-8 flex flex-col gap-6">
+                    <RevisionHistory contentType="case_study" contentId={existing.id} />
+                  </div>
+                )}
               </>
             }
             sideColumn={
@@ -276,7 +287,6 @@ export default function CaseStudyFormPage() {
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
-                {isEdit && existing && <RevisionHistory contentType="case_study" contentId={existing.id} />}
                 <TechInput error={errors.technologies} {...register('technologies')} />
                 <div className="flex items-center gap-3">
                   <input id="is_featured" type="checkbox" className="h-4 w-4 rounded border-border bg-input text-primary focus:ring-primary" {...register('is_featured')} />
