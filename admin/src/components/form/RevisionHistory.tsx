@@ -19,7 +19,7 @@ function formatDate(value: string) {
 }
 
 function actionLabel(action: string) {
- return action.replace(/_/g, ' ');
+ return action.replace(/_/g, ' '); // replace _ with space
 
 }
 
