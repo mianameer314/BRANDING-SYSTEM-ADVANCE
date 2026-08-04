@@ -17,10 +17,10 @@ export function LifecycleDetails({ audit }: LifecycleDetailsProps) {
 
  const changedByDisplay = audit.status_changed_by_id
    ? isLoading 
-     ? `Loading... (ID: ${audit.status_changed_by_id})` 
+     ? 'Loading staff name...'
      : user 
-       ? `${user.full_name} (ID: ${user.id})` 
-       : `Unknown User (ID: ${audit.status_changed_by_id})`
+       ? user.full_name
+       : 'Staff member no longer available'
    : 'Not recorded yet';
 
  return (

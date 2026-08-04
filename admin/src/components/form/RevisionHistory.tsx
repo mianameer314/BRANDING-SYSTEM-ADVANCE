@@ -29,6 +29,12 @@ function contentLabel(contentType: string) {
   return contentType.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function sourceLabel(source: string) {
+  if (source === 'revision_restore') return 'Restored from Revision History';
+  if (source === 'cms_api') return 'Saved through the CMS';
+  return source.replace(/_/g, ' ');
+}
+
 function getActionTextColor(action: string) {
   if (action === 'created') return 'text-green-600 font-semibold';
   if (action === 'updated') return 'text-blue-600 font-semibold';
@@ -68,7 +74,7 @@ function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionIt
           <p className="mt-1 text-muted-foreground">{formatDate(revision.created_at)}</p>
           <div className="mt-2 space-y-1">
             <p className="text-foreground"><span className="font-medium text-muted-foreground">Changed by:</span> {changedByDisplay}</p>
-            <p className="text-foreground"><span className="font-medium text-muted-foreground">Source:</span> {revision.source.replace(/_/g, ' ')}</p>
+            <p className="text-foreground"><span className="font-medium text-muted-foreground">How this happened:</span> {sourceLabel(revision.source)}</p>
             {revision.approval_reference && <p className="text-foreground"><span className="font-medium text-muted-foreground">Approval:</span> Version {revision.version} of this {contentLabel(revision.content_type)} was approved by {changedByDisplay}.</p>}
             {revision.changed_fields && revision.changed_fields.length > 0 && <p className="text-foreground"><span className="font-medium text-muted-foreground">Changes:</span> {revision.changed_fields.join(', ')}</p>}
             {revision.status_reason && <p className="text-foreground"><span className="font-medium text-muted-foreground">Reason:</span> {revision.status_reason}</p>}
