@@ -17,6 +17,7 @@ from app.services import project as project_service
 from app.services import resource as resource_service
 from app.services.storage import get_storage_service
 from app.services.webhook_dispatcher import dispatch_publish_event
+from app.services.revision_history import get_revision_referenced_urls
 from app.utils.parsers import parse_optional_string
 from app.rate_limit import PUBLIC_GET_LIMIT, UPLOAD_LIMIT, CONTENT_DELETE_LIMIT
 
@@ -215,13 +216,23 @@ def update_project(
     try:
         update_kwargs = {}
 
+        # Collect URLs protected by revision history — never delete these from storage
+        protected_urls = get_revision_referenced_urls(db, "project", project_id)
+
+        def safe_delete(urls: list[str]) -> None:
+            """Delete files from storage only if they are NOT referenced by any revision snapshot."""
+            deletable = [u for u in urls if u and u not in protected_urls]
+            if deletable:
+                storage.delete_files(deletable)
+
         # Handle cover image replacement
         if remove_cover_image and existing.cover_image:
-            storage.delete_files([existing.cover_image])
+            safe_delete([existing.cover_image])
             update_kwargs["cover_image"] = None
         elif cover_image and cover_image.filename:
-            cover_image_url = storage.replace_image(existing.cover_image, cover_image, "projects")
-            update_kwargs["cover_image"] = cover_image_url
+            new_cover_url = storage.upload_image(cover_image, "projects")
+            safe_delete([existing.cover_image] if existing.cover_image else [])
+            update_kwargs["cover_image"] = new_cover_url
 
         # Handle gallery logic
         if existing_gallery is None:
@@ -234,11 +245,11 @@ def update_project(
             except (json.JSONDecodeError, ValueError):
                 raise HTTPException(status_code=400, detail="existing_gallery must be a valid JSON array")
 
-        # Find which old URLs were removed and delete them
+        # Find which old URLs were removed — only delete if not protected
         if existing.gallery:
             removed_urls = [url for url in existing.gallery if url not in retained_urls]
             if removed_urls:
-                storage.delete_files(removed_urls)
+                safe_delete(removed_urls)
 
         has_gallery_files = bool(gallery) and any(f.filename for f in gallery)
         new_urls = []

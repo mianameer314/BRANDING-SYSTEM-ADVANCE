@@ -49,6 +49,56 @@ def content_type_for(content) -> str:
         raise ValueError(f"Unsupported revision content model: {type(content)!r}") from exc
 
 
+def get_revision_referenced_urls(
+    db: Session,
+    content_type: str,
+    content_id: int,
+) -> set[str]:
+    """Collect all image/file URLs stored in any revision snapshot for this content.
+
+    The update endpoints must NOT delete files from storage if they appear
+    in a historical snapshot — otherwise restoring that version would show
+    broken images.
+
+    Scans snapshot fields that are known to contain URLs:
+      - cover_image (str)
+      - client_logo (str)
+      - gallery (list[str])
+      - _resources[].file_url (list[dict])
+    """
+    revisions = (
+        db.query(ContentRevision.snapshot)
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content_id,
+        )
+        .all()
+    )
+    urls: set[str] = set()
+    for (snapshot,) in revisions:
+        if not snapshot:
+            continue
+        # Single-value URL fields
+        for field in ("cover_image", "client_logo"):
+            val = snapshot.get(field)
+            if val:
+                urls.add(val)
+        # List-of-URL field (gallery)
+        gallery = snapshot.get("gallery")
+        if gallery and isinstance(gallery, list):
+            for url in gallery:
+                if url:
+                    urls.add(url)
+        # Resource snapshots
+        resources = snapshot.get("_resources")
+        if resources and isinstance(resources, list):
+            for r in resources:
+                fu = r.get("file_url") if isinstance(r, dict) else None
+                if fu:
+                    urls.add(fu)
+    return urls
+
+
 def get_content_model(content_type: str):
     model = CONTENT_MODELS.get(content_type)
     if model is None:

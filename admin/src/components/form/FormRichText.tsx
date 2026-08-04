@@ -43,7 +43,8 @@ export const FormRichText = forwardRef<ReactQuill, FormRichTextProps>(
             ref={ref}
             theme="snow"
             value={value || ''}
-            onChange={(content) => {
+            onChange={(content, _delta, source) => {
+              if (source === 'api') return;
               const isActuallyEmpty = content === '<p><br></p>' || content === '<div><br></div>' || content === '';
               onChange(isActuallyEmpty ? '' : content);
             }}

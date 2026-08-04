@@ -39,8 +39,8 @@ class InsightGeneratedContent(BaseModel):
     meta_description: str
 
 class MetricItem(BaseModel):
-    label: str
-    value: str
+    label: str = ""
+    value: str = ""
 
 class CaseStudyGeneratedContent(BaseModel):
     title: str

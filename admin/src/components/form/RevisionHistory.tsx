@@ -19,7 +19,8 @@ function formatDate(value: string) {
 }
 
 function actionLabel(action: string) {
- return action.replaceAll('_', ' ');
+ return action.replace(/_/g, ' ');
+
 }
 
 function getActionTextColor(action: string) {

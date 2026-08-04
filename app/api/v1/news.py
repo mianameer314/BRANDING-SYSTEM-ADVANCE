@@ -16,6 +16,7 @@ from app.services import news as news_service
 from app.services import resource as resource_service
 from app.services.storage import get_storage_service
 from app.services.webhook_dispatcher import dispatch_publish_event
+from app.services.revision_history import get_revision_referenced_urls
 from app.utils.parsers import parse_optional_string
 from app.rate_limit import PUBLIC_GET_LIMIT, UPLOAD_LIMIT, CONTENT_DELETE_LIMIT
 
@@ -161,13 +162,22 @@ def update_news(
 
     try:
         update_kwargs = {}
+
+        # Collect URLs protected by revision history
+        protected_urls = get_revision_referenced_urls(db, "news", news_id)
+
+        def safe_delete(urls: list[str]) -> None:
+            deletable = [u for u in urls if u and u not in protected_urls]
+            if deletable:
+                storage.delete_files(deletable)
         
         if remove_cover_image and existing.cover_image:
-            storage.delete_files([existing.cover_image])
+            safe_delete([existing.cover_image])
             update_kwargs["cover_image"] = None
         elif cover_image and cover_image.filename:
-            cover_image_url = storage.replace_image(existing.cover_image, cover_image, "news")
-            update_kwargs["cover_image"] = cover_image_url
+            new_cover_url = storage.upload_image(cover_image, "news")
+            safe_delete([existing.cover_image] if existing.cover_image else [])
+            update_kwargs["cover_image"] = new_cover_url
 
         if headline is not None:
             update_kwargs["headline"] = parse_optional_string(headline)

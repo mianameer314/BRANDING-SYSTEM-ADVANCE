@@ -13,6 +13,7 @@ from app.models.user import User
 from app.schemas.resource import ResourceOut
 from app.services import resource as resource_service
 from app.services.storage import get_storage_service
+from app.services.revision_history import get_revision_referenced_urls
 from app.rate_limit import PUBLIC_GET_LIMIT, AUTH_GET_LIMIT, UPLOAD_LIMIT, CONTENT_DELETE_LIMIT
 
 logger = logging.getLogger(__name__)
@@ -105,11 +106,16 @@ def update_resource(
         raise HTTPException(status_code=400, detail="No file provided")
 
     try:
-        new_url, new_name = storage.replace_file(existing.file_url, file, "resources")
+        protected_urls = get_revision_referenced_urls(db, existing.content_type, existing.content_id)
+        
+        new_url, new_name = storage.upload_file(file, "resources")
 
         resource = resource_service.update_resource_file(
             db, resource_id, file_url=new_url, file_name=new_name, actor_id=admin.id
         )
+
+        if existing.file_url and existing.file_url not in protected_urls:
+            storage.delete_file(existing.file_url)
 
         storage.clear_pending()
         return resource
@@ -128,7 +134,7 @@ def delete_resource(resource_id: int, db: DbDep, admin: AdminDep):
     """
     Delete a resource (Admin/Editor).
 
-    - Also deletes the file from storage
+    - Also deletes the file from storage if not protected by revision history
     """
     storage = get_storage_service()
 
@@ -137,8 +143,13 @@ def delete_resource(resource_id: int, db: DbDep, admin: AdminDep):
         raise HTTPException(status_code=404, detail="Resource not found")
 
     old_url = resource.file_url
+    content_type = resource.content_type
+    content_id = resource.content_id
+
     deleted = resource_service.delete_resource(db, resource_id, actor_id=admin.id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Resource not found")
 
-    storage.delete_file(old_url)
+    protected_urls = get_revision_referenced_urls(db, content_type, content_id)
+    if old_url and old_url not in protected_urls:
+        storage.delete_file(old_url)
