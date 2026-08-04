@@ -95,9 +95,9 @@ Successfully implemented and hardened GitHub Actions pipelines for both the fron
 
 ## Day 3 — Revision History, Transactions & Audit Trail
 
-**Status:** Implementation complete; final full-suite verification pending.
+**Status:** Implementation complete; production migration and final full-suite verification pending.
 
-Added shared immutable `content_revisions` and append-only `audit_events` tables, transactional revision capture for all five content types, safe restore endpoints, operational audit events for media/user-role/webhook actions, revision-history dashboard panels, migration, and rollback tests. Existing content receives a baseline snapshot before its first Day 3 edit, preserving the pre-edit version. See [Day 3 model](../docs/baseline/day3_revision_audit_model.md), [revision/audit flow diagram](../docs/baseline/day3_revision_audit_diagram.svg), and [lifecycle transition diagram](../docs/baseline/day2_lifecycle_transition_diagram.svg).
+Added shared immutable `content_revisions` and append-only `audit_events` tables, transactional revision capture for all five content types, safe restore endpoints, operational audit events for media/user-role/webhook actions, revision-history dashboard panels, migration, and rollback tests. Existing content receives a baseline snapshot before its first Day 3 edit, preserving the pre-edit version. Later hardening added automatic snapshot diffs, revision-linked resource snapshots, S3 historical-media protection, synchronized resource restore, stable slugs, restore confirmation, actor-name display, source tracking (`cms_api` / `revision_restore`), an immutable approval reference for each approved version, and immediate dashboard refresh after restore. See [Day 3 model](../docs/baseline/day3_revision_audit_model.md), [revision/audit flow diagram](../docs/baseline/day3_revision_audit_diagram.svg), and [lifecycle transition diagram](../docs/baseline/day2_lifecycle_transition_diagram.svg).
 
 ---
 

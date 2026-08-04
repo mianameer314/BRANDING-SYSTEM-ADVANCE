@@ -7,6 +7,8 @@ export interface ContentRevision {
  snapshot: Record<string, unknown>;
  changed_fields: string[] | null;
  actor_id: number | null;
+ source: string;
+ approval_reference: string | null;
  status_reason: string | null;
  restored_from_revision_id: number | null;
  created_at: string;

@@ -64,6 +64,8 @@ function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionIt
           <p className="mt-1 text-muted-foreground">{formatDate(revision.created_at)}</p>
           <div className="mt-2 space-y-1">
             <p className="text-foreground"><span className="font-medium text-muted-foreground">Changed by:</span> {changedByDisplay}</p>
+            <p className="text-foreground"><span className="font-medium text-muted-foreground">Source:</span> {revision.source.replace(/_/g, ' ')}</p>
+            {revision.approval_reference && <p className="text-foreground"><span className="font-medium text-muted-foreground">Approval reference:</span> {revision.approval_reference}</p>}
             {revision.changed_fields && revision.changed_fields.length > 0 && <p className="text-foreground"><span className="font-medium text-muted-foreground">Changes:</span> {revision.changed_fields.join(', ')}</p>}
             {revision.status_reason && <p className="text-foreground"><span className="font-medium text-muted-foreground">Reason:</span> {revision.status_reason}</p>}
           </div>

@@ -138,6 +138,8 @@ def record_content_revision(
     action: str,
     actor_id: int | None,
     changed_fields: list[str] | None = None,
+    source: str = "cms_api",
+    approval_reference: str | None = None,
     status_reason: str | None = None,
     restored_from_revision_id: int | None = None,
 ) -> ContentRevision:
@@ -195,6 +197,14 @@ def record_content_revision(
     else:
         changed_fields = list(set(changed_fields + computed_changed_fields))
 
+    # A transition to approved receives an immutable reference which ties the
+    # approval to this exact content version and actor. Other actions leave it
+    # blank because they are not approval decisions.
+    if approval_reference is None and getattr(content, "status", None) == "approved":
+        approval_reference = (
+            f"approval:{content_type}:{content.id}:v{next_version}:actor:{actor_id or 'system'}"
+        )
+
     revision = ContentRevision(
         content_type=content_type,
         content_id=content.id,
@@ -203,6 +213,8 @@ def record_content_revision(
         snapshot=snapshot,
         changed_fields=sorted(changed_fields) if changed_fields else None,
         actor_id=actor_id,
+        source=source,
+        approval_reference=approval_reference,
         status_reason=status_reason,
         restored_from_revision_id=restored_from_revision_id,
     )
@@ -339,6 +351,7 @@ def restore_content_revision(
         action="restored",
         actor_id=actor_id,
         changed_fields=[field for field in revision.snapshot if field not in protected],
+        source="revision_restore",
         status_reason=content.status_change_reason,
         restored_from_revision_id=revision.id,
     )

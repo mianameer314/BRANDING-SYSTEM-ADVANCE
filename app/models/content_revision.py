@@ -23,6 +23,10 @@ class ContentRevision(Base):
     snapshot: Mapped[dict] = mapped_column(JSON, nullable=False)
     changed_fields: Mapped[list | None] = mapped_column(JSON, nullable=True)
     actor_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    source: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="cms_api", server_default="cms_api", index=True
+    )
+    approval_reference: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     status_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     restored_from_revision_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

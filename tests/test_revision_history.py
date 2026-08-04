@@ -23,6 +23,8 @@ def test_content_updates_create_immutable_sequential_revisions(db_session):
     assert history["total"] == 2
     assert history["items"][0].version == 2
     assert history["items"][0].action == "updated"
+    assert history["items"][0].source == "cms_api"
+    assert history["items"][0].approval_reference is None
     assert history["items"][0].snapshot["title"] == "Updated title"
     assert history["items"][1].snapshot["title"] == "Original title"
 
