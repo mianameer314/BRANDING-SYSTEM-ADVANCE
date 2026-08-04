@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { env } from '@/config/env';
 
 interface LivePreviewModalProps {
@@ -107,8 +108,8 @@ export const LivePreviewModal: React.FC<LivePreviewModalProps> = ({
 
  if (!isOpen) return null;
 
- return (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+ return createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
  <div className="flex flex-col w-[95vw] h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden">
  {/* Header */}
  <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
@@ -155,6 +156,7 @@ export const LivePreviewModal: React.FC<LivePreviewModalProps> = ({
  />
  </div>
  </div>
- </div>
+ </div>,
+ document.body
  );
 };

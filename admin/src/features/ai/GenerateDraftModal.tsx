@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useGenerateDraft } from './hooks';
@@ -58,8 +59,8 @@ export function GenerateDraftModal({ isOpen, onClose, contentType, onApply }: Ge
  onClose();
  };
 
- return (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+ return createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
  <div className="w-full max-w-2xl rounded-2xl border border-border bg-background p-6 shadow-2xl my-auto">
  <div className="flex items-center justify-between mb-6">
  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
@@ -262,6 +263,7 @@ export function GenerateDraftModal({ isOpen, onClose, contentType, onApply }: Ge
  </div>
  </form>
  </div>
- </div>
+ </div>,
+ document.body
  );
 }

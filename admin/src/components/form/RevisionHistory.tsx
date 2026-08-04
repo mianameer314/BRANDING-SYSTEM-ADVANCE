@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { History, RotateCcw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -126,19 +127,20 @@ export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps
  ))}
  </ul>
 
- {modalRevision && (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
- <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl">
- <h3 className="text-lg font-semibold text-foreground">Confirm Restore</h3>
- <p className="mt-2 text-sm text-muted-foreground">
- Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.
- </p>
- <div className="mt-6 flex justify-end gap-3">
- <button type="button" onClick={() => setModalRevision(null)} className="rounded px-4 py-2 text-sm font-medium hover:bg-muted">Cancel</button>
- <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">Restore</button>
- </div>
- </div>
- </div>
+ {modalRevision && createPortal(
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl">
+  <h3 className="text-lg font-semibold text-foreground">Confirm Restore</h3>
+  <p className="mt-2 text-sm text-muted-foreground">
+  Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.
+  </p>
+  <div className="mt-6 flex justify-end gap-3">
+  <button type="button" onClick={() => setModalRevision(null)} className="rounded px-4 py-2 text-sm font-medium hover:bg-muted">Cancel</button>
+  <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">Restore</button>
+  </div>
+  </div>
+  </div>,
+  document.body
  )}
 
  </section>
