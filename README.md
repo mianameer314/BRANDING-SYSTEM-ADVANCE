@@ -16,7 +16,7 @@
 
 ---
 
-## 🎨 System Overview
+## 🎨 -System Overview
 
 The **O2Geeks Branding System** is an enterprise-grade, decoupled Headless CMS architecture. It powers the public **O2Geeks Website** (Nuxt 3) and provides a feature-rich **Admin Dashboard** (React + Vite) backed by a high-performance **FastAPI REST API** (PostgreSQL + Redis).
 
