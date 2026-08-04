@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useNewsItem, useCreateNews, useUpdateNews, useDeleteNews } from './hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { newsSchema, type NewsFormData } from '@/features/shared/forms/schemas';
 import type { NewsGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';
@@ -32,6 +33,7 @@ export default function NewsFormPage() {
   const isEdit = !!slug;
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: existing, isLoading, isError } = useNewsItem(slug ?? '');
 
@@ -211,7 +213,11 @@ export default function NewsFormPage() {
                 <ResourceAttachments contentType="news" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
                   <div className="mt-8 flex flex-col gap-6">
-                    <RevisionHistory contentType="news" contentId={existing.id} />
+                    <RevisionHistory
+                      contentType="news"
+                      contentId={existing.id}
+                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['news', slug] })}
+                    />
                   </div>
                 )}
               </>

@@ -10,8 +10,9 @@ import { useUser } from '@/features/users/hooks';
 import type { ContentRevision } from '@/features/audit/types';
 
 interface RevisionHistoryProps {
- contentType: 'blog' | 'news' | 'project' | 'insight' | 'case_study';
- contentId: number;
+  contentType: 'blog' | 'news' | 'project' | 'insight' | 'case_study';
+  contentId: number;
+  onRestoreSuccess?: () => void;
 }
 
 function formatDate(value: string) {
@@ -78,7 +79,7 @@ function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionIt
   );
 }
 
-export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps) {
+export function RevisionHistory({ contentType, contentId, onRestoreSuccess }: RevisionHistoryProps) {
  const canRestore = usePermission('publish');
  const queryClient = useQueryClient();
  const [restoreReason, setRestoreReason] = useState('');
@@ -95,6 +96,7 @@ export function RevisionHistory({ contentType, contentId }: RevisionHistoryProps
      queryClient.invalidateQueries({ queryKey: [`${contentType}s`] });
      setRestoreReason('');
      toast.success('Revision restored and a new history entry was created.');
+     onRestoreSuccess?.();
    },
    onError: (error: any) => toast.error(error?.response?.data?.detail ?? 'Could not restore revision.'),
  });

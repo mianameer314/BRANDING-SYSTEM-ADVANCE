@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useBlog, useCreateBlog, useUpdateBlog, useDeleteBlog } from './hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { blogSchema, type BlogFormData } from '@/features/shared/forms/schemas';
 import type { BlogGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';
@@ -34,6 +35,7 @@ export default function BlogFormPage() {
   const isEdit = !!slug;
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: existing, isLoading, isError } = useBlog(slug ?? '');
 
@@ -223,7 +225,11 @@ export default function BlogFormPage() {
                 <ResourceAttachments contentType="blog" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
                   <div className="mt-8 flex flex-col gap-6">
-                    <RevisionHistory contentType="blog" contentId={existing.id} />
+                    <RevisionHistory
+                      contentType="blog"
+                      contentId={existing.id}
+                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['blog', slug] })}
+                    />
                   </div>
                 )}
               </>

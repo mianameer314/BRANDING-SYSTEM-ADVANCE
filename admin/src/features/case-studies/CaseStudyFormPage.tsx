@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useCaseStudy, useCreateCaseStudy, useUpdateCaseStudy, useDeleteCaseStudy } from './hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { caseStudySchema, type CaseStudyFormData } from '@/features/shared/forms/schemas';
 import type { CaseStudyGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';
@@ -36,6 +37,7 @@ export default function CaseStudyFormPage() {
   const isEdit = !!slug;
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: existing, isLoading, isError } = useCaseStudy(slug ?? '');
 
@@ -268,7 +270,11 @@ export default function CaseStudyFormPage() {
                 <ResourceAttachments contentType="case_study" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
                   <div className="mt-8 flex flex-col gap-6">
-                    <RevisionHistory contentType="case_study" contentId={existing.id} />
+                    <RevisionHistory
+                      contentType="case_study"
+                      contentId={existing.id}
+                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['case_study', slug] })}
+                    />
                   </div>
                 )}
               </>

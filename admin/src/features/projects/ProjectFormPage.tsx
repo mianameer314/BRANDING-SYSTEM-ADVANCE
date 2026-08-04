@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useProject, useCreateProject, useUpdateProject, useDeleteProject } from './hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { projectSchema, type ProjectFormData } from '@/features/shared/forms/schemas';
 import type { ProjectGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';
@@ -35,6 +36,7 @@ export default function ProjectFormPage() {
   const isEdit = !!slug;
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: existing, isLoading, isError } = useProject(slug ?? '');
 
@@ -231,7 +233,11 @@ export default function ProjectFormPage() {
                 <ResourceAttachments contentType="project" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
                   <div className="mt-8 flex flex-col gap-6">
-                    <RevisionHistory contentType="project" contentId={existing.id} />
+                    <RevisionHistory
+                      contentType="project"
+                      contentId={existing.id}
+                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['project', slug] })}
+                    />
                   </div>
                 )}
               </>
