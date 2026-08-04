@@ -103,12 +103,54 @@ def record_content_revision(
         .scalar()
         + 1
     )
+    snapshot = content_snapshot(content)
+    
+    # Snapshot associated resources
+    from app.models.resource import Resource
+    resources = db.query(Resource).filter(
+        Resource.content_type == content_type,
+        Resource.content_id == content.id
+    ).all()
+    snapshot["_resources"] = [
+        {"file_url": r.file_url, "file_name": r.file_name, "created_at": r.created_at.isoformat()}
+        for r in resources
+    ]
+
+    # Dynamically compute changed fields by diffing with the previous revision
+    previous_revision = (
+        db.query(ContentRevision)
+        .filter(
+            ContentRevision.content_type == content_type,
+            ContentRevision.content_id == content.id,
+        )
+        .order_by(ContentRevision.version.desc())
+        .first()
+    )
+    
+    computed_changed_fields = []
+    if previous_revision:
+        for key, new_val in snapshot.items():
+            if key in {"updated_at", "status_changed_at", "status_changed_by_id", "status_change_reason"}:
+                continue
+            old_val = previous_revision.snapshot.get(key)
+            if key == "_resources" and old_val is None:
+                old_val = [] # Treat untracked legacy resources as empty
+            if new_val != old_val:
+                computed_changed_fields.append(key)
+    else:
+        computed_changed_fields = [k for k in snapshot.keys() if k not in {"updated_at", "status_changed_at", "status_changed_by_id"}]
+
+    if changed_fields is None:
+        changed_fields = computed_changed_fields
+    else:
+        changed_fields = list(set(changed_fields + computed_changed_fields))
+
     revision = ContentRevision(
         content_type=content_type,
         content_id=content.id,
         version=next_version,
         action=action,
-        snapshot=content_snapshot(content),
+        snapshot=snapshot,
         changed_fields=sorted(changed_fields) if changed_fields else None,
         actor_id=actor_id,
         status_reason=status_reason,
@@ -193,13 +235,48 @@ def restore_content_revision(
     if revision is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Revision not found")
 
-    protected = {"id", "created_at", "updated_at", "status_changed_at", "status_changed_by_id", "status_change_reason"}
-    for field, value in revision.snapshot.items():
-        if field not in protected:
-            column = model.__table__.columns.get(field)
-            if value is not None and column is not None and isinstance(column.type, DateTime):
+    protected = {"id", "slug", "created_at", "updated_at", "status_changed_at", "status_changed_by_id", "status_change_reason"}
+    from app.models.resource import Resource
+    from sqlalchemy.orm.attributes import flag_modified
+    
+    # If the snapshot tracked resources, replace current resources with the snapshotted ones
+    if "_resources" in revision.snapshot:
+        db.query(Resource).filter(
+            Resource.content_type == content_type,
+            Resource.content_id == content_id
+        ).delete()
+        for r_data in revision.snapshot["_resources"]:
+            new_r = Resource(
+                content_type=content_type,
+                content_id=content_id,
+                file_url=r_data["file_url"],
+                file_name=r_data.get("file_name"),
+            )
+            db.add(new_r)
+
+    for column in model.__table__.columns:
+        field = column.name
+        if field == "_resources" or field in protected:
+            continue
+            
+        if field in revision.snapshot:
+            value = revision.snapshot[field]
+            if value is not None and isinstance(column.type, DateTime):
                 value = datetime.fromisoformat(value)
-            setattr(content, field, value)
+        else:
+            # Field didn't exist in the snapshot (added in later migration).
+            # Its value at the time was effectively None.
+            value = None
+            
+        setattr(content, field, value)
+        
+        # Explicitly flag JSON columns as modified to ensure SQLAlchemy detects the change
+        if field in revision.snapshot and value is not None:
+            # If we assign a list/dict, SQLAlchemy might need a hint
+            try:
+                flag_modified(content, field)
+            except Exception:
+                pass
 
     apply_content_status_metadata(
         content,

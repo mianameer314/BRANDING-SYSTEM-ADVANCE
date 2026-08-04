@@ -26,15 +26,13 @@ export function GalleryUploadField({
  const inputRef = useRef<HTMLInputElement>(null);
  const [newPreviews, setNewPreviews] = useState<{ file: File; url: string }[]>([]);
  const [keptUrls, setKeptUrls] = useState<string[]>([]);
- const [isInitialized, setIsInitialized] = useState(false);
 
- // Initialize keptUrls only once when currentGalleryUrls is provided
+ const galleryUrlsString = JSON.stringify(currentGalleryUrls);
+
+ // Sync state whenever the external gallery URLs change (e.g., after a restore)
  useEffect(() => {
- if (currentGalleryUrls && !isInitialized) {
- setKeptUrls(currentGalleryUrls);
- setIsInitialized(true);
- }
- }, [currentGalleryUrls, isInitialized]);
+   setKeptUrls(currentGalleryUrls || []);
+ }, [galleryUrlsString]);
 
  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
  const files = Array.from(e.target.files ?? []);

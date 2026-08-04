@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -28,7 +28,6 @@ import { MetricsEditor } from '@/components/form/MetricsEditor';
 import { LivePreviewModal } from '@/components/preview/LivePreviewModal';
 import { GenerateDraftModal } from '@/features/ai/GenerateDraftModal';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { ErrorState } from '@/components/shared/ErrorState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { uploadPendingResources } from '@/features/resources/utils';
 
