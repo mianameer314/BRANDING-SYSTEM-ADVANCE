@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
 interface ConfirmModalProps {
@@ -23,8 +24,8 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
  if (!isOpen) return null;
 
- return (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+ return createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-0">
  <div 
  className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
  onClick={!isLoading ? onCancel : undefined} 
@@ -71,6 +72,7 @@ export function ConfirmModal({
  </div>
  
  </div>
- </div>
+ </div>,
+ document.body
  );
 }
