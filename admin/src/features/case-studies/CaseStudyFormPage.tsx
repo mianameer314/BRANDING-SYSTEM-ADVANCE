@@ -91,28 +91,23 @@ export default function CaseStudyFormPage() {
   } = useForm<CaseStudyFormData>({
     resolver: zodResolver(caseStudySchema),
     defaultValues: { status: 'draft', is_featured: false, metrics: [] },
+    values: existing ? {
+      title: existing.title,
+      client_name: existing.client_name,
+      industry: existing.industry ?? '',
+      challenge: existing.challenge,
+      solution: existing.solution,
+      results: existing.results,
+      metrics: existing.metrics ?? [],
+      testimonial: existing.testimonial ?? '',
+      testimonial_author: existing.testimonial_author ?? '',
+      technologies: existing.technologies?.join(', ') ?? '',
+      is_featured: existing.is_featured,
+      status: existing.status as any,
+      cover_image: null,
+      client_logo: null,
+    } : undefined,
   });
-
-  useEffect(() => {
-    if (existing) {
-      reset({
-        title: existing.title,
-        client_name: existing.client_name,
-        industry: existing.industry ?? '',
-        challenge: existing.challenge,
-        solution: existing.solution,
-        results: existing.results,
-        metrics: existing.metrics ?? [],
-        testimonial: existing.testimonial ?? '',
-        testimonial_author: existing.testimonial_author ?? '',
-        technologies: existing.technologies?.join(', ') ?? '',
-        is_featured: existing.is_featured,
-        status: existing.status,
-        cover_image: null,
-        client_logo: null,
-      });
-    }
-  }, [existing, reset]);
 
   const handleApplyDraft = (generated: CaseStudyGeneratedContent) => {
     setValue('title', generated.title, { shouldDirty: true });

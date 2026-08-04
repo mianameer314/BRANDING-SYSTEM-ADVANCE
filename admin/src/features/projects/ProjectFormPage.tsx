@@ -88,25 +88,20 @@ export default function ProjectFormPage() {
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: { status: 'draft', is_featured: false },
+    values: existing ? {
+      name: existing.name,
+      client: existing.client ?? '',
+      description: existing.description,
+      short_desc: existing.short_desc ?? '',
+      category: existing.category ?? '',
+      technologies: existing.technologies?.join(', ') ?? '',
+      project_url: existing.project_url ?? '',
+      is_featured: existing.is_featured,
+      status: existing.status as any,
+      completed_at: existing.completed_at ? existing.completed_at.split('T')[0] : '',
+      cover_image: null,
+    } : undefined,
   });
-
-  useEffect(() => {
-    if (existing) {
-      reset({
-        name: existing.name,
-        client: existing.client ?? '',
-        description: existing.description,
-        short_desc: existing.short_desc ?? '',
-        category: existing.category ?? '',
-        technologies: existing.technologies?.join(', ') ?? '',
-        project_url: existing.project_url ?? '',
-        is_featured: existing.is_featured,
-        status: existing.status,
-        completed_at: existing.completed_at ? existing.completed_at.split('T')[0] : '',
-        cover_image: null,
-      });
-    }
-  }, [existing, reset]);
 
   const handleApplyDraft = (generated: ProjectGeneratedContent) => {
     setValue('name', generated.name, { shouldDirty: true });

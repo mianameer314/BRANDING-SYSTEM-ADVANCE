@@ -53,7 +53,7 @@ export type NewsFormData = z.infer<typeof newsSchema>;
 
 export const projectSchema = baseContentSchema.extend({
  name: z.string().min(1, 'Name is required').max(200, 'Max 200 characters'),
- description: z.string().min(1, 'Description is required'),
+ description: z.string().min(1, 'Description is required').refine((val) => val.replace(/<[^>]*>?/gm, '').trim().length > 0, 'Description is required'),
  client: z.string().max(200, 'Max 200 characters').optional().or(z.literal('')),
  short_desc: z.string().max(300, 'Max 300 characters').optional().or(z.literal('')),
  technologies: z.string().optional(), // comma-separated; serialized to JSON array on submit

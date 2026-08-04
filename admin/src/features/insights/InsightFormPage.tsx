@@ -85,22 +85,17 @@ export default function InsightFormPage() {
   } = useForm<InsightFormData>({
     resolver: zodResolver(insightSchema),
     defaultValues: { status: 'draft' },
+    values: existing ? {
+      title: existing.title,
+      author: existing.author,
+      content: existing.content,
+      excerpt: existing.excerpt ?? '',
+      category: existing.category ?? '',
+      tags: existing.tags?.join(', ') ?? '',
+      status: existing.status as any,
+      cover_image: null,
+    } : undefined,
   });
-
-  useEffect(() => {
-    if (existing) {
-      reset({
-        title: existing.title,
-        author: existing.author,
-        content: existing.content,
-        excerpt: existing.excerpt ?? '',
-        category: existing.category ?? '',
-        tags: existing.tags?.join(', ') ?? '',
-        status: existing.status,
-        cover_image: null,
-      });
-    }
-  }, [existing, reset]);
 
   const handleApplyDraft = (generated: InsightGeneratedContent) => {
     setValue('title', generated.title, { shouldDirty: true });

@@ -84,20 +84,15 @@ export default function NewsFormPage() {
   } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
     defaultValues: { status: 'draft', is_featured: false },
+    values: existing ? {
+      headline: existing.headline,
+      summary: existing.summary,
+      source: existing.source ?? '',
+      is_featured: existing.is_featured,
+      status: existing.status as any,
+      cover_image: null,
+    } : undefined,
   });
-
-  useEffect(() => {
-    if (existing) {
-      reset({
-        headline: existing.headline,
-        summary: existing.summary,
-        source: existing.source ?? '',
-        is_featured: existing.is_featured,
-        status: existing.status,
-        cover_image: null,
-      });
-    }
-  }, [existing, reset]);
 
   const handleApplyDraft = (generated: NewsGeneratedContent) => {
     setValue('headline', generated.headline, { shouldDirty: true });
