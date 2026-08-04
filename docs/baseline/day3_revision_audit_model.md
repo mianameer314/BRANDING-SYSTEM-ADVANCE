@@ -55,6 +55,10 @@ The edit page for each of the five content types includes a Revision history pan
 9. Refresh the page and confirm the history now contains an additional `restored` version. Earlier versions must still be visible.
 10. In Swagger, use `GET /api/v1/audit/content/blog/{id}/revisions` and, as super admin, `GET /api/v1/audit/events` to confirm the same evidence exists in the API.
 
+## Production deployment requirement
+
+The revision tables are created by Alembic migration `f4c7d2a9e821`. Production must run `python -m alembic upgrade head` against the Railway PostgreSQL database before the new application code handles content writes. The project start command now runs this migration before Uvicorn starts, preventing code from starting against an older schema on future deployments.
+
 ## Files delivered
 
 - `app/models/content_revision.py`
