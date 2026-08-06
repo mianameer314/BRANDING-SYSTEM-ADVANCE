@@ -48,7 +48,7 @@ export function FormActions({
  type="button"
  onClick={onLivePreview}
  disabled={isLoading}
- className="flex-1 flex justify-center items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+ className="flex-1 flex justify-center items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-0.5 hover:shadow-md shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
  >
  <Eye size={16} />
  Live Preview
@@ -60,7 +60,7 @@ export function FormActions({
  type="button"
  onClick={onSecurePreview}
  disabled={isLoading}
- className="flex-1 flex justify-center items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+ className="flex-1 flex justify-center items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-0.5 hover:shadow-md shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
  title="Generate a secure preview token for the saved draft"
  >
  <ExternalLink size={16} />
@@ -78,7 +78,7 @@ export function FormActions({
  type="button"
  onClick={onDelete}
  disabled={isLoading}
- className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+ className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 hover:-translate-y-0.5 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
  title="Delete permanently"
  >
  <Trash2 size={16} />
@@ -92,7 +92,7 @@ export function FormActions({
  type="button"
  onClick={handleCancel}
  disabled={isLoading}
- className="rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-zinc-100 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+ className="rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
  >
  Cancel
  </button>
@@ -101,10 +101,10 @@ export function FormActions({
  type="submit"
  disabled={isLoading || !isDirty}
  className={[
- 'flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-medium text-secondary transition-all duration-200 active:scale-95 disabled:active:scale-100',
+ 'flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-medium text-secondary transition-all duration-200 active:scale-95 disabled:active:scale-100 disabled:hover:translate-y-0',
  isLoading || !isDirty
  ? 'bg-primary opacity-60 cursor-not-allowed'
- : 'bg-primary hover:bg-secondary hover:text-white',
+ : 'bg-primary hover:bg-secondary hover:text-white hover:-translate-y-0.5 hover:shadow-md',
  ].join(' ')}
  >
  {isLoading && <Loader2 size={14} className="animate-spin" />}
@@ -115,4 +115,3 @@ export function FormActions({
  </div>
  );
 }
-

@@ -127,13 +127,13 @@ export function Header({ title, onMenuClick }: HeaderProps) {
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={() => setIsLogoutModalOpen(false)}
-                                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground hover:bg-gray-100 transition-colors"
+                                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleLogout}
-                                className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+                                className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95"
                             >
                                 Yes, Sign Out
                             </button>

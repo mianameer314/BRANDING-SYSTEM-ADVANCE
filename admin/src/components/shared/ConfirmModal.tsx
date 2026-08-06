@@ -53,7 +53,7 @@ export function ConfirmModal({
  <div className="bg-white/50 px-6 py-4 border-t border-border sm:flex sm:flex-row-reverse sm:gap-2">
  <button
  type="button"
- className="inline-flex w-full justify-center items-center rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto transition-all duration-200 active:scale-95"
+ className="inline-flex w-full justify-center items-center rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-destructive/90 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto transition-all duration-200 active:scale-95"
  onClick={onConfirm}
  disabled={isLoading}
  >
@@ -63,7 +63,7 @@ export function ConfirmModal({
  
  <button
  type="button"
- className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed sm:mt-0 sm:w-auto border border-border transition-all duration-200 active:scale-95"
+ className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed sm:mt-0 sm:w-auto border border-border transition-all duration-200 active:scale-95"
  onClick={onCancel}
  disabled={isLoading}
  >

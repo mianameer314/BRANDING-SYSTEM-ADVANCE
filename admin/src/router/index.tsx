@@ -5,8 +5,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { ForbiddenPage } from '@/components/errors/ForbiddenPage';
 import { PermissionRoute } from '@/features/auth/components/PermissionRoute';
 
-import { LoginPage } from '@/features/auth/LoginPage';
-import { RegisterPage } from '@/features/auth/RegisterPage';
+import { AuthPage } from '@/features/auth/AuthPage';
 import { ProfilePage } from '@/features/auth/ProfilePage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 
@@ -34,8 +33,8 @@ export const router = createBrowserRouter([
  {
  element: <PublicRoute />,
  children: [
- { path: '/login', element: <LoginPage /> },
- { path: '/register', element: <RegisterPage /> },
+ { path: '/login', element: <AuthPage /> },
+ { path: '/register', element: <AuthPage /> },
  ],
  },
  {
