@@ -48,7 +48,7 @@ export function StatusSelect({ value, onChange, currentStatus, error, disabled }
    const validTransition = currentStatus
      ? target === currentStatus || allowedTransitions[currentStatus].includes(target)
      : initialStatuses.includes(target);
-   const hasPermission = target === 'approved'
+   const hasPermission = (target === 'approved' || target === 'changes_requested')
      ? canApprove
      : publishStatuses.includes(target)
        ? canPublish

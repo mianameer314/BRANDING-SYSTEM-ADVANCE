@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import DbDep
+from app.api.idempotency import IdempotencyDep
 from app.core.permissions import require_permission
 from app.models.audit_event import AuditEvent
 from app.models.user import User
@@ -45,6 +46,7 @@ def restore_revision(
     data: RestoreRevisionRequest,
     db: DbDep,
     user: RestoreDep,
+    idempotency: IdempotencyDep = None,
 ):
     """Restore a prior snapshot; the restore itself becomes the next revision."""
     content = revision_history.restore_content_revision(
@@ -55,13 +57,18 @@ def restore_revision(
         actor_id=user.id,
         reason=data.reason,
     )
-    return RestoreRevisionOut(
+    response = RestoreRevisionOut(
         content_type=content_type,
         content_id=content_id,
         restored_version=version,
         status=content.status,
         message=f"Restored revision {version}; a new restore revision was recorded.",
     )
+    
+    if idempotency:
+        idempotency.save(db, 200, response.model_dump(mode="json"))
+        
+    return response
 
 
 @router.get("/events", response_model=PaginatedResponse[AuditEventOut])

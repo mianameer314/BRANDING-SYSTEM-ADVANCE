@@ -228,7 +228,7 @@ export default function BlogFormPage() {
                     <RevisionHistory
                       contentType="blog"
                       contentId={existing.id}
-                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['blog', slug] })}
+                      onRestoreSuccess={() => window.location.reload()}
                     />
                   </div>
                 )}

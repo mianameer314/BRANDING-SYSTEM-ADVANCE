@@ -9,7 +9,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status, BackgroundTasks
 
 from app.api.deps import DbDep, OptionalUser
-from app.core.permissions import require_permission, enforce_publish_permission, can_view_drafts
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission, enforce_publish_permission, enforce_content_lock, can_view_drafts
 from app.models.user import User
 from app.schemas.case_study import CaseStudyCreate, CaseStudyOut, CaseStudyUpdate
 from app.schemas.common import ContentStatus, PaginatedResponse
@@ -101,6 +102,7 @@ def create_case_study(
     cover_image: UploadFile | None = File(None, description="Cover image"),
     client_logo: UploadFile | None = File(None, description="Client logo image"),
     gallery: list[UploadFile] = File(None, description="Gallery images (multiple files)", json_schema_extra={"items": {"type": "string", "format": "binary"}}),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Create a new case study with optional image uploads.
@@ -172,6 +174,10 @@ def create_case_study(
 
         case_study = case_study_service.create_case_study(db, data, status_actor_id=admin.id, status_reason=status_reason)
         storage.clear_pending()
+
+        if idempotency:
+            idempotency.save(db, 201, CaseStudyOut.model_validate(case_study).model_dump(mode="json"))
+
         return case_study
 
     except HTTPException:
@@ -208,6 +214,7 @@ def update_case_study(
     existing_gallery: str | None = Form(None),
     remove_cover_image: bool = Form(False),
     remove_client_logo: bool = Form(False),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Update an existing case study.
@@ -226,6 +233,8 @@ def update_case_study(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Case study with id {case_study_id} not found",
         )
+
+    enforce_content_lock(admin, existing.status)
 
     try:
         update_kwargs = {}
@@ -351,6 +360,9 @@ def update_case_study(
                 payload=CaseStudyOut.model_validate(case_study).model_dump(mode="json")
             )
 
+        if idempotency:
+            idempotency.save(db, 200, CaseStudyOut.model_validate(case_study).model_dump(mode="json"))
+
         return case_study
 
     except HTTPException:
@@ -363,7 +375,12 @@ def update_case_study(
 
 
 @router.delete("/{case_study_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(CONTENT_DELETE_LIMIT)])
-def delete_case_study(case_study_id: int, db: DbDep, admin: DeleteDep):
+def delete_case_study(
+    case_study_id: int, 
+    db: DbDep, 
+    admin: DeleteDep,
+    idempotency: IdempotencyDep = None,
+):
     """
     Delete a case study by ID.
 
@@ -400,4 +417,8 @@ def delete_case_study(case_study_id: int, db: DbDep, admin: DeleteDep):
     if cs.gallery:
         storage.delete_files(cs.gallery)
 
-    return {"message": "Successfully deleted"}
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+
+    return response_body

@@ -60,8 +60,8 @@ export function GenerateDraftModal({ isOpen, onClose, contentType, onApply }: Ge
  };
 
  return createPortal(
- <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
- <div className="w-full max-w-2xl rounded-2xl border border-border bg-background p-6 shadow-2xl my-auto">
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+ <div className="w-full max-w-2xl rounded-2xl border border-border bg-background p-6 shadow-2xl my-auto relative z-10">
  <div className="flex items-center justify-between mb-6">
  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
  ✨ Generate with AI

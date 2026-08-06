@@ -20,7 +20,8 @@ from fastapi import (
 )
 
 from app.api.deps import DbDep, OptionalUser
-from app.core.permissions import require_permission, enforce_publish_permission, can_view_drafts
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission, enforce_publish_permission, enforce_content_lock, can_view_drafts
 from app.models.user import User
 from app.schemas.blog import BlogCreate, BlogOut, BlogUpdate
 from app.schemas.common import ContentStatus, PaginatedResponse
@@ -150,6 +151,7 @@ def create_blog(
         None,
         description="Cover image",
     ),
+    idempotency: IdempotencyDep = None,
 ):
     enforce_publish_permission(admin, status)
     storage = get_storage_service()
@@ -178,6 +180,9 @@ def create_blog(
         blog = blog_service.create_blog(db, data, status_actor_id=admin.id, status_reason=status_reason)
 
         storage.clear_pending()
+
+        if idempotency:
+            idempotency.save(db, 201, BlogOut.model_validate(blog).model_dump(mode="json"))
 
         return blog
 
@@ -216,6 +221,7 @@ def update_blog(
     status_reason: str | None = Form(None, max_length=500),
     cover_image: UploadFile | None = File(None),
     remove_cover_image: bool = Form(False),
+    idempotency: IdempotencyDep = None,
 ):
     enforce_publish_permission(admin, status)
     storage = get_storage_service()
@@ -228,6 +234,8 @@ def update_blog(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Blog not found",
         )
+
+    enforce_content_lock(admin, existing.status)
 
     try:
         update_data = {}
@@ -289,6 +297,9 @@ def update_blog(
                 payload=BlogOut.model_validate(blog).model_dump(mode="json")
             )
 
+        if idempotency:
+            idempotency.save(db, 200, BlogOut.model_validate(blog).model_dump(mode="json"))
+
         return blog
 
     except HTTPException:
@@ -314,6 +325,7 @@ def delete_blog(
     blog_id: int,
     db: DbDep,
     admin: DeleteDep,
+    idempotency: IdempotencyDep = None,
 ):
     storage = get_storage_service()
 
@@ -340,4 +352,8 @@ def delete_blog(
     if blog.cover_image:
         storage.delete_file(blog.cover_image)
 
-    return {"message": "Successfully deleted"}
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+
+    return response_body

@@ -6,6 +6,7 @@
  */
 import { Loader2, Trash2, Eye, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { usePermission } from '@/features/auth/hooks/usePermission';
 
 interface FormActionsProps {
  isLoading: boolean;
@@ -27,6 +28,7 @@ export function FormActions({
  onSecurePreview,
 }: FormActionsProps) {
  const navigate = useNavigate();
+ const canDelete = usePermission('delete');
 
  const handleCancel = () => {
  if (cancelTo) {
@@ -71,7 +73,7 @@ export function FormActions({
  {/* Bottom Row: Delete, Cancel, Update */}
  <div className="flex items-center justify-between w-full gap-2">
  <div className="flex items-center">
- {onDelete && (
+ {onDelete && canDelete && (
  <button
  type="button"
  onClick={onDelete}

@@ -216,7 +216,7 @@ export default function NewsFormPage() {
                     <RevisionHistory
                       contentType="news"
                       contentId={existing.id}
-                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['news', slug] })}
+                      onRestoreSuccess={() => window.location.reload()}
                     />
                   </div>
                 )}

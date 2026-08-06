@@ -103,14 +103,6 @@ Added shared immutable `content_revisions` and append-only `audit_events` tables
 
 ## Day 4 — API Contracts, Idempotency & Permission Hardening
 
-**Status:** Not started
+**Status:** Implementation complete.
 
-To be updated after contract, role, idempotency, duplicate-protection, and security testing work is complete.
-
----
-
-## Day 5 — Milestone 1: Controlled Editorial Backend
-
-**Status:** Not started
-
-To be updated after all five content types complete the tested lifecycle and Milestone 1 evidence is collected.
+Added API Contract validation for request/response schemas, error formats, pagination and permission boundaries. Implemented robust PostgreSQL-backed durable Idempotency (ApiIdempotencyRecord) to protect mutating actions (especially AI generation and webhook-triggered changes) against retries. Added Webhook Delivery Deduplication utilizing a SHA-256 payload fingerprint. Finished Permission Hardening by segregating manage_webhooks and securing endpoints. Wrote comprehensive automated contract tests, permission tests, and idempotency tests which all currently pass in CI/CD. Frontend Admin UI successfully integrates with all changes and UX bugs reported were addressed.

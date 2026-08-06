@@ -44,6 +44,13 @@ axiosInstance.interceptors.request.use((config) => {
  delete config.headers['Content-Type'];
  }
 
+ // Inject Idempotency-Key for all mutating requests (Day 4)
+ if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+   if (config.headers && !config.headers['Idempotency-Key']) {
+     config.headers['Idempotency-Key'] = crypto.randomUUID();
+   }
+ }
+
  return config;
 });
 

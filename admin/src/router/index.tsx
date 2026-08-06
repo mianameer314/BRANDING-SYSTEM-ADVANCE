@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
  { path: 'users/create', element: <PermissionRoute permission="manage_users"><UserFormPage /></PermissionRoute> },
  { path: 'users/:id/edit', element: <PermissionRoute permission="manage_users"><UserFormPage /></PermissionRoute> },
  
- { path: 'webhooks', element: <PermissionRoute permission="create"><WebhooksPage /></PermissionRoute> },
+ { path: 'webhooks', element: <PermissionRoute permission="manage_webhooks"><WebhooksPage /></PermissionRoute> },
  ],
  },
  ],

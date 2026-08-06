@@ -7,4 +7,5 @@ export type Permission =
  | "publish"
  | "interact"
  | "manage_users"
- | "view_drafts";
+ | "view_drafts"
+ | "manage_webhooks";

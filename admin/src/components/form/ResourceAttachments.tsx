@@ -339,7 +339,9 @@ export function ResourceAttachments({ contentType, contentId, onPendingFilesChan
  <PermissionGuard permission="delete">
  <button
  type="button"
- onClick={() => {
+ onClick={(e) => {
+ e.preventDefault();
+ e.stopPropagation();
  setResourceToDelete(resource.id);
  setIsDeleteModalOpen(true);
  }}

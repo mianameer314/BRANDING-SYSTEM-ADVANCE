@@ -9,7 +9,8 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
 
 from app.api.deps import DbDep, OptionalUser
-from app.core.permissions import require_permission, enforce_publish_permission, can_view_drafts
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission, enforce_publish_permission, enforce_content_lock, can_view_drafts
 from app.models.user import User
 from app.schemas.common import ContentStatus, PaginatedResponse
 from app.schemas.insight import InsightCreate, InsightOut, InsightUpdate
@@ -92,6 +93,7 @@ def create_insight(
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Create a new insight article with optional cover image upload.
@@ -135,6 +137,10 @@ def create_insight(
 
         insight = insight_service.create_insight(db, data, status_actor_id=admin.id, status_reason=status_reason)
         storage.clear_pending()
+
+        if idempotency:
+            idempotency.save(db, 201, InsightOut.model_validate(insight).model_dump(mode="json"))
+
         return insight
 
     except HTTPException:
@@ -162,6 +168,7 @@ def update_insight(
     status_reason: str | None = Form(None, max_length=500),
     cover_image: UploadFile | None = File(None, description="New cover image (replaces existing)"),
     remove_cover_image: bool = Form(False),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Update an existing insight article by ID.
@@ -179,6 +186,8 @@ def update_insight(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Insight with id {insight_id} not found",
         )
+
+    enforce_content_lock(admin, existing.status)
 
     try:
         update_kwargs = {}
@@ -246,6 +255,9 @@ def update_insight(
                 payload=InsightOut.model_validate(insight).model_dump(mode="json")
             )
 
+        if idempotency:
+            idempotency.save(db, 200, InsightOut.model_validate(insight).model_dump(mode="json"))
+
         return insight
 
     except HTTPException:
@@ -258,7 +270,12 @@ def update_insight(
 
 
 @router.delete("/{insight_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(CONTENT_DELETE_LIMIT)])
-def delete_insight(insight_id: int, db: DbDep, admin: DeleteDep):
+def delete_insight(
+    insight_id: int, 
+    db: DbDep, 
+    admin: DeleteDep,
+    idempotency: IdempotencyDep = None,
+):
     """
     Delete an insight article by ID.
 
@@ -290,4 +307,8 @@ def delete_insight(insight_id: int, db: DbDep, admin: DeleteDep):
     if insight.cover_image:
         storage.delete_file(insight.cover_image)
 
-    return {"message": "Successfully deleted"}
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+
+    return response_body

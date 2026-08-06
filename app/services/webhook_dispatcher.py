@@ -5,11 +5,13 @@ import hmac
 import hashlib
 import json
 import logging
+import uuid
 import httpx
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 
 from app.core.config import settings
 from app.models.webhook import Webhook
@@ -73,6 +75,9 @@ async def dispatch_publish_event(
                     ).hexdigest()
                     headers["X-Webhook-Signature"] = f"sha256={signature}"
 
+                dedup_key = hashlib.sha256(f"content.published|{content_type}|{content_id}".encode("utf-8")).hexdigest()
+                delivery_id = str(uuid.uuid4())
+
                 # Create log entry
                 log_entry = WebhookLog(
                     webhook_id=hook.id,
@@ -81,6 +86,8 @@ async def dispatch_publish_event(
                     content_id=content_id,
                     request_url=hook.url,
                     request_body=body_bytes.decode("utf-8"),
+                    delivery_id=delivery_id,
+                    dedup_key=dedup_key,
                 )
                 
                 try:
@@ -101,6 +108,18 @@ async def dispatch_publish_event(
                     log_entry.error_message = str(e)
                 
                 db.add(log_entry)
+                
+                try:
+                    # Flush to catch unique constraint violations immediately
+                    db.flush()
+                except IntegrityError as e:
+                    db.rollback()
+                    if "uq_webhook_log_webhook_dedup" in str(e.orig) or "23505" in str(e.orig):
+                        logger.info(f"Webhook {hook.id} deduplicated for event content.published, type {content_type}, id {content_id}. Skipped.")
+                        continue
+                    else:
+                        raise e
+                
                 record_audit_event(
                     db,
                     event_type="integration.webhook_delivered" if log_entry.success else "integration.webhook_failed",

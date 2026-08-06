@@ -236,7 +236,7 @@ export default function ProjectFormPage() {
                     <RevisionHistory
                       contentType="project"
                       contentId={existing.id}
-                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['project', slug] })}
+                      onRestoreSuccess={() => window.location.reload()}
                     />
                   </div>
                 )}

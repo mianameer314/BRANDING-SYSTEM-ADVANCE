@@ -8,7 +8,8 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
 
 from app.api.deps import DbDep, OptionalUser
-from app.core.permissions import require_permission, enforce_publish_permission, can_view_drafts
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission, enforce_publish_permission, enforce_content_lock, can_view_drafts
 from app.models.user import User
 from app.schemas.common import ContentStatus, PaginatedResponse
 from app.schemas.news import NewsCreate, NewsOut, NewsUpdate
@@ -90,6 +91,7 @@ def create_news(
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Create a new news article with optional cover image upload.
@@ -116,6 +118,10 @@ def create_news(
 
         news = news_service.create_news(db, data, status_actor_id=admin.id, status_reason=status_reason)
         storage.clear_pending()
+
+        if idempotency:
+            idempotency.save(db, 201, NewsOut.model_validate(news).model_dump(mode="json"))
+
         return news
 
     except HTTPException:
@@ -141,6 +147,7 @@ def update_news(
     status_reason: str | None = Form(None, max_length=500),
     cover_image: UploadFile | None = File(None, description="New cover image (replaces existing)"),
     remove_cover_image: bool = Form(False),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Update an existing news article by ID.
@@ -157,8 +164,10 @@ def update_news(
     if existing is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"News article with id {news_id} not found",
+            detail="News article not found",
         )
+
+    enforce_content_lock(admin, existing.status)
 
     try:
         update_kwargs = {}
@@ -205,6 +214,9 @@ def update_news(
                 payload=NewsOut.model_validate(news).model_dump(mode="json")
             )
 
+        if idempotency:
+            idempotency.save(db, 200, NewsOut.model_validate(news).model_dump(mode="json"))
+
         return news
 
     except HTTPException:
@@ -217,7 +229,12 @@ def update_news(
 
 
 @router.delete("/{news_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(CONTENT_DELETE_LIMIT)])
-def delete_news(news_id: int, db: DbDep, admin: DeleteDep):
+def delete_news(
+    news_id: int, 
+    db: DbDep, 
+    admin: DeleteDep,
+    idempotency: IdempotencyDep = None,
+):
     """
     Delete a news article by ID.
 
@@ -249,4 +266,8 @@ def delete_news(news_id: int, db: DbDep, admin: DeleteDep):
     if news.cover_image:
         storage.delete_file(news.cover_image)
 
-    return {"message": "Successfully deleted"}
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+
+    return response_body

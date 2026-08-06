@@ -7,13 +7,14 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { formatDate, truncate } from '@/utils/utils';
 import type { BlogOut } from './types';
-import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { toast } from 'react-hot-toast';
 import { PermissionGuard } from '@/features/auth/components/PermissionGuard';
 import { useUrlFilters } from '@/hooks/useUrlFilters';
 import { ContentFilterBar } from '@/components/table/ContentFilterBar';
+import { usePermission } from '@/features/auth/hooks/usePermission';
 
 const BLOG_CATEGORIES = [
  { label: 'Technology', value: 'Technology' },
@@ -46,6 +47,15 @@ const BLOG_CATEGORIES = [
 export function BlogsPage() {
  const { filters, setFilter, resetFilters } = useUrlFilters();
  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+
+ const canApprove = usePermission('approve');
+ const canPublish = usePermission('publish');
+
+ const isLocked = (status: string) => {
+   if (status === 'approved') return !canApprove;
+   if (['published', 'scheduled', 'unpublished', 'archived'].includes(status)) return !canPublish;
+   return false;
+ };
  
  const { data, isLoading, isError, refetch } = useBlogs(filters);
  const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteBlog();
@@ -122,13 +132,24 @@ export function BlogsPage() {
  render: (row) => (
  <div className="flex items-center justify-end gap-1">
  <PermissionGuard permission="update">
- <Link
- to={`/blogs/${row.slug}/edit`}
- className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
- title="Edit"
- >
- <Edit2 size={16} />
- </Link>
+ {isLocked(row.status) ? (
+   <button
+     type="button"
+     disabled
+     className="rounded p-1.5 text-muted-foreground opacity-50 cursor-not-allowed"
+     title="Content is locked in its current status. You do not have permission to modify it."
+   >
+     <Lock size={16} />
+   </button>
+ ) : (
+   <Link
+     to={`/blogs/${row.slug}/edit`}
+     className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
+     title="Edit"
+   >
+     <Edit2 size={16} />
+   </Link>
+ )}
  </PermissionGuard>
  <PermissionGuard permission="delete">
  <button

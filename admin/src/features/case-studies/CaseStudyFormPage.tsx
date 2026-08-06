@@ -273,7 +273,7 @@ export default function CaseStudyFormPage() {
                     <RevisionHistory
                       contentType="case_study"
                       contentId={existing.id}
-                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['case_study', slug] })}
+                      onRestoreSuccess={() => window.location.reload()}
                     />
                   </div>
                 )}

@@ -9,7 +9,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status, BackgroundTasks
 
 from app.api.deps import DbDep, OptionalUser
-from app.core.permissions import require_permission, enforce_publish_permission, can_view_drafts
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission, enforce_publish_permission, enforce_content_lock, can_view_drafts
 from app.models.user import User
 from app.schemas.common import ContentStatus, PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectOut, ProjectUpdate
@@ -98,6 +99,7 @@ def create_project(
     completed_at: str | None = Form(None, description="ISO datetime string"),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
     gallery: list[UploadFile] = File(None, description="Gallery images (multiple files)", json_schema_extra={"items": {"type": "string", "format": "binary"}}),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Create a new project showcase with optional image uploads.
@@ -162,6 +164,10 @@ def create_project(
 
         project = project_service.create_project(db, data, status_actor_id=admin.id, status_reason=status_reason)
         storage.clear_pending()
+
+        if idempotency:
+            idempotency.save(db, 201, ProjectOut.model_validate(project).model_dump(mode="json"))
+
         return project
 
     except HTTPException:
@@ -194,6 +200,7 @@ def update_project(
     gallery: list[UploadFile] | None = File(None),
     existing_gallery: str | None = Form(None),
     remove_cover_image: bool = Form(False),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Update an existing project.
@@ -212,6 +219,8 @@ def update_project(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project with id {project_id} not found",
         )
+    
+    enforce_content_lock(admin, existing.status)
 
     try:
         update_kwargs = {}
@@ -320,6 +329,9 @@ def update_project(
                 payload=ProjectOut.model_validate(project).model_dump(mode="json")
             )
 
+        if idempotency:
+            idempotency.save(db, 200, ProjectOut.model_validate(project).model_dump(mode="json"))
+
         return project
 
     except HTTPException:
@@ -332,7 +344,12 @@ def update_project(
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(CONTENT_DELETE_LIMIT)])
-def delete_project(project_id: int, db: DbDep, admin: DeleteDep):
+def delete_project(
+    project_id: int,
+    db: DbDep,
+    admin: DeleteDep,
+    idempotency: IdempotencyDep = None,
+):
     """
     Delete a project by ID.
 
@@ -367,4 +384,8 @@ def delete_project(project_id: int, db: DbDep, admin: DeleteDep):
     if project.gallery:
         storage.delete_files(project.gallery)
 
-    return {"message": "Successfully deleted"}
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+
+    return response_body

@@ -7,12 +7,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.deps import DbDep
+from app.api.idempotency import IdempotencyDep
 from app.core.permissions import require_permission
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.webhook import (
     WebhookCreate,
     WebhookOut,
+    WebhookCreateOut,
     WebhookUpdate,
     WebhookLogOut,
     WebhookTestResponse
@@ -22,24 +24,24 @@ from app.services.webhook_dispatcher import dispatch_publish_event
 
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
-# Webhooks can only be managed by users with 'manage_users' permission (super_admin) 
-# or we can use a generic 'create' permission if admins are allowed.
-# Given the DB has "super_admin" and "admin", we'll restrict to super_admin or admin.
-# 'manage_users' is super_admin only. 'publish' is admin and super_admin.
-# Let's use 'publish' to allow admins, or a dedicated permission. We'll use 'publish' as proxy for admin,
-# but 'create' + 'update' + 'delete' + 'manage_users' are available. We'll use 'create', 'update', 'delete'.
-
-AdminDep = Annotated[User, Depends(require_permission("publish"))]
+# Webhooks can only be managed by users with 'manage_webhooks' permission (super_admin) 
+AdminDep = Annotated[User, Depends(require_permission("manage_webhooks"))]
 
 
-@router.post("", response_model=WebhookOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=WebhookCreateOut, status_code=status.HTTP_201_CREATED)
 def create_webhook(
     data: WebhookCreate,
     db: DbDep,
-    admin: AdminDep
+    admin: AdminDep,
+    idempotency: IdempotencyDep = None,
 ):
     """Register a new webhook."""
-    return webhook_service.create_webhook(db, data, actor_id=admin.id)
+    webhook = webhook_service.create_webhook(db, data, actor_id=admin.id)
+    
+    if idempotency:
+        idempotency.save(db, 201, WebhookCreateOut.model_validate(webhook).model_dump(mode="json"))
+        
+    return webhook
 
 
 @router.get("", response_model=PaginatedResponse[WebhookOut])
@@ -72,25 +74,37 @@ def update_webhook(
     webhook_id: int,
     data: WebhookUpdate,
     db: DbDep,
-    admin: AdminDep
+    admin: AdminDep,
+    idempotency: IdempotencyDep = None,
 ):
     """Update a webhook."""
     webhook = webhook_service.update_webhook(db, webhook_id, data, actor_id=admin.id)
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
+        
+    if idempotency:
+        idempotency.save(db, 200, WebhookOut.model_validate(webhook).model_dump(mode="json"))
+        
     return webhook
 
 
-@router.delete("/{webhook_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{webhook_id}", status_code=status.HTTP_200_OK)
 def delete_webhook(
     webhook_id: int,
     db: DbDep,
-    admin: AdminDep
+    admin: AdminDep,
+    idempotency: IdempotencyDep = None,
 ):
     """Delete a webhook."""
     success = webhook_service.delete_webhook(db, webhook_id, actor_id=admin.id)
     if not success:
         raise HTTPException(status_code=404, detail="Webhook not found")
+        
+    response_body = {"message": "Successfully deleted"}
+    if idempotency:
+        idempotency.save(db, 200, response_body)
+        
+    return response_body
 
 
 @router.get("/{webhook_id}/logs", response_model=PaginatedResponse[WebhookLogOut])

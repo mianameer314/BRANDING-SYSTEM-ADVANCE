@@ -142,8 +142,8 @@ export function RevisionHistory({ contentType, contentId, onRestoreSuccess }: Re
  </ul>
 
  {modalRevision && createPortal(
-  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-  <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl">
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+  <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl relative z-10">
   <h3 className="text-lg font-semibold text-foreground">Confirm Restore</h3>
   <p className="mt-2 text-sm text-muted-foreground">
   Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.

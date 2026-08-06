@@ -228,7 +228,7 @@ export default function InsightFormPage() {
                     <RevisionHistory
                       contentType="insight"
                       contentId={existing.id}
-                      onRestoreSuccess={() => queryClient.invalidateQueries({ queryKey: ['insight', slug] })}
+                      onRestoreSuccess={() => window.location.reload()}
                     />
                   </div>
                 )}

@@ -7,13 +7,14 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { formatDate, truncate } from '@/utils/utils';
 import type { CaseStudyOut } from './types';
-import { ChevronLeft, ChevronRight, Star, Plus, Edit2, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { toast } from 'react-hot-toast';
 import { PermissionGuard } from '@/features/auth/components/PermissionGuard';
 import { useUrlFilters } from '@/hooks/useUrlFilters';
 import { ContentFilterBar } from '@/components/table/ContentFilterBar';
+import { usePermission } from '@/features/auth/hooks/usePermission';
 
 const CASE_STUDY_INDUSTRIES = [
  { label: 'Technology', value: 'Technology' },
@@ -30,6 +31,15 @@ const CASE_STUDY_INDUSTRIES = [
 export function CaseStudiesPage() {
  const { filters, setFilter, resetFilters } = useUrlFilters();
  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+
+ const canApprove = usePermission('approve');
+ const canPublish = usePermission('publish');
+
+ const isLocked = (status: string) => {
+   if (status === 'approved') return !canApprove;
+   if (['published', 'scheduled', 'unpublished', 'archived'].includes(status)) return !canPublish;
+   return false;
+ };
 
  const { data, isLoading, isError, refetch } = useCaseStudies(filters);
  const { mutateAsync: deleteCaseStudy, isPending: isDeleting } = useDeleteCaseStudy();
@@ -70,9 +80,9 @@ export function CaseStudiesPage() {
  { key: 'industry', header: 'Industry', width: 'w-32', render: (row) => row.industry ? <span className="rounded-md bg-accent px-2 py-0.5 text-xs text-muted-foreground whitespace-nowrap">{row.industry}</span> : <span className="text-muted-foreground">—</span> },
  { key: 'is_featured', header: 'Featured', width: 'w-24', render: (row) => (
  row.is_featured ? (
- <Star className="h-4 w-4 text-warning fill-amber-400" />
+ <span className="text-amber-400">★</span>
  ) : (
- <Star className="h-4 w-4 text-muted-foreground" />
+ <span className="text-muted-foreground">☆</span>
  )
  )},
  { key: 'created_at', header: 'Created', width: 'w-28', render: (row) => <span className="text-xs">{formatDate(row.created_at)}</span> },
@@ -84,13 +94,24 @@ export function CaseStudiesPage() {
  render: (row) => (
  <div className="flex items-center justify-end gap-1">
  <PermissionGuard permission="update">
- <Link
- to={`/case-studies/${row.slug}/edit`}
- className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
- title="Edit"
- >
- <Edit2 size={16} />
- </Link>
+ {isLocked(row.status) ? (
+   <button
+     type="button"
+     disabled
+     className="rounded p-1.5 text-muted-foreground opacity-50 cursor-not-allowed"
+     title="Content is locked in its current status. You do not have permission to modify it."
+   >
+     <Lock size={16} />
+   </button>
+ ) : (
+   <Link
+   to={`/case-studies/${row.slug}/edit`}
+   className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
+   title="Edit"
+   >
+   <Edit2 size={16} />
+   </Link>
+ )}
  </PermissionGuard>
  <PermissionGuard permission="delete">
  <button

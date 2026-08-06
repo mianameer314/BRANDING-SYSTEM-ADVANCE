@@ -27,7 +27,7 @@ export function ConfirmModal({
  return createPortal(
  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-0">
  <div 
- className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+ className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" 
  onClick={!isLoading ? onCancel : undefined} 
  />
  

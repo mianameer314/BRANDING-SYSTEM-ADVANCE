@@ -109,8 +109,8 @@ export const LivePreviewModal: React.FC<LivePreviewModalProps> = ({
  if (!isOpen) return null;
 
  return createPortal(
- <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
- <div className="flex flex-col w-[95vw] h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md">
+ <div className="flex flex-col w-[95vw] h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden relative z-10">
  {/* Header */}
  <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
  <div className="flex items-center space-x-3">

@@ -41,7 +41,7 @@ const navSections: NavSection[] = [
   {
     label: 'System',
     items: [
-      { to: '/webhooks', icon: Webhook, label: 'Webhooks', permission: 'publish' },
+      { to: '/webhooks', icon: Webhook, label: 'Webhooks', permission: 'manage_webhooks' },
     ],
   },
 ];

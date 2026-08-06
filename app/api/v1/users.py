@@ -77,7 +77,7 @@ def create_user(
 def get_user(
     user_id: int,
     db: DbDep,
-    current_user: ManageUsersDep,
+    current_user: Annotated[User, Depends(require_permission("read_content"))],
 ):
     """Get a user by ID."""
 

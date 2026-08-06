@@ -3,7 +3,7 @@ Webhook Log model — audit trail of webhook delivery attempts.
 """
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Text, ForeignKey, func
+from sqlalchemy import Boolean, DateTime, Integer, String, Text, ForeignKey, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
@@ -30,6 +30,13 @@ class WebhookLog(Base):
     
     delivered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    
+    delivery_id: Mapped[str | None] = mapped_column(String(36), nullable=True, unique=True, index=True)
+    dedup_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("webhook_id", "dedup_key", name="uq_webhook_log_webhook_dedup"),
     )
 
     webhook = relationship("Webhook", back_populates="logs")

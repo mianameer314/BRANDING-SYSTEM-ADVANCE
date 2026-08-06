@@ -25,6 +25,7 @@
 **Problem:** Retry or duplicate requests can repeat side effects.  
 **Action:** Introduce durable PostgreSQL idempotency records and deduplicated publish-event delivery.  
 **Acceptance:** An identical retry returns the original result; a conflicting reuse of a key is rejected.
+**Status:** Complete.
 
 ## P2 — Performance and operational visibility
 

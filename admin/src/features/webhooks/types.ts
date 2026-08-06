@@ -6,6 +6,8 @@ export interface Webhook {
  description: string | null;
  is_active: boolean;
  created_at: string;
+ secret?: string;
+ secret_masked?: string;
 }
 
 export interface WebhookCreate {

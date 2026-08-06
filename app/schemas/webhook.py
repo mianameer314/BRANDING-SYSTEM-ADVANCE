@@ -2,7 +2,7 @@
 Pydantic schemas for Webhook management.
 """
 from datetime import datetime
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel, HttpUrl, Field, field_validator
 
 class WebhookCreate(BaseModel):
     url: HttpUrl = Field(..., description="Target endpoint URL (must be a valid HTTP/HTTPS URL)")
@@ -22,7 +22,7 @@ class WebhookUpdate(BaseModel):
     is_active: bool | None = None
 
 
-class WebhookOut(BaseModel):
+class WebhookBaseOut(BaseModel):
     id: int
     url: str
     event: str
@@ -31,14 +31,23 @@ class WebhookOut(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    
-    # We don't expose the full secret in the list/get response for security
-    # We will mask it in the service layer or keep it hidden. 
-    # For now we'll include it for the UI if needed, but it's best to mask it.
+
+    model_config = {"from_attributes": True}
+
+
+class WebhookOut(WebhookBaseOut):
     secret: str
 
-    class Config:
-        from_attributes = True
+    @field_validator("secret", mode="before")
+    @classmethod
+    def mask_secret(cls, v: str) -> str:
+        if v and len(v) > 8:
+            return f"{v[:4]}...{v[-4:]}"
+        return "***"
+
+
+class WebhookCreateOut(WebhookBaseOut):
+    secret: str
 
 
 class WebhookLogOut(BaseModel):

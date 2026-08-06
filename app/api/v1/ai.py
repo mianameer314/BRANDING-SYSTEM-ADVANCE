@@ -3,7 +3,8 @@ AI Content Generation API Routes.
 """
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.deps import CurrentUser
+from app.api.deps import DbDep, CurrentUser
+from app.api.idempotency import IdempotencyDep
 from app.core.permissions import require_permission
 from app.rate_limit.dependencies import AI_GENERATION_LIMIT
 from app.schemas.ai import GenerateContentRequest, GenerateContentResponse
@@ -19,10 +20,17 @@ router = APIRouter(prefix="/ai", tags=["AI Content Assistant"])
 )
 async def api_generate_content(
     request: GenerateContentRequest,
-    current_user = Depends(require_permission("create"))
+    db: DbDep,
+    current_user = Depends(require_permission("create")),
+    idempotency: IdempotencyDep = None,
 ):
     """
     Generates structured content drafts using AI.
     Requires 'create' permission.
     """
-    return await generate_content(request, current_user.id)
+    result = await generate_content(request, current_user.id)
+    
+    if idempotency:
+        idempotency.save(db, 200, GenerateContentResponse.model_validate(result).model_dump(mode="json"))
+        
+    return result

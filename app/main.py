@@ -12,6 +12,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import ai, audit, auth, blogs, case_studies, insights, interactions, news, preview, projects, resources, users, webhooks
+from app.api.idempotency import IdempotentReplayException, idempotency_exception_handler
 from app.core.config import settings
 
 from sqlalchemy import text
@@ -127,6 +128,8 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Internal Server Error"}
     )
+
+app.add_exception_handler(IdempotentReplayException, idempotency_exception_handler)
 
 
 # ── Static Files / Media Mount ───────────────────────────────

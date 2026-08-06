@@ -14,7 +14,7 @@ class UserRole(str, Enum):
     viewer = "viewer"
 
 ROLE_PERMISSIONS = {
-    "super_admin": {"read_content", "create", "update", "delete", "approve", "publish", "interact", "manage_users", "view_drafts"},
+    "super_admin": {"read_content", "create", "update", "delete", "approve", "publish", "interact", "manage_users", "view_drafts", "manage_webhooks"},
     "admin":       {"read_content", "create", "update", "delete", "approve", "publish", "interact", "view_drafts"},
     "editor":      {"read_content", "create", "update", "interact", "view_drafts"},
     "user":        {"read_content", "interact"},
@@ -22,6 +22,15 @@ ROLE_PERMISSIONS = {
 }
 
 STATUS_PERMISSION_REQUIREMENTS = {
+    "changes_requested": "approve",
+    "approved": "approve",
+    "scheduled": "publish",
+    "published": "publish",
+    "unpublished": "publish",
+    "archived": "publish",
+}
+
+LOCKED_STATUS_REQUIREMENTS = {
     "approved": "approve",
     "scheduled": "publish",
     "published": "publish",
@@ -65,6 +74,24 @@ def enforce_publish_permission(user, target_status) -> None:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"You do not have permission to move content to '{status_val}'."
+            )
+
+def enforce_content_lock(user, current_status) -> None:
+    """
+    Verifies if the user is authorized to modify content in its current privileged status.
+    Raises HTTP 403 Forbidden if the user lacks the permission for the current status.
+    """
+    if current_status is None:
+        return
+        
+    status_val = current_status.value if hasattr(current_status, "value") else current_status
+    required_permission = LOCKED_STATUS_REQUIREMENTS.get(status_val)
+    if required_permission:
+        user_perms = ROLE_PERMISSIONS.get(user.role, set())
+        if required_permission not in user_perms:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Content is locked in '{status_val}' status. You do not have permission to modify it."
             )
 
 

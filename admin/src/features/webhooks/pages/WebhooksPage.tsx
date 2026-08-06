@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Activity, Zap, Shield, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -7,12 +8,16 @@ import type { Webhook } from '../types';
 import { WebhookFormModal } from '../components/WebhookFormModal';
 import { WebhookLogsModal } from '../components/WebhookLogsModal';
 import { useCreateWebhook } from '../hooks';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 export const WebhooksPage = () => {
  const [page] = useState(1);
  const [isFormOpen, setIsFormOpen] = useState(false);
  const [isLogsOpen, setIsLogsOpen] = useState(false);
  const [selectedWebhook, setSelectedWebhook] = useState<Webhook | null>(null);
+ const [newWebhookSecret, setNewWebhookSecret] = useState<string | null>(null);
+ const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+ const [webhookToDelete, setWebhookToDelete] = useState<number | null>(null);
 
  const { data, isLoading } = useWebhooks({ page, per_page: 20 });
  const createWebhook = useCreateWebhook();
@@ -50,26 +55,41 @@ export const WebhooksPage = () => {
  }
  );
  } else {
- createWebhook.mutate(formData, {
- onSuccess: () => {
- toast.success('Webhook created successfully');
- setIsFormOpen(false);
- },
- onError: (error: any) => {
+  createWebhook.mutate(formData, {
+  onSuccess: (res: any) => {
+  toast.success('Webhook created successfully');
+  setIsFormOpen(false);
+  if (res?.secret) {
+  setNewWebhookSecret(res.secret);
+  }
+  },
+  onError: (error: any) => {
  toast.error(error.response?.data?.detail || 'Failed to create webhook');
  }
  });
  }
  };
 
- const handleDelete = (id: number) => {
- if (window.confirm('Are you sure you want to delete this webhook?')) {
- deleteWebhook.mutate(id, {
- onSuccess: () => toast.success('Webhook deleted'),
- onError: () => toast.error('Failed to delete webhook'),
- });
- }
- };
+  const handleDelete = (id: number) => {
+  setWebhookToDelete(id);
+  setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+  if (webhookToDelete === null) return;
+  deleteWebhook.mutate(webhookToDelete, {
+  onSuccess: () => {
+  toast.success('Webhook deleted');
+  setIsDeleteModalOpen(false);
+  setWebhookToDelete(null);
+  },
+  onError: () => {
+  toast.error('Failed to delete webhook');
+  setIsDeleteModalOpen(false);
+  setWebhookToDelete(null);
+  },
+  });
+  };
 
  const handleToggleStatus = (webhook: Webhook) => {
  updateWebhook.mutate(
@@ -225,11 +245,64 @@ export const WebhooksPage = () => {
  isSubmitting={createWebhook.isPending || updateWebhook.isPending}
  />
 
- <WebhookLogsModal
- isOpen={isLogsOpen}
- onClose={() => setIsLogsOpen(false)}
- webhookId={selectedWebhook?.id || null}
- />
- </div>
- );
+  <WebhookLogsModal
+  isOpen={isLogsOpen}
+  onClose={() => setIsLogsOpen(false)}
+  webhookId={selectedWebhook?.id || null}
+  />
+
+  {newWebhookSecret && createPortal(
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+  <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-2xl relative z-10">
+  <div className="flex items-center gap-3 mb-4">
+  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success/10 text-success">
+  <Shield className="h-5 w-5" />
+  </div>
+  <h3 className="text-xl font-semibold text-foreground">Save Your Secret Key</h3>
+  </div>
+  <p className="text-sm text-muted-foreground mb-4">
+  Please copy this webhook secret key and store it somewhere safe. For security reasons, <strong>we will not show it to you again</strong>.
+  </p>
+  <div className="mb-6 rounded-lg bg-gray-100 p-4 border border-gray-200 flex items-center justify-between shadow-inner">
+  <code className="text-base font-bold font-mono text-gray-900 break-all select-all">{newWebhookSecret}</code>
+  <button 
+  onClick={() => {
+  navigator.clipboard.writeText(newWebhookSecret);
+  toast.success('Secret copied to clipboard');
+  }}
+  className="ml-4 flex-shrink-0 rounded-md bg-gray-900 p-2.5 text-white hover:bg-gray-800 transition-colors shadow-sm"
+  title="Copy to clipboard"
+  >
+  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+  </svg>
+  </button>
+  </div>
+  <div className="flex justify-end">
+  <button
+  onClick={() => setNewWebhookSecret(null)}
+  className="interactive-button-small"
+  >
+  <span className="label flex items-center gap-2">I have saved it</span>
+  </button>
+  </div>
+  </div>
+  </div>,
+  document.body
+  )}
+
+  <ConfirmModal
+  isOpen={isDeleteModalOpen}
+  title="Delete Webhook?"
+  message="Are you sure you want to delete this webhook? This action cannot be undone."
+  confirmText="Delete"
+  isLoading={deleteWebhook.isPending}
+  onConfirm={confirmDelete}
+  onCancel={() => {
+  setIsDeleteModalOpen(false);
+  setWebhookToDelete(null);
+  }}
+  />
+  </div>
+  );
 };
