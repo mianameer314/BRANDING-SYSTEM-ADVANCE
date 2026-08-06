@@ -36,7 +36,7 @@ export default function ProjectFormPage() {
   const isEdit = !!slug;
   const navigate = useNavigate();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+
 
   const { data: existing, isLoading, isError } = useProject(slug ?? '');
 
