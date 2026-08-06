@@ -5,14 +5,14 @@ import { CountUp } from '@/components/ui/CountUp';
 import { useDashboardStats } from './hooks';
 
 const STATUS_DOT_COLORS: Record<string, string> = {
-  draft: 'bg-warning/80',
-  in_review: 'bg-info/80',
-  changes_requested: 'bg-warning',
-  approved: 'bg-success',
-  scheduled: 'bg-primary/80',
-  published: 'bg-success/80',
-  unpublished: 'bg-muted-foreground',
-  archived: 'bg-destructive/80',
+  published: 'bg-emerald-500',
+  draft: 'bg-slate-500',
+  in_review: 'bg-amber-500',
+  changes_requested: 'bg-rose-500',
+  approved: 'bg-cyan-500',
+  scheduled: 'bg-fuchsia-500',
+  unpublished: 'bg-orange-500',
+  archived: 'bg-zinc-600',
 };
 
 const STATUS_LABELS: Record<string, string> = {
