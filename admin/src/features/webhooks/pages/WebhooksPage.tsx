@@ -262,9 +262,19 @@ export const WebhooksPage = () => {
   </div>
   <h3 className="text-xl font-semibold text-foreground">Save Your Secret Key</h3>
   </div>
-  <p className="text-sm text-muted-foreground mb-4">
-  Please copy this webhook secret key and store it somewhere safe. For security reasons, <strong>we will not show it to you again</strong>.
-  </p>
+  <div className="mb-5 space-y-3">
+    <p className="text-sm text-muted-foreground">
+      Please copy this webhook secret key and add it to your receiving system's configuration. For security reasons, <strong>we will not show it to you again</strong>.
+    </p>
+    <div className="rounded-md bg-info/10 p-3 text-xs text-info flex gap-2 items-start">
+      <div className="mt-0.5"><Shield className="h-4 w-4" /></div>
+      <p>
+        <strong>What is this for?</strong> The CMS signs outgoing requests using this key in the <code>x-o2-signature</code> header so your destination server can verify its authenticity. 
+        <br className="my-1"/>
+        <em className="opacity-90">Note: If you are using a third-party service like Zapier or Discord that doesn't verify HMAC signatures, you can safely ignore this key.</em>
+      </p>
+    </div>
+  </div>
   <div className="mb-6 rounded-lg bg-gray-100 p-4 border border-gray-200 flex items-center justify-between shadow-inner">
   <code className="text-base font-bold font-mono text-gray-900 break-all select-all">{newWebhookSecret}</code>
   <button 
