@@ -160,12 +160,14 @@ export const WebhooksPage = () => {
  ) : (
  data?.items.map((webhook) => (
  <tr key={webhook.id} className="hover:bg-white">
- <td className="px-6 py-4">
- <div className="font-medium text-foreground ">{webhook.url}</div>
- <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
- <Shield className="h-3 w-3" /> HMAC Signed
- </div>
- </td>
+  <td className="px-6 py-4">
+    <div className="font-medium text-foreground">{webhook.url}</div>
+    <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+      <span className="flex items-center gap-1"><Shield className="h-3 w-3" /> HMAC Signed</span>
+      <span className="text-gray-300">•</span>
+      <span className="font-mono">{webhook.secret}</span>
+    </div>
+  </td>
  <td className="px-6 py-4 font-mono text-xs">{webhook.event}</td>
  <td className="px-6 py-4">
  <div className="flex flex-wrap gap-1">
