@@ -85,22 +85,40 @@ export function Sidebar() {
                   to={item.to}
                   className={({ isActive }) =>
                     cn(
-                      'group flex items-center gap-3 px-4 py-2 text-sm font-semibold transition-all',
+                      'group relative flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 overflow-hidden',
                       isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-zinc-50 hover:text-foreground hover:shadow-sm'
                     )
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <span className="absolute left-0 h-6 w-1 rounded-r bg-primary-foreground" />
+                        <span className="absolute left-0 h-full w-1 rounded-r bg-zinc-900" />
                       )}
-                      <Icon size={16} />
-                      <span className="font-semibold">{item.label}</span>
+                      
+                      {/* Icon with hover color and continuous animation */}
+                      <Icon 
+                        size={18} 
+                        className={cn(
+                          "transition-all duration-300",
+                          isActive 
+                            ? "animate-pulse" 
+                            : "group-hover:text-emerald-500 group-hover:scale-110 group-hover:animate-pulse"
+                        )} 
+                      />
+                      
+                      {/* Text that slides to center on hover */}
+                      <span className={cn(
+                        "font-semibold transition-all duration-300",
+                        !isActive && "group-hover:translate-x-2"
+                      )}>
+                        {item.label}
+                      </span>
+                      
                       {isActive && (
-                        <ChevronRight size={12} className="ml-auto opacity-60" />
+                        <ChevronRight size={14} className="ml-auto opacity-80" />
                       )}
                     </>
                   )}
