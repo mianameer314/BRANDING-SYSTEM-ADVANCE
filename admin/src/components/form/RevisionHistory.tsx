@@ -149,8 +149,8 @@ export function RevisionHistory({ contentType, contentId, onRestoreSuccess }: Re
   Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.
   </p>
   <div className="mt-6 flex justify-end gap-3">
-  <button type="button" onClick={() => setModalRevision(null)} className="rounded px-4 py-2 text-sm font-medium hover:bg-muted">Cancel</button>
-  <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">Restore</button>
+  <button type="button" onClick={() => setModalRevision(null)} className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Cancel</button>
+  <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Restore</button>
   </div>
   </div>
   </div>,
