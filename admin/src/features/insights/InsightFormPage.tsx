@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useInsight, useCreateInsight, useUpdateInsight, useDeleteInsight } from './hooks';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { insightSchema, type InsightFormData } from '@/features/shared/forms/schemas';
 import type { InsightGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';

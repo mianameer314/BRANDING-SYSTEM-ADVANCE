@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useProject, useCreateProject, useUpdateProject, useDeleteProject } from './hooks';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { projectSchema, type ProjectFormData } from '@/features/shared/forms/schemas';
 import type { ProjectGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';

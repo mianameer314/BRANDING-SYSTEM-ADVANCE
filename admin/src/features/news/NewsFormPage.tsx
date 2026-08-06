@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useNewsItem, useCreateNews, useUpdateNews, useDeleteNews } from './hooks';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { newsSchema, type NewsFormData } from '@/features/shared/forms/schemas';
 import type { NewsGeneratedContent } from '@/features/ai/types';
 import { generatePreviewToken } from '@/features/preview/api';
