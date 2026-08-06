@@ -115,7 +115,7 @@ export function UsersPage() {
  <div className="flex items-center justify-end gap-1">
  <Link
  to={`/users/${row.id}/edit`}
- className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
+ className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition duration-200 active:scale-90"
  title="Edit"
  >
  <Edit2 size={16} />
@@ -124,7 +124,7 @@ export function UsersPage() {
  row.is_active ? (
  <button
  onClick={() => setUserToDeactivate(row.id)}
- className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition"
+ className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition duration-200 active:scale-90"
  title="Deactivate"
  >
  <UserX size={16} />

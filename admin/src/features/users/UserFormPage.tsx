@@ -94,7 +94,7 @@ export function UserFormPage() {
  <div className="flex items-center gap-4">
  <Link
  to="/users"
- className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition hover:bg-accent hover:text-foreground"
+ className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition hover:bg-accent hover:text-foreground duration-200 active:scale-90"
  >
  <ArrowLeft size={16} />
  </Link>

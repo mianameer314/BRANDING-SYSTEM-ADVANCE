@@ -106,7 +106,7 @@ export function CaseStudiesPage() {
  ) : (
    <Link
    to={`/case-studies/${row.slug}/edit`}
-   className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition"
+   className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition duration-200 active:scale-90"
    title="Edit"
    >
    <Edit2 size={16} />
@@ -116,7 +116,7 @@ export function CaseStudiesPage() {
  <PermissionGuard permission="delete">
  <button
  onClick={() => setItemToDelete(row.id)}
- className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition"
+ className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition duration-200 active:scale-90"
  title="Delete"
  >
  <Trash2 size={16} />

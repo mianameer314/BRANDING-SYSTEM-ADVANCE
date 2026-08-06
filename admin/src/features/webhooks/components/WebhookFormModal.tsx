@@ -74,7 +74,7 @@ export const WebhookFormModal = ({ isOpen, onClose, onSubmit, initialData, isSub
  <h2 className="text-xl font-bold text-foreground ">
  {initialData ? 'Edit Webhook' : 'Create Webhook'}
  </h2>
- <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+ <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-200 active:scale-90">
  <X className="h-5 w-5" />
  </button>
  </div>

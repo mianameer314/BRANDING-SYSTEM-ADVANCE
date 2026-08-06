@@ -224,7 +224,7 @@ export const WebhooksPage = () => {
  </button>
  <button
  onClick={() => handleDelete(webhook.id)}
- className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+ className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-200 active:scale-90"
  title="Delete Webhook"
  >
  <Trash2 className="h-4 w-4" />
