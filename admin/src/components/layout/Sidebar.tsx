@@ -121,88 +121,88 @@ export function Sidebar() {
               {section.label}
             </p>
             <div className="space-y-1">
-            {section.items.map((item) => {
-              const Icon = item.icon;
+              {section.items.map((item) => {
+                const Icon = item.icon;
 
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className="block relative outline-none rounded-lg overflow-hidden"
-                >
-                  {({ isActive }) => (
-                    <motion.div
-                      initial="idle"
-                      whileHover={isActive ? "idle" : "hover"}
-                      animate={isActive ? "active" : "idle"}
-                      className={cn(
-                        "relative flex items-center gap-3 px-3 py-3 text-sm font-semibold transition-colors z-10",
-                        isActive 
-                          ? "text-primary-foreground" 
-                          : "text-muted-foreground hover:text-foreground hover:bg-zinc-50/50"
-                      )}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="sidebarActiveBg"
-                          className="absolute inset-0 bg-primary shadow-sm rounded-lg"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
-                      )}
-                      
-                      {isActive && (
-                        <motion.div
-                          layoutId="sidebarActiveIndicator"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 h-1/2 w-1 bg-zinc-900 rounded-r-full z-20"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
-                      )}
-
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className="block relative outline-none rounded-lg overflow-hidden"
+                  >
+                    {({ isActive }) => (
                       <motion.div
-                        variants={item.variants || {
-                          idle: { scale: 1, rotate: 0, color: "currentColor" },
-                          hover: { 
-                            scale: 1.15, 
-                            rotate: [0, -12, 12, -12, 0],
-                            color: "#10b981", 
-                            transition: {
-                              rotate: { repeat: Infinity, duration: 0.5, ease: "linear" }
-                            }
-                          },
-                          active: { scale: 1, rotate: 0, color: "currentColor" }
-                        }}
-                        className="relative z-20 flex items-center justify-center"
+                        initial="idle"
+                        whileHover={isActive ? "idle" : "hover"}
+                        animate={isActive ? "active" : "idle"}
+                        className={cn(
+                          "relative flex items-center gap-3 px-3 py-3 text-sm font-semibold transition-colors z-10",
+                          isActive
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-zinc-50/50"
+                        )}
                       >
-                        <Icon size={18} />
-                      </motion.div>
+                        {isActive && (
+                          <motion.div
+                            layoutId="sidebarActiveBg"
+                            className="absolute inset-0 bg-primary shadow-sm rounded-lg"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                          />
+                        )}
 
-                      <motion.span
-                        variants={{
-                          idle: { x: 0 },
-                          hover: { x: 6 },
-                          active: { x: 0 }
-                        }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="relative z-20"
-                      >
-                        {item.label}
-                      </motion.span>
-                      
-                      {isActive && (
-                        <motion.div 
-                          className="relative z-20 ml-auto"
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 0.8, scale: 1 }}
-                          transition={{ duration: 0.2 }}
+                        {isActive && (
+                          <motion.div
+                            layoutId="sidebarActiveIndicator"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 h-1/2 w-1 bg-zinc-900 rounded-r-full z-20"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                          />
+                        )}
+
+                        <motion.div
+                          variants={item.variants || {
+                            idle: { scale: 1, rotate: 0, color: "currentColor" },
+                            hover: {
+                              scale: 1.15,
+                              rotate: [0, -12, 12, -12, 0],
+                              color: "#10b981",
+                              transition: {
+                                rotate: { repeat: Infinity, duration: 0.5, ease: "linear" }
+                              }
+                            },
+                            active: { scale: 1, rotate: 0, color: "currentColor" }
+                          }}
+                          className="relative z-20 flex items-center justify-center"
                         >
-                          <ChevronRight size={14} />
+                          <Icon size={18} />
                         </motion.div>
-                      )}
-                    </motion.div>
-                  )}
-                </NavLink>
-              );
-            })}
+
+                        <motion.span
+                          variants={{
+                            idle: { x: 0 },
+                            hover: { x: 6 },
+                            active: { x: 0 }
+                          }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          className="relative z-20"
+                        >
+                          {item.label}
+                        </motion.span>
+
+                        {isActive && (
+                          <motion.div
+                            className="relative z-20 ml-auto"
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 0.8, scale: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronRight size={14} />
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           </div>
         ))}
