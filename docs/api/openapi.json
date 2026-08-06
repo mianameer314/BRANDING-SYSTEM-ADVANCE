@@ -5313,6 +5313,49 @@
         }
       }
     },
+    "/api/v1/stats/dashboard": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Dashboard Stats",
+        "description": "Get aggregated counts by status for all content types.",
+        "operationId": "get_dashboard_stats_api_v1_stats_dashboard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "tags": [
