@@ -28,11 +28,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 tags_metadata = [
+    # ── Core Identity & Security ──
     {
         "name": "Authentication",
         "description": "Operations for user registration, login, and token refresh.",
     },
+    {
+        "name": "User Management",
+        "description": "User profile management and admin user control.",
+    },
     
+    # ── Editorial Content Types ──
     {
         "name": "Blogs",
         "description": "Manage long-form articles and thought pieces. Supports multimedia and rich text.",
@@ -53,35 +59,44 @@ tags_metadata = [
         "name": "Case Studies",
         "description": "Detailed client success stories with business metrics.",
     },
-    {
-        "name": "User Management",
-        "description": "User profile management and admin user control.",
-    },
-    {
-        "name": "Interactions",
-        "description": "User engagement features: liking and commenting on content.",
-    },
+    
+    # ── Supporting Content & Engagement ──
     {
         "name": "Resources",
         "description": "Downloadable gated files and assets linked to content.",
     },
     {
+        "name": "Preview",
+        "description": "Secure short-lived token generation for real-time iframe previews.",
+    },
+    {
+        "name": "Interactions",
+        "description": "User engagement features (likes, comments, favorites).<br/><br/>⚠️ **NOTE:** *These endpoints are currently available via API only and are not yet implemented in the Admin Dashboard UI.*",
+    },
+    
+    # ── Automation & Auditing ──
+    {
         "name": "AI Content Assistant",
-        "description": "AI-powered content generation endpoints.",
+        "description": "AI-powered content generation endpoints for rapid drafting.",
     },
     {
         "name": "Webhooks",
-        "description": "Manage outbound webhooks for publish events.",
+        "description": "Manage outbound webhooks for real-time content publish events.",
     },
     {
         "name": "Audit & Revisions",
         "description": "Immutable content revisions and operational audit events.",
     },
+    
+    # ── Infrastructure ──
     {
         "name": "System",
-        "description": "Health checks and system status endpoints.",
+        "description": "Health checks, metrics, and system status endpoints.",
     },
-   
+    {
+        "name": "Stats",
+        "description": "Aggregated content statistics for the Admin Dashboard overview.",
+    },
 ]
 
 app = FastAPI(
@@ -91,12 +106,14 @@ app = FastAPI(
 
 This API powers the decoupled content management backend. It provides robust RESTful endpoints for delivering and managing multi-format content.
 
-### Key Features:
+### Key Capabilities:
 - **Authentication**: JWT-based secure access with Refresh Tokens.
 - **RBAC**: Strict Role-Based Access Control (Super Admin, Admin, Editor, User).
-- **Rate Limiting**: Distributed Redis-backed abuse protection.
+- **Controlled Lifecycle**: 7-state publishing workflow (`draft` to `archived`) with enforced content locking.
+- **Audit Trails**: Immutable revision history logs for all content modifications.
+- **Resilience**: API Idempotency for safe network retries and Redis-backed Rate Limiting.
+- **Webhooks**: Real-time HTTP dispatching for content publication events.
 - **Media**: Dual-provider (Local + AWS S3) Multipart/Form-Data uploads.
-- **Engagement**: Zero-N+1 likes, comments, and favorites.
 """,
     version="1.0.0",
     openapi_tags=tags_metadata,

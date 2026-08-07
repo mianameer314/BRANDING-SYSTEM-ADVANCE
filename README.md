@@ -20,6 +20,11 @@
 
 The **O2Geeks Branding System** is an enterprise-grade, decoupled Headless CMS architecture. It powers the public **O2Geeks Website** (Nuxt 3) and provides a feature-rich **Admin Dashboard** (React + Vite) backed by a high-performance **FastAPI REST API** (PostgreSQL + Redis).
 
+**Key Milestone 1 Features (Backend Engine):**
+* **Controlled Content Lifecycle**: A 7-state workflow (`draft`, `in_review`, `approved`, `published`, `archived`) with strict role-based access control (RBAC).
+* **Content Locking & Audit Trails**: Content locks prevent unauthorized edits after approval. Every state change is tracked in an immutable revision history.
+* **Resilient Integrations**: Support for API Idempotency (safe retries) and a webhook dispatch system for real-time `content.published` events.
+
 ```text
   ┌────────────────────────┐      ┌────────────────────────┐
   │   Nuxt 3 Website       │      │  React Admin Dashboard │
@@ -177,6 +182,7 @@ For full historical background on the step-by-step development process, explore 
 * [Week 3 (Days 9-13) — Rate Limiting, Admin UI Architecture & User Management](daily%20work%20updates/week3_complete.md)
 * [Week 4 (Days 14-18) — Previews, AI Auto-Population & Staging Deployment](daily%20work%20updates/week4_complete.md)
 * [Week 5 (Days 19-23) — UI Synchronization, Production Bug Fixes & Project Documentation](daily%20work%20updates/week5_complete.md)
+* [Week 6 (Milestone 1) — Controlled Editorial Backend, Content Lifecycle, Revision History, Idempotency, and Webhooks](daily%20work%20updates/week6_complete.md)
 
 
 ---
