@@ -178,22 +178,19 @@ class TestIdempotencyEvidence:
         """Two identical requests with the same Idempotency-Key return the same result."""
         idem_key = str(uuid.uuid4())
         headers = {"Idempotency-Key": idem_key}
+        payload = {
+            "url": f"https://replay-test-{uuid.uuid4().hex[:8]}.example.com/hook",
+            "event": "content.published",
+            "content_types": ["*"],
+        }
 
         with TestClient(app) as client:
             # First request — creates the webhook
-            resp1 = client.post("/api/v1/webhooks", json={
-                "url": f"https://replay-test-{uuid.uuid4().hex[:8]}.example.com/hook",
-                "event": "content.published",
-                "content_types": ["*"],
-            }, headers=headers)
+            resp1 = client.post("/api/v1/webhooks", json=payload, headers=headers)
             assert resp1.status_code == 201
 
             # Second request — identical payload, same key → replay
-            resp2 = client.post("/api/v1/webhooks", json={
-                "url": f"https://replay-test-{uuid.uuid4().hex[:8]}.example.com/hook",
-                "event": "content.published",
-                "content_types": ["*"],
-            }, headers=headers)
+            resp2 = client.post("/api/v1/webhooks", json=payload, headers=headers)
             # Replay should return the saved status and include the replay header
             assert resp2.status_code == 201
             assert resp2.headers.get("X-Idempotent-Replay") == "true"

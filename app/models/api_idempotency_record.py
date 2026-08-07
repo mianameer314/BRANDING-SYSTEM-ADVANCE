@@ -1,13 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import Integer, String, DateTime, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.session import Base
 
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
 def get_default_expiration() -> datetime:
-    # We could read from config, but a simple 24h default is requested by the spec
-    # and can be handled via config if needed. For now, 24 hours.
-    return datetime.utcnow() + timedelta(hours=24)
+    return datetime.now(timezone.utc) + timedelta(hours=24)
 
 class ApiIdempotencyRecord(Base):
     __tablename__ = "api_idempotency_records"
@@ -19,7 +20,7 @@ class ApiIdempotencyRecord(Base):
     request_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
     response_status: Mapped[int] = mapped_column(Integer, nullable=False)
     response_body: Mapped[dict] = mapped_column(JSON, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utc_now, index=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=get_default_expiration, index=True, nullable=False)
 
     __table_args__ = (

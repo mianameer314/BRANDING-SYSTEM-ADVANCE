@@ -113,7 +113,7 @@ def test_blog_full_lifecycle(db_session):
 def test_news_full_lifecycle(db_session):
     news = news_service.create_news(
         db_session,
-        NewsCreate(title="Lifecycle News", source="Tester", content="Body"),
+        NewsCreate(headline="Lifecycle News", summary="Lifecycle summary", source="Tester"),
         status_actor_id=1,
     )
 
@@ -131,9 +131,9 @@ def test_project_full_lifecycle(db_session):
     project = project_service.create_project(
         db_session,
         ProjectCreate(
-            title="Lifecycle Project",
-            short_description="Short desc",
-            content="Body",
+            name="Lifecycle Project",
+            description="Full description body",
+            short_desc="Short desc",
         ),
         status_actor_id=1,
     )
@@ -176,7 +176,9 @@ def test_case_study_full_lifecycle(db_session):
         CaseStudyCreate(
             title="Lifecycle Case Study",
             client_name="Acme Corp",
-            content="Body",
+            challenge="The challenge",
+            solution="The solution",
+            results="The results",
         ),
         status_actor_id=1,
     )
