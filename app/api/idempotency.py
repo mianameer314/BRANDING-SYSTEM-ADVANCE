@@ -83,7 +83,6 @@ async def get_idempotency_context(
     # Check for existing record
     from datetime import datetime, timezone
     
-    # We use utcnow for comparison as created_at/expires_at are timezone-aware
     now = datetime.now(timezone.utc)
 
     record = (
@@ -97,8 +96,12 @@ async def get_idempotency_context(
     )
 
     if record:
+        # Normalize expires_at to timezone-aware (SQLite returns naive datetimes)
+        expires_at = record.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
         # Treat expired records as a miss
-        if record.expires_at < now:
+        if expires_at < now:
             # we could delete it, but the janitor handles it. We just proceed.
             pass
         elif record.request_fingerprint == fingerprint:
