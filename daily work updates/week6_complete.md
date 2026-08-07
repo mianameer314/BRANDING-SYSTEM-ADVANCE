@@ -106,3 +106,24 @@ Added shared immutable `content_revisions` and append-only `audit_events` tables
 **Status:** Implementation complete.
 
 Added API Contract validation for request/response schemas, error formats, pagination and permission boundaries. Implemented robust PostgreSQL-backed durable Idempotency (ApiIdempotencyRecord) to protect mutating actions (especially AI generation and webhook-triggered changes) against retries. Added Webhook Delivery Deduplication utilizing a SHA-256 payload fingerprint. Finished Permission Hardening by segregating manage_webhooks and securing endpoints. Wrote comprehensive automated contract tests, permission tests, and idempotency tests which all currently pass in CI/CD. Frontend Admin UI successfully integrates with all changes and UX bugs reported were addressed.
+
+---
+
+## Day 5 — Milestone 1 Sign-Off & Verification
+
+**Date:** August 7, 2026  
+**Status:** MILESTONE COMPLETE
+
+Created a comprehensive test suite to verify the controlled editorial backend built across Days 1-4. Successfully pushed the entire system to green (77 passing tests).
+
+### Evidence Gathered
+| Evidence Area | Verification | Result |
+|---|---|---|
+| Lifecycle Walkthrough | Walked Blog, News, Project, Insight, Case Study through all 7 states | PASS |
+| Invalid Transitions | Prevented illegal state skips (e.g., draft directly to approved) | PASS |
+| Permission Boundaries | Blocked editors from approving/publishing; blocked editing of locked states | PASS |
+| Idempotency Protection | Identical requests replay correctly; conflicts are rejected | PASS (Fixed SQLite timezone bug) |
+
+### Milestone Wrap-Up
+The backend API is now fully resilient. It strictly enforces content workflows, correctly rejects unauthorized actions, safely stores revision histories, and protects against duplicate network requests. 
+The backend-alpha release is ready for tagging.
