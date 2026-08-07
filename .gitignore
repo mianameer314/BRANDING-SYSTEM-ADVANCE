@@ -36,6 +36,7 @@ venv.bak/
 .ipynb_checkpoints
 
 # Testing & Databases
+.agents
 .pytest_cache/
 .coverage
 htmlcov/
