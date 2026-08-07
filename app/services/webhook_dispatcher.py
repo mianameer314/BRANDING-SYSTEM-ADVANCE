@@ -35,15 +35,17 @@ async def dispatch_publish_event(
 
     # We need a new DB session since this runs in a background task after the original session is closed
     with SessionLocal() as db:
-        # Find matching webhooks: active, correct event, and matching content type (or "*")
-        webhooks = db.query(Webhook).filter(
+        # Find matching webhooks: active and correct event
+        webhooks_all = db.query(Webhook).filter(
             Webhook.is_active == True,
-            Webhook.event == "content.published",
-            or_(
-                Webhook.content_types.any(content_type),
-                Webhook.content_types.any("*")
-            )
+            Webhook.event == "content.published"
         ).all()
+        
+        # Filter array in python to support SQLite test db
+        webhooks = [
+            w for w in webhooks_all
+            if content_type in w.content_types or "*" in w.content_types
+        ]
 
         if not webhooks:
             return

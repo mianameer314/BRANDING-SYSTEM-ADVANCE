@@ -7,13 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from passlib.context import CryptContext
 
-from app.main import app
-from app.db.session import Base
-from app.api.deps import get_db, get_current_user, get_refresh_user
-from app.services.storage.service import StorageService, get_storage_service
-from app.models.user import User
-
-# In-memory SQLite Database
+# 1. Setup in-memory SQLite Database FIRST
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
@@ -22,6 +16,34 @@ engine = create_engine(
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# 2. Patch the real session with the testing session BEFORE app is imported
+# This ensures background tasks (like webhook dispatch) that import SessionLocal
+# will use the test SQLite database instead of the real Postgres DB from CI environment variables.
+import app.db.session
+app.db.session.engine = engine
+app.db.session.SessionLocal = TestingSessionLocal
+
+# 3. Now import the rest of the application
+from app.main import app
+from app.db.session import Base
+from app.api.deps import get_db, get_current_user, get_refresh_user
+from app.services.storage.service import StorageService, get_storage_service
+from app.models.user import User
+from app.models.blog import Blog
+from app.models.news import News
+from app.models.project import Project
+from app.models.insight import Insight
+from app.models.case_study import CaseStudy
+from app.models.resource import Resource
+from app.models.favorite import Favorite
+from app.models.like import Like
+from app.models.comment import Comment
+from app.models.webhook import Webhook
+from app.models.webhook_log import WebhookLog
+from app.models.content_revision import ContentRevision
+from app.models.audit_event import AuditEvent
+from app.models.api_idempotency_record import ApiIdempotencyRecord
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
