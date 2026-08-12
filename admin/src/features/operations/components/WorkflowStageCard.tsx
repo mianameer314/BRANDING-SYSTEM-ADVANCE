@@ -34,7 +34,7 @@ export function WorkflowStageCard({
     : [];
 
   return (
-    <div className="o2-card-3d group relative overflow-hidden rounded-xl border border-border bg-card p-6 flex flex-col justify-between">
+    <Link to={linkTo} className="o2-card-3d block group relative overflow-hidden rounded-xl border border-border bg-card p-6 flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer">
       {/* Glow accent */}
       <div className={cn('absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity', color)} />
 
@@ -70,13 +70,10 @@ export function WorkflowStageCard({
           )}
         </div>
         
-        <Link
-          to={linkTo}
-          className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-        >
-          View All <ArrowRight size={16} />
-        </Link>
+        <div className="flex items-center text-primary opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0 duration-300">
+          <ArrowRight size={20} />
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
