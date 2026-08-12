@@ -75,10 +75,10 @@ export function BlogPreview({ data }: { data: any }) {
               </p>
             )}
             
-            {data.body && (
+            {data.content && (
               <article 
                 className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl text-[#131415] leading-[1.8]"
-                dangerouslySetInnerHTML={{ __html: data.body }}
+                dangerouslySetInnerHTML={{ __html: data.content }}
               />
             )}
           </div>

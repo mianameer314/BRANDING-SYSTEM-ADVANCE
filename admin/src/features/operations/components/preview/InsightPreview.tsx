@@ -42,6 +42,9 @@ export function InsightPreview({ data }: { data: any }) {
                     {data.category}
                   </span>
                 )}
+                {data.author && (
+                  <span className="text-white/70 text-sm font-medium">By {data.author}</span>
+                )}
                 {data.published_at && (
                   <span className="text-white/50 text-sm font-medium">
                     {format(new Date(data.published_at), 'MMMM d, yyyy')}

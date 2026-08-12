@@ -45,6 +45,11 @@ export function NewsPreview({ data }: { data: any }) {
                 <span className="bg-red-600 text-white px-3 py-1 text-sm font-semibold rounded-md uppercase tracking-wider">
                   Press Release
                 </span>
+                {data.is_featured && (
+                  <span className="bg-yellow-500 text-black px-3 py-1 text-sm font-semibold rounded-md uppercase tracking-wider">
+                    Featured
+                  </span>
+                )}
                 {data.published_at && (
                   <span className="text-white/50 text-sm font-medium">
                     {format(new Date(data.published_at), 'MMMM d, yyyy')}

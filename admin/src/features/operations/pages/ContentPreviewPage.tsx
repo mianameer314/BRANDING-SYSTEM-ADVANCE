@@ -121,7 +121,7 @@ export function ContentPreviewPage() {
         </div>
 
         {/* SEO Sidebar */}
-        <PreviewMetadataPanel data={data} />
+        <PreviewMetadataPanel data={data} contentType={contentType!} />
       </div>
     </div>
   );

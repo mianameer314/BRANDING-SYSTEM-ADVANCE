@@ -1,11 +1,18 @@
-import { Settings2, Tag, Globe } from 'lucide-react';
+import { Settings2, Tag, Globe, User } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface PreviewMetadataPanelProps {
   data: any;
+  contentType: string;
 }
 
-export function PreviewMetadataPanel({ data }: PreviewMetadataPanelProps) {
+export function PreviewMetadataPanel({ data, contentType }: PreviewMetadataPanelProps) {
+  // Types that have Category & Tags schemas
+  const hasClassification = ['blog', 'insight', 'project'].includes(contentType);
+  
+  // Author
+  const authorDisplay = data.author || data.status_changed_by_id || 'System';
+
   return (
     <div className="w-80 bg-card border-l border-border/50 shadow-sm h-full overflow-y-auto custom-scrollbar shrink-0">
       <div className="p-4 border-b border-border/50 sticky top-0 bg-card/90 backdrop-blur z-10">
@@ -34,39 +41,44 @@ export function PreviewMetadataPanel({ data }: PreviewMetadataPanelProps) {
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Author ID:</span>
-              <span className="font-medium">{data.owner_id || 'System'}</span>
+              <span className="text-muted-foreground">Author:</span>
+              <span className="font-medium flex items-center gap-1">
+                <User className="w-3 h-3" />
+                {authorDisplay}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Classification */}
-        <div className="space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <Tag className="w-3.5 h-3.5" />
-            Classification
-          </h4>
-          <div className="bg-muted/20 border border-border/50 rounded-lg p-3 space-y-3 text-sm">
-            <div>
-              <span className="text-muted-foreground text-xs block mb-1">Category:</span>
-              <span className="font-semibold bg-background border px-2 py-0.5 rounded text-xs">{data.category || 'None'}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground text-xs block mb-1">Tags:</span>
-              <div className="flex flex-wrap gap-1.5">
-                {data.tags && data.tags.length > 0 ? (
-                  (typeof data.tags === 'string' ? data.tags.split(',') : data.tags).map((tag: string) => (
-                    <span key={tag} className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
-                      #{tag.trim()}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs italic opacity-50">No tags</span>
-                )}
+        {hasClassification && (
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Tag className="w-3.5 h-3.5" />
+              Classification
+            </h4>
+            <div className="bg-muted/20 border border-border/50 rounded-lg p-3 space-y-3 text-sm">
+              <div>
+                <span className="text-muted-foreground text-xs block mb-1">Category:</span>
+                <span className="font-semibold bg-background border px-2 py-0.5 rounded text-xs">{data.category || 'None'}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground text-xs block mb-1">Tags:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {data.tags && data.tags.length > 0 ? (
+                    (typeof data.tags === 'string' ? data.tags.split(',') : data.tags).map((tag: string) => (
+                      <span key={tag} className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                        #{tag.trim()}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs italic opacity-50">No tags</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

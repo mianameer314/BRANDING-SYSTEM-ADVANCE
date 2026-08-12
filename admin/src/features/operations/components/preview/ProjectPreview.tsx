@@ -35,11 +35,20 @@ export function ProjectPreview({ data }: { data: any }) {
 
           {/* Bottom row: title + badge */}
           <div className="flex flex-col md:flex-row gap-5 items-start md:items-end mt-3 md:mt-6">
-            {data.name && (
-              <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight m-0">
-                {data.name}
-              </h1>
-            )}
+            <div>
+              {data.name && (
+                <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight m-0">
+                  {data.name}
+                </h1>
+              )}
+              {data.is_featured && (
+                <div className="mt-6">
+                  <span className="bg-yellow-500 text-black px-3 py-1 text-sm font-semibold rounded-md uppercase tracking-wider">
+                    Featured Project
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -83,12 +92,12 @@ export function ProjectPreview({ data }: { data: any }) {
               </div>
             </div>
           )}
-          {data.published_at && (
+          {data.completed_at && (
             <div>
               <p className="text-sm font-semibold text-[#131415]/70 m-0">Completed</p>
               <div className="mt-2">
                 <span className="text-lg font-medium">
-                  {format(new Date(data.published_at), 'MMM yyyy')}
+                  {format(new Date(data.completed_at), 'MMM yyyy')}
                 </span>
               </div>
             </div>
@@ -107,6 +116,20 @@ export function ProjectPreview({ data }: { data: any }) {
                  className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl text-[#131415] leading-[1.8]"
                  dangerouslySetInnerHTML={{ __html: data.description }}
                />
+            </div>
+          </div>
+        )}
+
+        {/* Gallery */}
+        {data.gallery && data.gallery.length > 0 && (
+          <div className="mt-16 border-t border-gray-200 pt-16">
+            <h2 className="text-4xl font-bold text-[#131415] mb-8">Gallery</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {data.gallery.map((imgUrl: string, idx: number) => (
+                <div key={idx} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                  <img src={imgUrl} alt={`Gallery image ${idx + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
             </div>
           </div>
         )}
