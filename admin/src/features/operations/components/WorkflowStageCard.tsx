@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/utils/utils';
 import { CountUp } from '@/components/ui/CountUp';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 
 interface WorkflowStageCardProps {
   title: string;
@@ -13,6 +13,7 @@ interface WorkflowStageCardProps {
   isLoading?: boolean;
   linkTo: string;
   breakdown?: Record<string, number>;
+  isLocked?: boolean;
 }
 
 export function WorkflowStageCard({
@@ -25,6 +26,7 @@ export function WorkflowStageCard({
   isLoading,
   linkTo,
   breakdown,
+  isLocked,
 }: WorkflowStageCardProps) {
   // Sort breakdown by count descending
   const sortedBreakdown = breakdown
@@ -33,10 +35,25 @@ export function WorkflowStageCard({
         .sort((a, b) => b[1] - a[1])
     : [];
 
+  const CardWrapper = (isLocked ? 'div' : Link) as any;
+
   return (
-    <Link to={linkTo} className="o2-card-3d block group relative overflow-hidden rounded-xl border border-border bg-card p-6 flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer">
+    <CardWrapper 
+      to={!isLocked ? linkTo : undefined} 
+      className={cn(
+        "o2-card-3d block group relative overflow-hidden rounded-xl border border-border bg-card p-6 flex flex-col justify-between hover:bg-accent/50 transition-all duration-300",
+        isLocked ? "cursor-not-allowed opacity-60 grayscale-[30%]" : "cursor-pointer"
+      )}
+      title={isLocked ? "You don't have permission to view or manage content in this stage." : undefined}
+    >
       {/* Glow accent */}
-      <div className={cn('absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity', color)} />
+      <div className={cn('absolute -right-4 -top-4 h-20 w-20 rounded-full blur-2xl opacity-10 transition-opacity duration-300', isLocked ? '' : 'group-hover:opacity-30', color)} />
+      
+      {isLocked && (
+        <div className="absolute top-4 right-4">
+          <Lock className="text-muted-foreground/50" size={18} />
+        </div>
+      )}
 
       <div className="relative flex items-start justify-between">
         <div>
@@ -70,10 +87,16 @@ export function WorkflowStageCard({
           )}
         </div>
         
-        <div className="flex items-center text-primary opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0 duration-300">
-          <ArrowRight size={20} />
-        </div>
+        {isLocked ? (
+          <div className="text-muted-foreground/50 flex items-center gap-1 group-hover:text-muted-foreground transition-colors duration-200">
+            <Lock size={16} /> Restricted
+          </div>
+        ) : (
+          <div className="text-muted-foreground flex items-center group-hover:text-primary transition-colors duration-200">
+            <ArrowRight size={18} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+          </div>
+        )}
       </div>
-    </Link>
+    </CardWrapper>
   );
 }

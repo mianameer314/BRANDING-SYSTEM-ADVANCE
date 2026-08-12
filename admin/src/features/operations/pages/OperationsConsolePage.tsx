@@ -15,9 +15,20 @@ import { useWorkflowOverview } from '../hooks';
 import { WorkflowStageCard } from '../components/WorkflowStageCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
 
 export function OperationsConsolePage() {
   const { data: overview, isLoading, refetch, isFetching } = useWorkflowOverview();
+  const { user } = useAuth();
+  
+  const canApprove = user?.permissions?.includes('approve');
+  const canPublish = user?.permissions?.includes('publish');
+  
+  const isLocked = (status: string) => {
+    if (status === 'approved') return !canApprove;
+    if (['published', 'scheduled', 'unpublished', 'archived'].includes(status)) return !canPublish;
+    return false;
+  };
 
   const stages = [
     {
@@ -156,6 +167,7 @@ export function OperationsConsolePage() {
               count={count}
               breakdown={breakdown}
               isLoading={isLoading}
+              isLocked={isLocked(stage.id)}
             />
           );
         })}
