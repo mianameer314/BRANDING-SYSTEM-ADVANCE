@@ -1,5 +1,5 @@
 # Week 7: Operations Console & Pipeline Implementation
-**Status:** In Progress (Day 1 Completed)
+**Status:** In Progress (Day 1 FULLY COMPLETED)
 
 ## Day 1 Summary: End-to-End Operations Workflow & UI/UX Polish
 
@@ -7,6 +7,8 @@ Today we successfully built, tested, and polished the production-ready **Operati
 
 ### 1. Backend & Testing
 - **Unified Operations API:** Built and verified the `/api/v1/operations/workflow-overview` and `/api/v1/operations/items` endpoints to aggregate statuses across all content types (Blog, News, Project, Insight, Case Study).
+- **Recent Activity Update:** Refined the backend query to sort recent activity by `updated_at` instead of `status_changed_at`, guaranteeing that all global edits and revisions surface in the activity feed immediately, not just stage transitions.
+- **Filter Precision:** Fixed backend filtering so that if an author filter is applied to a content type that doesn't track authors (like News), it correctly returns zero results instead of all results.
 - **Test Coverage:** Wrote and executed comprehensive end-to-end test suites in `tests/test_operations.py`. Verified that stage aggregations, unified queues, and status/type filters all successfully pass (100% completion).
 
 ### 2. Frontend Connectivity & Bug Fixes
@@ -20,14 +22,14 @@ Today we successfully built, tested, and polished the production-ready **Operati
 - **Icon Polish:** Swapped out confusing identical icons to distinct ones (`FileWarning` for Changes Requested, `ZapOff` for Integration Issues).
 
 ### 4. Advanced UI/UX Enhancements
-- **Fully Clickable Cards:** Removed the tiny, inaccessible "View All" links and transformed the entire Operations Console cards into massive interactive touch targets with a sliding arrow hover effect.
+- **Dynamic Kanban Board:** Upgraded the pipeline view so that whenever an operator applies an active filter (Title, Author, Content Type), any column that yields 0 results is completely hidden from the board, creating a laser-focused, uncluttered workspace.
+- **Custom Select Component:** Built a bespoke `CustomSelect` component from scratch to replace the standard OS dropdown, ensuring perfect dark-mode theming, subtle hover highlights, and injected dynamic color dots matching the content type schemas.
+- **Premium Interactive Cards:** Removed tiny, inaccessible links and transformed the entire Operations Console cards into massive interactive touch targets. Re-integrated the `o2-card-3d` smooth lift effect, exact corner glow, and an animated directional arrow icon that pivots on hover.
 - **Smart Pipeline Auto-Scrolling:** Implemented a quality-of-life feature where clicking a specific status card on the dashboard instantly navigates to the Pipeline board and **auto-scrolls horizontally** to center the exact column the user requested.
 - **Professional Terminology:** Updated the UI navigation labels to enterprise-standard terms ("Operations Console" and "Content Pipeline") based on user feedback.
+- **Active Navigation Bug Fix:** Patched React Router's URL matching logic (`exact: true`) to prevent both the Console and Pipeline sidebar links from improperly glowing green at the same time.
 
 ### 5. Enterprise Role-Based Access Control (RBAC)
 - **Strict Sidebar Visibility:** Locked down the Operations section in the UI. Standard Users and Viewers can no longer see the Operations Console since it exposes unpublished drafts. It is now only visible to Super Admins, Admins, and Editors (requiring `view_drafts` permission).
-- **Pipeline Content Locks:** Implemented visual and functional content locks for Editors. If an Editor attempts to view locked/privileged statuses (like Published, Scheduled, or Approved) in the Kanban board:
-  - The card becomes faded (`opacity-80`).
-  - The interactive hover effect is removed.
-  - A `Lock` icon is displayed.
-  - The title link is completely disabled, securely preventing them from bypassing the dashboard to edit privileged content.
+- **Pipeline Content Locks:** Implemented visual and functional content locks for Editors in the Kanban board.
+- **Dashboard Card Locks:** Synchronized the RBAC logic directly into the main Operations Console page. Restricted stage cards (like Published or Scheduled for editors) are now heavily grayed out (`opacity-60 grayscale-[30%]`), stripped of their 3D interactive hover effects, marked with a lock icon, and made completely unclickable to block unauthorized access at the route level.
