@@ -208,19 +208,19 @@ export function DashboardPage() {
   return (
     <div className="space-y-8 pb-8">
       {/* Main Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative flex flex-col items-center text-center gap-4 py-2 sm:py-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Dashboard & Console</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard & Console</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto">
             Monitor and manage the entire editorial workflow.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
           <PermissionGuard permission="view_drafts">
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+              className="flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50 transition-colors"
             >
               <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
               Refresh
@@ -231,12 +231,19 @@ export function DashboardPage() {
 
       <PermissionGuard permission="view_drafts">
         {/* Summary Bar */}
-        <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Total Managed Content</span>
-              <span className="text-2xl font-bold">
-                {isOperationsLoading ? '...' : overview?.total_content || 0}
+        <div className="flex justify-center w-full py-4 mb-4">
+          <div className="relative group overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-card to-card/50 px-16 py-10 text-center shadow-sm transition-all hover:shadow-md hover:border-primary/40 min-w-[320px]">
+            {/* Glow Accent */}
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative z-10 flex flex-col items-center justify-center gap-3">
+              <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Total Managed Content</span>
+              <span className="text-6xl font-black text-foreground drop-shadow-sm">
+                {isOperationsLoading ? (
+                  <span className="inline-block h-14 w-24 animate-pulse rounded-lg bg-accent" />
+                ) : (
+                  <CountUp end={overview?.total_content || 0} />
+                )}
               </span>
             </div>
           </div>
