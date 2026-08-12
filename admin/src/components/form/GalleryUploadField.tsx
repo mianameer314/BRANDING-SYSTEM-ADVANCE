@@ -32,7 +32,7 @@ export function GalleryUploadField({
  // Sync state whenever the external gallery URLs change (e.g., after a restore)
  useEffect(() => {
    setKeptUrls(currentGalleryUrls || []);
- }, [galleryUrlsString]);
+ }, [currentGalleryUrls, galleryUrlsString]);
 
  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
  const files = Array.from(e.target.files ?? []);

@@ -29,7 +29,7 @@ import { UserFormPage } from '@/features/users/UserFormPage';
 
 import { WebhooksPage } from '@/features/webhooks/pages/WebhooksPage';
 
-import { OperationsConsolePage } from '@/features/operations/pages/OperationsConsolePage';
+
 import { WorkflowOverviewPage } from '@/features/operations/pages/WorkflowOverviewPage';
 
 export const router = createBrowserRouter([
@@ -75,7 +75,7 @@ export const router = createBrowserRouter([
  { path: 'users/create', element: <PermissionRoute permission="manage_users"><UserFormPage /></PermissionRoute> },
  { path: 'users/:id/edit', element: <PermissionRoute permission="manage_users"><UserFormPage /></PermissionRoute> },
  
- { path: 'operations', element: <PermissionRoute permission="read_content"><OperationsConsolePage /></PermissionRoute> },
+ { path: 'operations', element: <Navigate to="/dashboard" replace /> },
  { path: 'operations/workflow', element: <PermissionRoute permission="read_content"><WorkflowOverviewPage /></PermissionRoute> },
  
  { path: 'webhooks', element: <PermissionRoute permission="manage_webhooks"><WebhooksPage /></PermissionRoute> },

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "O2geeks Headless CMS",
-    "description": "\n**Backend API for the O2geeks Branding System**\n\nThis API powers the decoupled content management backend. It provides robust RESTful endpoints for delivering and managing multi-format content.\n\n### Key Features:\n- **Authentication**: JWT-based secure access with Refresh Tokens.\n- **RBAC**: Strict Role-Based Access Control (Super Admin, Admin, Editor, User).\n- **Rate Limiting**: Distributed Redis-backed abuse protection.\n- **Media**: Dual-provider (Local + AWS S3) Multipart/Form-Data uploads.\n- **Engagement**: Zero-N+1 likes, comments, and favorites.\n",
+    "description": "\n**Backend API for the O2geeks Branding System**\n\nThis API powers the decoupled content management backend. It provides robust RESTful endpoints for delivering and managing multi-format content.\n\n### Key Capabilities:\n- **Authentication**: JWT-based secure access with Refresh Tokens.\n- **RBAC**: Strict Role-Based Access Control (Super Admin, Admin, Editor, User).\n- **Controlled Lifecycle**: 7-state publishing workflow (`draft` to `archived`) with enforced content locking.\n- **Audit Trails**: Immutable revision history logs for all content modifications.\n- **Resilience**: API Idempotency for safe network retries and Redis-backed Rate Limiting.\n- **Webhooks**: Real-time HTTP dispatching for content publication events.\n- **Media**: Dual-provider (Local + AWS S3) Multipart/Form-Data uploads.\n",
     "version": "1.0.0"
   },
   "paths": {
@@ -5356,6 +5356,197 @@
         ]
       }
     },
+    "/api/v1/operations/workflow-overview": {
+      "get": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Get Workflow Overview",
+        "description": "Aggregated workflow metrics across all content types.\nReturns counts per lifecycle stage per content type.",
+        "operationId": "get_workflow_overview_api_v1_operations_workflow_overview_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/items": {
+      "get": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Get Workflow Items",
+        "description": "Paginated list of workflow items across all content types.\nCan filter by content_type and status.",
+        "operationId": "get_workflow_items_api_v1_operations_items_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated list of statuses, e.g. 'in_review,changes_requested'",
+              "title": "Status"
+            },
+            "description": "Comma-separated list of statuses, e.g. 'in_review,changes_requested'"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search across titles",
+              "title": "Search"
+            },
+            "description": "Search across titles"
+          },
+          {
+            "name": "author",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by author",
+              "title": "Author"
+            },
+            "description": "Filter by author"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -9628,6 +9819,10 @@
       "description": "Operations for user registration, login, and token refresh."
     },
     {
+      "name": "User Management",
+      "description": "User profile management and admin user control."
+    },
+    {
       "name": "Blogs",
       "description": "Manage long-form articles and thought pieces. Supports multimedia and rich text."
     },
@@ -9648,24 +9843,24 @@
       "description": "Detailed client success stories with business metrics."
     },
     {
-      "name": "User Management",
-      "description": "User profile management and admin user control."
-    },
-    {
-      "name": "Interactions",
-      "description": "User engagement features: liking and commenting on content."
-    },
-    {
       "name": "Resources",
       "description": "Downloadable gated files and assets linked to content."
     },
     {
+      "name": "Preview",
+      "description": "Secure short-lived token generation for real-time iframe previews."
+    },
+    {
+      "name": "Interactions",
+      "description": "User engagement features (likes, comments, favorites).<br/><br/>\u26a0\ufe0f **NOTE:** *These endpoints are currently available via API only and are not yet implemented in the Admin Dashboard UI.*"
+    },
+    {
       "name": "AI Content Assistant",
-      "description": "AI-powered content generation endpoints."
+      "description": "AI-powered content generation endpoints for rapid drafting."
     },
     {
       "name": "Webhooks",
-      "description": "Manage outbound webhooks for publish events."
+      "description": "Manage outbound webhooks for real-time content publish events."
     },
     {
       "name": "Audit & Revisions",
@@ -9673,7 +9868,15 @@
     },
     {
       "name": "System",
-      "description": "Health checks and system status endpoints."
+      "description": "Health checks, metrics, and system status endpoints."
+    },
+    {
+      "name": "Stats",
+      "description": "Aggregated content statistics for the Admin Dashboard overview."
+    },
+    {
+      "name": "Operations Console",
+      "description": "Aggregated workflow metrics and consolidated review queues."
     }
   ]
 }
