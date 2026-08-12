@@ -1,7 +1,6 @@
 import { format } from 'date-fns';
 
 export function BlogPreview({ data }: { data: any }) {
-  // Parse tags if it's a string, otherwise use array
   const tagsList = typeof data.tags === 'string' ? data.tags.split(',') : (Array.isArray(data.tags) ? data.tags : []);
 
   return (
@@ -9,11 +8,12 @@ export function BlogPreview({ data }: { data: any }) {
       {/* common-banner position-relative */}
       <div className="relative w-full h-[500px] flex flex-col justify-end">
         {/* SharedImage Background */}
-        {data.cover_image ? (
+        {data.cover_image && (
           <img src={data.cover_image} alt={data.title} className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
+        )}
+        {!data.cover_image && (
           <div className="absolute inset-0 w-full h-full bg-slate-800 flex items-center justify-center">
-            <span className="text-white/30 text-2xl font-bold">No Cover Image</span>
+            {/* Empty state background */}
           </div>
         )}
         {/* banner-overlay */}
@@ -24,19 +24,23 @@ export function BlogPreview({ data }: { data: any }) {
           {/* Top row: icon + paragraph */}
           <div className="max-w-2xl flex gap-6 mb-8">
             <div className="flex-shrink-0 w-11 h-11 bg-primary/20 rounded-full flex items-center justify-center">
-              <span className="text-primary text-xl">*</span> {/* Placeholder for AnimatedIcon */}
+              <span className="text-primary text-xl">*</span>
             </div>
-            <p className="text-white/70 text-lg m-0">
-              {data.excerpt || 'Explore our latest thoughts, strategy, and insights.'}
-            </p>
+            {data.excerpt && (
+              <p className="text-white/70 text-lg m-0">
+                {data.excerpt}
+              </p>
+            )}
           </div>
 
           {/* Bottom row: title + badge */}
           <div className="flex flex-col md:flex-row gap-5 items-start md:items-end mt-3 md:mt-6">
             <div>
-              <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight m-0">
-                {data.title || 'Untitled Blog Post'}
-              </h1>
+              {data.title && (
+                <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight m-0">
+                  {data.title}
+                </h1>
+              )}
               <div className="flex gap-4 mt-6 items-center flex-wrap">
                 {data.category && (
                   <span className="bg-primary text-white px-3 py-1 text-sm font-semibold rounded-md">
@@ -60,9 +64,8 @@ export function BlogPreview({ data }: { data: any }) {
       {/* Blog Details */}
       <div className="w-full max-w-7xl mx-auto px-6 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* LEFT SIDE IMAGE / HEADING */}
           <div className="lg:col-span-4">
-            <h2 className="text-4xl font-bold text-[#131415]">Scroll to read</h2>
+            <h2 className="text-4xl font-bold text-[#131415]">Article</h2>
           </div>
           
           <div className="lg:col-span-8">
@@ -72,11 +75,12 @@ export function BlogPreview({ data }: { data: any }) {
               </p>
             )}
             
-            {/* Project description markdown */}
-            <article 
-              className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl text-[#131415] leading-[1.8]"
-              dangerouslySetInnerHTML={{ __html: data.body || '<p class="text-gray-400 italic">Empty body content...</p>' }}
-            />
+            {data.body && (
+              <article 
+                className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl text-[#131415] leading-[1.8]"
+                dangerouslySetInnerHTML={{ __html: data.body }}
+              />
+            )}
           </div>
         </div>
         

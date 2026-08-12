@@ -9,23 +9,31 @@ export function ValidationWarnings({ data, contentType }: ValidationWarningsProp
   const warnings: string[] = [];
 
   // General warnings
-  if (!data.title) warnings.push('Missing Title');
   if (!data.slug) warnings.push('Missing URL Slug');
-  if (!data.excerpt) warnings.push('Missing Excerpt / Summary');
-  if (!data.body) warnings.push('Missing Main Content Body');
-  if (!data.cover_image) warnings.push('Missing Cover Image');
   
-  // SEO warnings
-  if (!data.seo_title) warnings.push('Missing SEO Title');
-  if (!data.seo_description) warnings.push('Missing SEO Description');
-  if (!data.seo_keywords || data.seo_keywords.length === 0) warnings.push('Missing SEO Keywords');
-
-  // Type specific warnings
-  if (contentType === 'project') {
-    if (!data.client_name) warnings.push('Missing Client Name');
-    if (!data.tech_stack || data.tech_stack.length === 0) warnings.push('Missing Tech Stack');
+  if (contentType === 'blog') {
+    if (!data.title) warnings.push('Missing Title');
+    if (!data.excerpt) warnings.push('Missing Excerpt');
+    if (!data.content && !data.body) warnings.push('Missing Content');
+    if (!data.cover_image) warnings.push('Missing Cover Image');
+  } else if (contentType === 'news') {
+    if (!data.headline) warnings.push('Missing Headline');
+    if (!data.summary) warnings.push('Missing Summary');
+  } else if (contentType === 'project') {
+    if (!data.name) warnings.push('Missing Project Name');
+    if (!data.description) warnings.push('Missing Description');
+    if (!data.cover_image) warnings.push('Missing Cover Image');
+  } else if (contentType === 'insight') {
+    if (!data.title) warnings.push('Missing Title');
+    if (!data.content) warnings.push('Missing Content');
+    if (!data.cover_image) warnings.push('Missing Cover Image');
   } else if (contentType === 'case_study') {
-    if (!data.metrics || data.metrics.length === 0) warnings.push('Missing Business Metrics');
+    if (!data.title) warnings.push('Missing Title');
+    if (!data.client_name) warnings.push('Missing Client Name');
+    if (!data.challenge) warnings.push('Missing Challenge Section');
+    if (!data.solution) warnings.push('Missing Solution Section');
+    if (!data.results) warnings.push('Missing Results Section');
+    if (!data.cover_image) warnings.push('Missing Cover Image');
   }
 
   if (warnings.length === 0) return null;

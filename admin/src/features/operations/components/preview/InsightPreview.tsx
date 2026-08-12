@@ -1,57 +1,99 @@
 import { format } from 'date-fns';
 
 export function InsightPreview({ data }: { data: any }) {
+  const tagsList = typeof data.tags === 'string' ? data.tags.split(',') : (Array.isArray(data.tags) ? data.tags : []);
+
   return (
-    <div className="font-sans antialiased text-[#111] pb-24 bg-white min-h-full">
-      {/* Header / Nav simulation */}
-      <header className="h-16 flex items-center px-8 border-b border-gray-200">
-        <div className="font-bold text-xl tracking-tight">O2Geeks Insights</div>
-      </header>
-
-      <main className="max-w-[900px] mx-auto px-6 mt-16">
-        {/* Category & Date */}
-        <div className="flex items-center gap-4 text-sm font-bold tracking-wider text-blue-600 mb-6 uppercase">
-          <span>{data.category || 'Analysis'}</span>
-          <span className="text-gray-300">•</span>
-          <span className="text-gray-500">{data.published_at ? format(new Date(data.published_at), 'MMMM d, yyyy') : 'Draft'}</span>
-        </div>
-
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.2] mb-8">
-          {data.title || 'Untitled Insight'}
-        </h1>
-
-        {/* Excerpt as a highlight block */}
-        <div className="border-l-4 border-blue-600 pl-6 mb-12">
-          <p className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium italic">
-            {data.excerpt || 'No summary provided.'}
-          </p>
-        </div>
-
-        {/* Cover Image / Chart Placeholder */}
-        {data.cover_image ? (
-          <div className="w-full mb-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-200 p-2">
-            <img src={data.cover_image} alt={data.title} className="w-full h-auto rounded-lg" />
-          </div>
-        ) : (
-          <div className="w-full h-[400px] mb-12 rounded-xl bg-gradient-to-tr from-blue-50 to-indigo-50 border border-gray-200 flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-full max-w-sm h-48 border-b-2 border-l-2 border-gray-300 relative flex items-end justify-between px-4 pb-4">
-               {/* Mock Chart Bars */}
-               <div className="w-8 h-1/3 bg-blue-300 rounded-t-sm"></div>
-               <div className="w-8 h-2/3 bg-blue-400 rounded-t-sm"></div>
-               <div className="w-8 h-1/2 bg-blue-500 rounded-t-sm"></div>
-               <div className="w-8 h-full bg-blue-600 rounded-t-sm"></div>
-            </div>
-            <p className="text-sm font-semibold text-gray-500 mt-4 uppercase tracking-widest">Data Visualization Placeholder</p>
+    <div className="font-sans antialiased text-[#131415] bg-[#f9f9f9] min-h-screen">
+      {/* common-banner position-relative */}
+      <div className="relative w-full h-[500px] flex flex-col justify-end">
+        {/* SharedImage Background */}
+        {data.cover_image && (
+          <img src={data.cover_image} alt={data.title} className="absolute inset-0 w-full h-full object-cover" />
+        )}
+        {!data.cover_image && (
+          <div className="absolute inset-0 w-full h-full bg-slate-800 flex items-center justify-center">
+            {/* Empty state background */}
           </div>
         )}
+        {/* banner-overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+        
+        {/* container-lg */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-16">
+          {/* Top row: icon + paragraph */}
+          <div className="max-w-2xl flex gap-6 mb-8">
+            <div className="flex-shrink-0 w-11 h-11 bg-primary/20 rounded-full flex items-center justify-center">
+              <span className="text-primary text-xl">*</span>
+            </div>
+          </div>
 
-        {/* Content Body */}
-        <article 
-          className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-a:text-blue-600 prose-img:rounded-xl"
-          dangerouslySetInnerHTML={{ __html: data.body || '<p class="text-gray-400 italic">Empty body content...</p>' }}
-        />
-      </main>
+          {/* Bottom row: title + badge */}
+          <div className="flex flex-col md:flex-row gap-5 items-start md:items-end mt-3 md:mt-6">
+            <div>
+              {data.title && (
+                <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight m-0">
+                  {data.title}
+                </h1>
+              )}
+              <div className="flex gap-4 mt-6 items-center flex-wrap">
+                {data.category && (
+                  <span className="bg-primary text-white px-3 py-1 text-sm font-semibold rounded-md">
+                    {data.category}
+                  </span>
+                )}
+                {data.published_at && (
+                  <span className="text-white/50 text-sm font-medium">
+                    {format(new Date(data.published_at), 'MMMM d, yyyy')}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="w-full max-w-7xl mx-auto px-6 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-4">
+            <h2 className="text-4xl font-bold text-[#131415] mb-8">Data & Research</h2>
+          </div>
+          
+          <div className="lg:col-span-8">
+            {data.excerpt && (
+              <p className="text-xl text-[#131415]/70 mb-12">
+                {data.excerpt}
+              </p>
+            )}
+            
+            {/* body markdown */}
+            {data.content && (
+              <article 
+                className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl text-[#131415] leading-[1.8]"
+                dangerouslySetInnerHTML={{ __html: data.content }}
+              />
+            )}
+          </div>
+        </div>
+        
+        {/* Tags */}
+        {tagsList.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-gray-200">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-semibold text-[#131415]/70 mr-2">Tags:</span>
+              {tagsList.map((tag: string, index: number) => (
+                <span 
+                  key={index}
+                  className="px-3 py-1 border border-[#131415] text-[#131415] rounded-full text-xs font-semibold"
+                >
+                  {tag.trim()}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

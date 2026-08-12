@@ -24,7 +24,9 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
   // E.g. "blogs", "case-studies"
   const getEditRoute = (type: string) => {
     const map: Record<string, string> = {
-      case_study: 'case-studies'
+      case_study: 'case-studies',
+      news: 'news',
+      project: 'projects', // just to be safe
     };
     return map[type] || type + 's';
   };

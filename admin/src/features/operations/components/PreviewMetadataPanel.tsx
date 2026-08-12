@@ -1,4 +1,4 @@
-import { Settings2, Tag, Search, Globe } from 'lucide-react';
+import { Settings2, Tag, Globe } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface PreviewMetadataPanelProps {
@@ -11,7 +11,7 @@ export function PreviewMetadataPanel({ data }: PreviewMetadataPanelProps) {
       <div className="p-4 border-b border-border/50 sticky top-0 bg-card/90 backdrop-blur z-10">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <Settings2 className="w-4 h-4 text-primary" />
-          Metadata & SEO
+          Metadata
         </h3>
       </div>
 
@@ -40,45 +40,6 @@ export function PreviewMetadataPanel({ data }: PreviewMetadataPanelProps) {
           </div>
         </div>
 
-        {/* SEO Data */}
-        <div className="space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <Search className="w-3.5 h-3.5" />
-            SEO Optimization
-          </h4>
-          
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1 font-medium">Meta Title</p>
-              <p className="text-sm font-medium border border-border/50 rounded-md p-2 bg-muted/10 leading-snug">
-                {data.seo_title || <span className="text-destructive/80 italic text-xs">Missing SEO Title</span>}
-              </p>
-            </div>
-            
-            <div>
-              <p className="text-xs text-muted-foreground mb-1 font-medium">Meta Description</p>
-              <p className="text-xs border border-border/50 rounded-md p-2 bg-muted/10 leading-relaxed text-muted-foreground h-20 overflow-y-auto">
-                {data.seo_description || <span className="text-destructive/80 italic">Missing SEO Description</span>}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs text-muted-foreground mb-1 font-medium">Keywords</p>
-              <div className="flex flex-wrap gap-1.5">
-                {data.seo_keywords && data.seo_keywords.length > 0 ? (
-                  data.seo_keywords.map((kw: string) => (
-                    <span key={kw} className="text-[10px] font-medium bg-primary/10 text-primary-foreground px-2 py-0.5 rounded border border-primary/20">
-                      {kw}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-destructive/80 italic text-xs">No keywords</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Classification */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
@@ -94,9 +55,9 @@ export function PreviewMetadataPanel({ data }: PreviewMetadataPanelProps) {
               <span className="text-muted-foreground text-xs block mb-1">Tags:</span>
               <div className="flex flex-wrap gap-1.5">
                 {data.tags && data.tags.length > 0 ? (
-                  data.tags.map((tag: string) => (
+                  (typeof data.tags === 'string' ? data.tags.split(',') : data.tags).map((tag: string) => (
                     <span key={tag} className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
-                      #{tag}
+                      #{tag.trim()}
                     </span>
                   ))
                 ) : (
