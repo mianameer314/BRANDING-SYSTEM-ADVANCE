@@ -1,5 +1,6 @@
 import { Filter, X } from 'lucide-react';
 import { SearchInput } from '@/components/table/SearchInput';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 
 export interface OperationsFilters {
   search?: string;
@@ -15,11 +16,11 @@ interface OperationsFilterBarProps {
 }
 
 const CONTENT_TYPES = [
-  { value: 'blog', label: 'Blogs' },
-  { value: 'news', label: 'News' },
-  { value: 'project', label: 'Projects' },
-  { value: 'insight', label: 'Insights' },
-  { value: 'case_study', label: 'Case Studies' },
+  { value: 'blog', label: 'Blogs', colorClass: 'bg-primary' },
+  { value: 'news', label: 'News', colorClass: 'bg-info' },
+  { value: 'project', label: 'Projects', colorClass: 'bg-success' },
+  { value: 'insight', label: 'Insights', colorClass: 'bg-warning' },
+  { value: 'case_study', label: 'Case Studies', colorClass: 'bg-destructive' },
 ];
 
 export const OperationsFilterBar = ({
@@ -54,23 +55,20 @@ export const OperationsFilterBar = ({
             <span className="hidden sm:inline">Filters:</span>
           </div>
 
-          <select
+          <CustomSelect
+            options={CONTENT_TYPES}
             value={filters.content_type || ''}
-            onChange={(e) => onChange('content_type', e.target.value)}
-            className="text-sm border border-input rounded-md bg-background text-foreground py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">All Content Types</option>
-            {CONTENT_TYPES.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
+            onChange={(value) => onChange('content_type', value)}
+            placeholder="All Content Types"
+            className="w-[180px]"
+          />
 
           <input
             type="text"
             placeholder="Filter by author..."
             value={filters.author || ''}
             onChange={(e) => onChange('author', e.target.value)}
-            className="text-sm border border-input rounded-md bg-background text-foreground py-2 px-3 focus:outline-none focus:ring-2 focus:ring-primary w-[160px]"
+            className="text-sm border border-input rounded-md bg-card text-foreground py-2 px-3 focus:outline-none focus:ring-2 focus:ring-primary w-[160px] shadow-sm hover:bg-accent/50 transition-colors"
           />
 
           {hasActiveFilters && (

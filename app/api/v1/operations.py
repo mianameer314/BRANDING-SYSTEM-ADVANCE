@@ -103,7 +103,7 @@ def get_workflow_overview(db: DbDep, user: ReadDep):
     # Get recent activity (last 5 status changes across all types)
     union_stmt = build_union_query(models)
     subq = union_stmt.subquery()
-    recent_activity_stmt = select(subq).order_by(desc(subq.c.status_changed_at)).limit(5)
+    recent_activity_stmt = select(subq).order_by(desc(subq.c.updated_at)).limit(5)
     recent_activity_results = db.execute(recent_activity_stmt).mappings().all()
     recent_activity = [dict(row) for row in recent_activity_results]
 
@@ -150,10 +150,16 @@ def get_workflow_items(
             title_col = getattr(model, "title", None) or getattr(model, "headline", None) or getattr(model, "name", None)
             if title_col is not None:
                 filters.append(title_col.ilike(f"%{search}%"))
+            else:
+                from sqlalchemy import false
+                filters.append(false())
         if author:
             author_col = getattr(model, "author", None)
             if author_col is not None:
                 filters.append(author_col.ilike(f"%{author}%"))
+            else:
+                from sqlalchemy import false
+                filters.append(false())
         return filters
         
     union_stmt = build_union_query(models_mapping, filter_builder)

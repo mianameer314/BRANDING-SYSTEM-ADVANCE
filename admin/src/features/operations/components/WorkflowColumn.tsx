@@ -15,8 +15,14 @@ interface WorkflowColumnProps {
 export function WorkflowColumn({ title, status, colorClass, search, author, contentType }: WorkflowColumnProps) {
   // Join statuses if array
   const statusStr = Array.isArray(status) ? status.join(',') : status;
-  
   const { data, isLoading, isError } = useWorkflowItems(1, 50, contentType, statusStr, search, author);
+
+  const hasFilters = !!search || !!author || !!contentType;
+
+  // Hide the column entirely if filters are applied and there are no items
+  if (hasFilters && !isLoading && !isError && data?.items.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-xl border border-border bg-muted/30">

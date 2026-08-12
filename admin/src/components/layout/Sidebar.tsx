@@ -23,6 +23,7 @@ type NavItem = {
   label: string;
   permission?: Permission;
   variants?: any;
+  exact?: boolean;
 };
 
 type NavSection = {
@@ -87,7 +88,7 @@ const navSections: NavSection[] = [
   {
     label: 'Operations',
     items: [
-      { to: '/operations', icon: Workflow, label: 'Operations Console', permission: 'view_drafts', variants: dashboardVariants },
+      { to: '/operations', icon: Workflow, label: 'Operations Console', permission: 'view_drafts', variants: dashboardVariants, exact: true },
       { to: '/operations/workflow', icon: GitBranch, label: 'Content Pipeline', permission: 'view_drafts', variants: dashboardVariants },
     ],
   },
@@ -137,6 +138,7 @@ export function Sidebar() {
                   <NavLink
                     key={item.to}
                     to={item.to}
+                    end={item.exact}
                     className="block relative outline-none rounded-lg overflow-hidden"
                   >
                     {({ isActive }) => (
