@@ -22,7 +22,7 @@ export function WorkflowOverviewPage() {
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Pipeline Overview</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Content Pipeline</h2>
         <p className="text-muted-foreground mt-1">
           Visual kanban board of content flowing through the editorial lifecycle.
         </p>

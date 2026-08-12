@@ -4,11 +4,11 @@ import {
   CheckCircle2, 
   CalendarClock, 
   Globe2, 
-  AlertOctagon,
+  ZapOff,
   RefreshCw,
   Archive,
   EyeOff,
-  AlertCircle
+  FileWarning
 } from 'lucide-react';
 import { useWorkflowOverview } from '../hooks';
 import { WorkflowStageCard } from '../components/WorkflowStageCard';
@@ -39,7 +39,7 @@ export function OperationsConsolePage() {
       id: 'changes_requested',
       title: 'Changes Requested',
       description: 'Returned to author for revisions.',
-      icon: AlertCircle,
+      icon: FileWarning,
       color: 'bg-rose-500',
       textColor: 'text-rose-500',
       linkTo: '/operations/workflow?status=changes_requested',
@@ -93,7 +93,7 @@ export function OperationsConsolePage() {
       id: 'failed',
       title: 'Integration Issues',
       description: 'Failed webhooks or delivery errors requiring attention.',
-      icon: AlertOctagon,
+      icon: ZapOff,
       color: 'bg-rose-500',
       textColor: 'text-rose-500',
       linkTo: '/webhooks',
@@ -138,7 +138,7 @@ export function OperationsConsolePage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {stages.map((stage) => {
           // 'failed' is a placeholder for webhook failures, we don't have a content status for it
-          const count = stage.id === 'failed' ? 0 : overview?.stages[stage.id]?.total;
+          const count = stage.id === 'failed' ? overview?.failed_webhooks : overview?.stages[stage.id]?.total;
           const breakdown = stage.id === 'failed' ? undefined : overview?.stages[stage.id]?.by_type;
           
           return (

@@ -87,8 +87,8 @@ const navSections: NavSection[] = [
   {
     label: 'Operations',
     items: [
-      { to: '/operations', icon: Workflow, label: 'Console', permission: 'read_content', variants: dashboardVariants },
-      { to: '/operations/workflow', icon: GitBranch, label: 'Pipeline', permission: 'read_content', variants: dashboardVariants },
+      { to: '/operations', icon: Workflow, label: 'Operations Console', permission: 'view_drafts', variants: dashboardVariants },
+      { to: '/operations/workflow', icon: GitBranch, label: 'Content Pipeline', permission: 'view_drafts', variants: dashboardVariants },
     ],
   },
   {

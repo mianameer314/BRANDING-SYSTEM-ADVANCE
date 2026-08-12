@@ -15,10 +15,11 @@ from app.models.news import News
 from app.models.project import Project
 from app.models.insight import Insight
 from app.models.case_study import CaseStudy
+from app.models.webhook_log import WebhookLog
 
 router = APIRouter(prefix="/operations", tags=["Operations Console"])
 
-ReadDep = Annotated[User, Depends(require_permission("read_content"))]
+ReadDep = Annotated[User, Depends(require_permission("view_drafts"))]
 
 def build_union_query(models_mapping, filters=None):
     selects = []
@@ -94,9 +95,15 @@ def get_workflow_overview(db: DbDep, user: ReadDep):
             if ct not in stage_data["by_type"]:
                 stage_data["by_type"][ct] = 0
 
+    # Count failed webhooks
+    failed_webhooks_count = db.scalar(
+        select(func.count(WebhookLog.id)).where(WebhookLog.success == False)
+    ) or 0
+
     return {
         "stages": stages,
-        "total_content": total_content
+        "total_content": total_content,
+        "failed_webhooks": failed_webhooks_count
     }
 
 @router.get("/items")

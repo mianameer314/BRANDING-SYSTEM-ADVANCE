@@ -8,6 +8,7 @@ export interface WorkflowStageStats {
 export interface WorkflowOverviewData {
   stages: Record<ContentStatus | string, WorkflowStageStats>;
   total_content: number;
+  failed_webhooks: number;
 }
 
 export interface ReviewQueueItem {
