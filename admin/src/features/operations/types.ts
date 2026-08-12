@@ -9,6 +9,7 @@ export interface WorkflowOverviewData {
   stages: Record<ContentStatus | string, WorkflowStageStats>;
   total_content: number;
   failed_webhooks: number;
+  recent_activity: ReviewQueueItem[];
 }
 
 export interface ReviewQueueItem {

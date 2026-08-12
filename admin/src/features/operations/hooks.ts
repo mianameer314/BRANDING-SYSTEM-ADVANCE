@@ -8,9 +8,9 @@ export function useWorkflowOverview() {
   });
 }
 
-export function useWorkflowItems(page: number = 1, perPage: number = 20, contentType?: string, status?: string) {
+export function useWorkflowItems(page: number = 1, perPage: number = 20, contentType?: string, status?: string, search?: string, author?: string) {
   return useQuery({
-    queryKey: ['operations', 'items', page, perPage, contentType, status],
-    queryFn: () => operationsApi.getWorkflowItems(page, perPage, contentType, status),
+    queryKey: ['operations', 'items', page, perPage, contentType, status, search, author],
+    queryFn: () => operationsApi.getWorkflowItems(page, perPage, contentType, status, search, author),
   });
 }

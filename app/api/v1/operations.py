@@ -100,10 +100,18 @@ def get_workflow_overview(db: DbDep, user: ReadDep):
         select(func.count(WebhookLog.id)).where(WebhookLog.success == False)
     ) or 0
 
+    # Get recent activity (last 5 status changes across all types)
+    union_stmt = build_union_query(models)
+    subq = union_stmt.subquery()
+    recent_activity_stmt = select(subq).order_by(desc(subq.c.status_changed_at)).limit(5)
+    recent_activity_results = db.execute(recent_activity_stmt).mappings().all()
+    recent_activity = [dict(row) for row in recent_activity_results]
+
     return {
         "stages": stages,
         "total_content": total_content,
-        "failed_webhooks": failed_webhooks_count
+        "failed_webhooks": failed_webhooks_count,
+        "recent_activity": recent_activity
     }
 
 @router.get("/items")
@@ -114,6 +122,8 @@ def get_workflow_items(
     per_page: int = Query(20, ge=1, le=100),
     content_type: str | None = Query(None),
     status: str | None = Query(None, description="Comma-separated list of statuses, e.g. 'in_review,changes_requested'"),
+    search: str | None = Query(None, description="Search across titles"),
+    author: str | None = Query(None, description="Filter by author"),
 ):
     """
     Paginated list of workflow items across all content types.
@@ -130,14 +140,23 @@ def get_workflow_items(
     if content_type and content_type in models_mapping:
         models_mapping = {content_type: models_mapping[content_type]}
         
-    def status_filters(model):
+    def filter_builder(model):
         filters = []
         if status:
             status_list = [s.strip() for s in status.split(",")]
             filters.append(model.status.in_(status_list))
+        if search:
+            # Handle title column differences
+            title_col = getattr(model, "title", None) or getattr(model, "headline", None) or getattr(model, "name", None)
+            if title_col is not None:
+                filters.append(title_col.ilike(f"%{search}%"))
+        if author:
+            author_col = getattr(model, "author", None)
+            if author_col is not None:
+                filters.append(author_col.ilike(f"%{author}%"))
         return filters
         
-    union_stmt = build_union_query(models_mapping, status_filters)
+    union_stmt = build_union_query(models_mapping, filter_builder)
     subq = union_stmt.subquery()
     
     # Count total

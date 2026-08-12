@@ -7,13 +7,16 @@ interface WorkflowColumnProps {
   title: string;
   status: ContentStatus | ContentStatus[];
   colorClass: string;
+  search?: string;
+  author?: string;
+  contentType?: string;
 }
 
-export function WorkflowColumn({ title, status, colorClass }: WorkflowColumnProps) {
+export function WorkflowColumn({ title, status, colorClass, search, author, contentType }: WorkflowColumnProps) {
   // Join statuses if array
   const statusStr = Array.isArray(status) ? status.join(',') : status;
   
-  const { data, isLoading, isError } = useWorkflowItems(1, 50, undefined, statusStr);
+  const { data, isLoading, isError } = useWorkflowItems(1, 50, contentType, statusStr, search, author);
 
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-xl border border-border bg-muted/30">

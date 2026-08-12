@@ -11,7 +11,9 @@ export const operationsApi = {
     page: number = 1,
     perPage: number = 20,
     contentType?: string,
-    status?: string
+    status?: string,
+    search?: string,
+    author?: string
   ): Promise<ReviewQueueResponse> => {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -23,6 +25,12 @@ export const operationsApi = {
     }
     if (status) {
       params.append('status', status);
+    }
+    if (search) {
+      params.append('search', search);
+    }
+    if (author) {
+      params.append('author', author);
     }
     
     const response = await api.get(`/operations/items?${params.toString()}`);

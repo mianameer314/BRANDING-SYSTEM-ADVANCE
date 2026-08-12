@@ -8,10 +8,13 @@ import {
   RefreshCw,
   Archive,
   EyeOff,
-  FileWarning
+  FileWarning,
+  Activity
 } from 'lucide-react';
 import { useWorkflowOverview } from '../hooks';
 import { WorkflowStageCard } from '../components/WorkflowStageCard';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { Link } from 'react-router-dom';
 
 export function OperationsConsolePage() {
   const { data: overview, isLoading, refetch, isFetching } = useWorkflowOverview();
@@ -156,6 +159,52 @@ export function OperationsConsolePage() {
             />
           );
         })}
+      </div>
+
+      {/* Recent Activity Feed */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-border p-4 bg-muted/10">
+          <Activity size={18} className="text-muted-foreground" />
+          <h3 className="font-semibold text-foreground">Recent Activity</h3>
+        </div>
+        <div className="flex flex-col">
+          {isLoading ? (
+            <div className="p-8 text-center text-muted-foreground">Loading activity...</div>
+          ) : !overview?.recent_activity || overview.recent_activity.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">No recent activity.</div>
+          ) : (
+            <div className="divide-y divide-border">
+              {overview.recent_activity.map((item) => {
+                const getEditRoute = (type: string) => {
+                  const map: Record<string, string> = { case_study: 'case-studies' };
+                  return map[type] || type + 's';
+                };
+                const routePath = `/${getEditRoute(item.content_type)}/${item.slug}/edit`;
+
+                return (
+                  <div key={`${item.content_type}-${item.id}`} className="flex items-center justify-between p-4 hover:bg-muted/5 transition-colors">
+                    <div className="flex items-start gap-4">
+                      <span className="mt-0.5 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-muted text-muted-foreground">
+                        {item.content_type.replace('_', ' ')}
+                      </span>
+                      <div className="flex flex-col gap-1">
+                        <Link to={routePath} className="font-medium text-foreground hover:text-primary transition-colors">
+                          {item.title}
+                        </Link>
+                        <span className="text-xs text-muted-foreground">
+                          Updated by {item.author} • {new Date(item.status_changed_at || item.updated_at).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <StatusBadge status={item.status} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

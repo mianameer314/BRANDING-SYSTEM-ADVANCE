@@ -57,7 +57,9 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
           <span className="font-semibold text-foreground line-clamp-2 text-muted-foreground cursor-not-allowed">
             {item.title}
           </span>
-          <Lock size={14} className="text-muted-foreground shrink-0 mt-1" title="Locked: You do not have permission to edit this status." />
+          <div title="Locked: You do not have permission to edit this status." className="flex items-center">
+            <Lock size={14} className="text-muted-foreground shrink-0 mt-1" />
+          </div>
         </div>
       ) : (
         <Link to={routePath} className="font-semibold text-foreground line-clamp-2 hover:text-primary transition-colors">
