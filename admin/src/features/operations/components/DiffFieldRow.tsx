@@ -17,11 +17,11 @@ export function DiffFieldRow({ label, oldValue, newValue, type = 'text' }: DiffF
   
   if (isUnchanged) {
     return (
-      <div className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-4 border-b border-border/50 items-start opacity-60 hover:opacity-100 transition-opacity">
-        <div className="md:col-span-3 text-sm font-semibold text-muted-foreground pt-1">
-          {label}
+      <div className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-4 border-b border-border/50 items-start opacity-50 hover:opacity-100 transition-opacity duration-200">
+        <div className="md:col-span-3 text-sm font-semibold text-muted-foreground pt-1 capitalize">
+          {label.replace(/_/g, ' ')}
         </div>
-        <div className="md:col-span-9 bg-muted/20 p-3 rounded-lg text-sm text-muted-foreground truncate">
+        <div className="md:col-span-9 bg-muted/20 p-3 rounded-lg text-sm text-muted-foreground">
           Unchanged
         </div>
       </div>
@@ -34,13 +34,17 @@ export function DiffFieldRow({ label, oldValue, newValue, type = 'text' }: DiffF
       return <img src={val} alt={label} className="h-20 w-auto rounded-md shadow-sm border border-border" />;
     }
     if (type === 'json' || typeof val === 'object') {
-      return <pre className="text-xs bg-muted/50 p-2 rounded">{JSON.stringify(val, null, 2)}</pre>;
+      return (
+        <pre className="text-xs bg-muted/50 p-3 rounded-lg overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all font-mono">
+          {JSON.stringify(val, null, 2)}
+        </pre>
+      );
     }
-    return <span className="break-words">{String(val)}</span>;
+    return <span className="break-words whitespace-pre-wrap">{String(val)}</span>;
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-border/50 items-start">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 py-5 border-b border-border/50 items-start">
       <div className="md:col-span-3">
         <h4 className="text-sm font-bold text-foreground capitalize tracking-wide">{label.replace(/_/g, ' ')}</h4>
         <div className="flex gap-2 mt-2">
@@ -50,39 +54,39 @@ export function DiffFieldRow({ label, oldValue, newValue, type = 'text' }: DiffF
         </div>
       </div>
 
-      <div className="md:col-span-9">
+      <div className="md:col-span-9 min-w-0">
         {type === 'text' && !isAdded && !isRemoved ? (
-          <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
+          <div className="bg-card border border-border rounded-lg p-4 shadow-sm overflow-hidden">
             <TextDiffView oldValue={oldValue} newValue={newValue} />
           </div>
         ) : type === 'rich-text' && !isAdded && !isRemoved ? (
           <RichTextDiffView oldHtml={oldValue} newHtml={newValue} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Old Value */}
             <div className={cn(
-              "p-4 rounded-lg border",
+              "p-4 rounded-lg border min-w-0 overflow-hidden",
               isRemoved ? "bg-rose-500/5 border-rose-500/30" : "bg-muted/10 border-border/50"
             )}>
-              <div className="text-xs font-semibold text-muted-foreground mb-2 flex justify-between items-center">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex justify-between items-center">
                 Old Value
-                {isRemoved && <span className="text-rose-500 font-bold">-</span>}
+                {isRemoved && <span className="text-rose-500 font-bold text-sm">✕</span>}
               </div>
-              <div className={cn("text-sm", isRemoved && "text-rose-700/80")}>
+              <div className={cn("text-sm break-words overflow-hidden", isRemoved && "text-rose-700/80")}>
                 {renderValue(oldValue)}
               </div>
             </div>
 
             {/* New Value */}
             <div className={cn(
-              "p-4 rounded-lg border shadow-sm",
+              "p-4 rounded-lg border min-w-0 overflow-hidden shadow-sm",
               isAdded ? "bg-emerald-500/5 border-emerald-500/30 ring-1 ring-emerald-500/20" : "bg-card border-border"
             )}>
-              <div className="text-xs font-semibold text-muted-foreground mb-2 flex justify-between items-center">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex justify-between items-center">
                 New Value
-                {isAdded && <span className="text-emerald-500 font-bold">+</span>}
+                {isAdded && <span className="text-emerald-500 font-bold text-sm">✓</span>}
               </div>
-              <div className={cn("text-sm font-medium", isAdded && "text-emerald-700")}>
+              <div className={cn("text-sm font-medium break-words overflow-hidden", isAdded && "text-emerald-700")}>
                 {renderValue(newValue)}
               </div>
             </div>

@@ -20,7 +20,7 @@ const TYPE_COLORS: Record<string, string> = {
 export function WorkflowItem({ item }: WorkflowItemProps) {
   const { user } = useAuth();
   const typeColor = TYPE_COLORS[item.content_type] || 'bg-muted text-muted-foreground';
-  
+
   // E.g. "blogs", "case-studies"
   const getEditRoute = (type: string) => {
     const map: Record<string, string> = {
@@ -30,7 +30,7 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
   };
 
   const routePath = `/${getEditRoute(item.content_type)}/${item.slug}/edit`;
-  
+
   const isLocked = (() => {
     if (!user) return true;
     if (item.status === 'approved' && !user.permissions.includes('approve')) return true;
@@ -38,7 +38,7 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
     if (publishStatuses.includes(item.status) && !user.permissions.includes('publish')) return true;
     return false;
   })();
-  
+
   return (
     <div className={cn(
       "group relative flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all",
@@ -51,7 +51,7 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
         </span>
         <StatusBadge status={item.status} />
       </div>
-      
+
       {isLocked ? (
         <div className="flex items-start gap-2">
           <span className="font-semibold text-foreground line-clamp-2 text-muted-foreground cursor-not-allowed">
@@ -66,7 +66,7 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
           {item.title}
         </Link>
       )}
-      
+
       <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="font-medium truncate max-w-[120px]">{item.author}</span>
@@ -74,21 +74,21 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
             {new Date(item.updated_at).toLocaleDateString()}
           </span>
         </div>
-        
-        <div className="flex items-center gap-2 mt-1">
-          <Link 
+
+        <div className="flex items-center gap-2 mt-2">
+          <Link
             to={`/operations/preview/${item.content_type}/${item.id}`}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 rounded transition-colors"
+            className="interactive-button-small flex-1"
           >
-            <MonitorPlay size={12} />
-            Preview
+            <span className="label">Preview</span>
+            <MonitorPlay size={14} className="icon" />
           </Link>
-          <Link 
+          <Link
             to={`/operations/revisions/${item.content_type}/${item.id}`}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground border border-border/50 rounded transition-colors"
+            className="interactive-button-small flex-1"
           >
-            <History size={12} />
-            History
+            <span className="label">History</span>
+            <History size={14} className="icon" />
           </Link>
         </div>
       </div>

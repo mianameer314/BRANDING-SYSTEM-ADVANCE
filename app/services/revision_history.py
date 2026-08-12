@@ -250,6 +250,8 @@ def ensure_content_baseline(db: Session, content, *, actor_id: int | None = None
 def list_content_revisions(
     db: Session, content_type: str, content_id: int, *, page: int = 1, per_page: int = 20
 ) -> dict:
+    from app.models.user import User
+
     model = get_content_model(content_type)
     if db.query(model.id).filter(model.id == content_id).first() is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
@@ -262,8 +264,23 @@ def list_content_revisions(
         .order_by(ContentRevision.version.desc())
     )
     total = query.count()
+    revisions = query.offset((page - 1) * per_page).limit(per_page).all()
+
+    # Resolve actor IDs to names
+    actor_ids = {r.actor_id for r in revisions if r.actor_id is not None}
+    actor_map: dict[int, str] = {}
+    if actor_ids:
+        users = db.query(User.id, User.full_name).filter(User.id.in_(actor_ids)).all()
+        actor_map = {u.id: u.full_name for u in users}
+
+    # Attach actor_name to each revision
+    items = []
+    for rev in revisions:
+        rev.actor_name = actor_map.get(rev.actor_id, "System") if rev.actor_id else "System"
+        items.append(rev)
+
     return {
-        "items": query.offset((page - 1) * per_page).limit(per_page).all(),
+        "items": items,
         "total": total,
         "page": page,
         "per_page": per_page,

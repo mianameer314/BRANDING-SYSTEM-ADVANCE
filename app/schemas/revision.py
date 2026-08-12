@@ -13,6 +13,7 @@ class ContentRevisionOut(BaseModel):
     snapshot: dict
     changed_fields: list[str] | None
     actor_id: int | None
+    actor_name: str | None = None
     source: str
     approval_reference: str | None
     status_reason: str | None

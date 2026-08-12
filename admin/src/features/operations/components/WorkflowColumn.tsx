@@ -25,7 +25,7 @@ export function WorkflowColumn({ title, status, colorClass, search, author, cont
   }
 
   return (
-    <div className="flex h-full w-[350px] shrink-0 flex-col rounded-xl border border-border bg-muted/30">
+    <div className="flex h-full w-[400px] shrink-0 flex-col rounded-xl border border-border bg-muted/30">
       <div className={`flex items-center justify-between border-b border-border p-4 ${colorClass} bg-opacity-10 rounded-t-xl`}>
         <h3 className="font-semibold text-foreground">{title}</h3>
         <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-background px-2 text-xs font-bold shadow-sm">

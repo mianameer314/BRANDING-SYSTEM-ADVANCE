@@ -1,5 +1,5 @@
 import { cn } from '@/utils/utils';
-import { History, GitBranch } from 'lucide-react';
+import { GitBranch, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface RevisionTimelineProps {
@@ -10,13 +10,12 @@ interface RevisionTimelineProps {
   onToggleCompare: (version: number) => void;
 }
 
-
-
-const actionColors: Record<string, string> = {
-  update: 'bg-amber-500/10 border-amber-500/20 text-amber-700',
-  baseline: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700',
-  restore: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-700',
-  workflow: 'bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-700',
+const ACTION_LABELS: Record<string, { label: string; color: string }> = {
+  baseline: { label: 'Created', color: 'bg-emerald-500 text-white' },
+  update: { label: 'Updated', color: 'bg-amber-500 text-white' },
+  status_changed: { label: 'Status Changed', color: 'bg-violet-500 text-white' },
+  restore: { label: 'Restored', color: 'bg-cyan-500 text-white' },
+  workflow: { label: 'Workflow', color: 'bg-fuchsia-500 text-white' },
 };
 
 export function RevisionTimeline({
@@ -28,27 +27,30 @@ export function RevisionTimeline({
 }: RevisionTimelineProps) {
   return (
     <div className="relative border-l-2 border-border/60 ml-4 space-y-6 pb-4">
-      {revisions.map((rev) => {
+      {revisions.map((rev, index) => {
         const isSelected = rev.version === selectedVersion;
         const isCompare = rev.version === compareVersion;
         const isActive = isSelected || isCompare;
+        const isLatest = index === 0;
+        const actionInfo = ACTION_LABELS[rev.action] || { label: rev.action, color: 'bg-muted text-muted-foreground' };
+        const actorName = rev.actor_name || (rev.actor_id ? `User ${rev.actor_id}` : 'System');
 
         return (
           <div key={rev.id} className="relative pl-6">
             {/* Timeline Dot */}
-            <div 
+            <div
               className={cn(
                 "absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border-2 bg-card transition-all duration-300 shadow-sm",
-                isActive ? "border-primary scale-125" : "border-border"
+                isActive ? "border-primary scale-125 bg-primary" : "border-border"
               )}
             />
 
             {/* Content Card */}
-            <div 
+            <div
               className={cn(
                 "group relative bg-card border rounded-xl p-4 transition-all duration-300 cursor-pointer overflow-hidden",
-                isSelected ? "border-primary shadow-md ring-1 ring-primary/20" : 
-                isCompare ? "border-amber-500 shadow-md ring-1 ring-amber-500/20" : 
+                isSelected ? "border-primary shadow-md ring-1 ring-primary/20" :
+                isCompare ? "border-amber-500 shadow-md ring-1 ring-amber-500/20" :
                 "border-border/50 hover:border-primary/40 hover:shadow-sm"
               )}
               onClick={() => onSelect(rev.version)}
@@ -61,50 +63,58 @@ export function RevisionTimeline({
                 "group-hover:bg-primary/[0.02] group-hover:opacity-100"
               )} />
 
+              {/* Header Row */}
               <div className="relative z-10 flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-bold text-foreground">v{rev.version}</span>
                   <span className={cn(
-                    "text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full border",
-                    actionColors[rev.action] || 'bg-muted border-border text-muted-foreground'
+                    "text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+                    actionInfo.color
                   )}>
-                    {rev.action}
+                    {actionInfo.label}
                   </span>
-                </div>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleCompare(rev.version);
-                  }}
-                  className={cn(
-                    "p-1.5 rounded-md transition-all text-xs font-semibold flex items-center gap-1.5",
-                    isCompare 
-                      ? "bg-amber-500 text-white shadow-sm" 
-                      : isSelected
-                        ? "bg-primary/20 text-primary-foreground opacity-50 cursor-not-allowed"
-                        : "bg-muted text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
+                  {isLatest && (
+                    <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      Latest
+                    </span>
                   )}
-                  disabled={isSelected}
-                  title={isSelected ? "Cannot compare with itself" : "Select for comparison"}
-                >
-                  <GitBranch className="w-3.5 h-3.5" />
-                  {isCompare ? "Comparing" : "Compare"}
-                </button>
+                </div>
+
+                {/* Compare Button */}
+                {!isSelected && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleCompare(rev.version);
+                    }}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all duration-200 text-xs font-semibold flex items-center gap-1.5 hover:-translate-y-0.5 hover:shadow-sm active:scale-95",
+                      isCompare
+                        ? "bg-amber-500 text-white shadow-sm"
+                        : "bg-muted text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
+                    )}
+                  >
+                    <GitBranch className="w-3.5 h-3.5" />
+                    {isCompare ? "Comparing" : "Compare"}
+                  </button>
+                )}
               </div>
 
+              {/* Timestamp */}
               <div className="relative z-10 space-y-2">
-                <p className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                  <History className="w-3.5 h-3.5 opacity-70" />
+                <p className="text-xs text-muted-foreground font-medium">
                   {formatDistanceToNow(new Date(rev.created_at), { addSuffix: true })}
                 </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center text-[10px] font-bold text-primary-foreground border border-primary/30 shadow-sm">
-                    {rev.actor_id || 'S'}
+
+                {/* Actor */}
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                    <User className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Actor #{rev.actor_id || 'System'}</span>
+                  <span className="text-xs font-medium text-foreground/80">{actorName}</span>
                 </div>
-                
+
+                {/* Changed Fields */}
                 {rev.changed_fields && rev.changed_fields.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-border/50">
                     <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Changed Fields</p>
