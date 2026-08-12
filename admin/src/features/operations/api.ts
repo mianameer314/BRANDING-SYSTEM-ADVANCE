@@ -36,4 +36,29 @@ export const operationsApi = {
     const response = await api.get(`/operations/items?${params.toString()}`);
     return response.data;
   },
+
+  // --- Revisions & History ---
+  getRevisions: async (contentType: string, contentId: number, params?: Record<string, any>) => {
+    const response = await api.get(`/audit/content/${contentType}/${contentId}/revisions`, { params });
+    return response.data;
+  },
+    
+  restoreRevision: async (contentType: string, contentId: number, version: number, reason: string | null = null) => {
+    const response = await api.post(`/audit/content/${contentType}/${contentId}/revisions/${version}/restore`, { reason });
+    return response.data;
+  },
+    
+  // --- Preview ---
+  getPreviewToken: async (contentType: string, contentId: number) => {
+    const response = await api.post<{ token: string }>(`/preview/generate`, {
+      content_type: contentType,
+      content_id: contentId
+    });
+    return response.data;
+  },
+    
+  getPreviewData: async (contentType: string, token: string) => {
+    const response = await api.get(`/preview/${contentType}`, { params: { token } });
+    return response.data;
+  },
 };

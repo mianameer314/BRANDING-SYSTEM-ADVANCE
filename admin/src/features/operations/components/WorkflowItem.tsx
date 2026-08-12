@@ -3,7 +3,7 @@ import type { ReviewQueueItem } from '../types';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
-import { Lock } from 'lucide-react';
+import { Lock, MonitorPlay, History } from 'lucide-react';
 
 interface WorkflowItemProps {
   item: ReviewQueueItem;
@@ -67,11 +67,30 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
         </Link>
       )}
       
-      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground border-t border-border pt-3">
-        <span className="font-medium truncate max-w-[120px]">{item.author}</span>
-        <span title={new Date(item.updated_at).toLocaleString()}>
-          {new Date(item.updated_at).toLocaleDateString()}
-        </span>
+      <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="font-medium truncate max-w-[120px]">{item.author}</span>
+          <span title={new Date(item.updated_at).toLocaleString()}>
+            {new Date(item.updated_at).toLocaleDateString()}
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-2 mt-1">
+          <Link 
+            to={`/operations/preview/${item.content_type}/${item.id}`}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 rounded transition-colors"
+          >
+            <MonitorPlay size={12} />
+            Preview
+          </Link>
+          <Link 
+            to={`/operations/revisions/${item.content_type}/${item.id}`}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground border border-border/50 rounded transition-colors"
+          >
+            <History size={12} />
+            History
+          </Link>
+        </div>
       </div>
     </div>
   );
