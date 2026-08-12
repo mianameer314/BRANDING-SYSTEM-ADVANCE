@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.v1 import ai, audit, auth, blogs, case_studies, insights, interactions, news, preview, projects, resources, stats, users, webhooks
+from app.api.v1 import ai, audit, auth, blogs, case_studies, insights, interactions, news, operations, preview, projects, resources, stats, users, webhooks
 from app.api.idempotency import IdempotentReplayException, idempotency_exception_handler
 from app.core.config import settings
 
@@ -96,6 +96,10 @@ tags_metadata = [
     {
         "name": "Stats",
         "description": "Aggregated content statistics for the Admin Dashboard overview.",
+    },
+    {
+        "name": "Operations Console",
+        "description": "Aggregated workflow metrics and consolidated review queues.",
     },
 ]
 
@@ -191,6 +195,7 @@ app.include_router(ai.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 app.include_router(webhooks.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 app.include_router(audit.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 app.include_router(stats.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
+app.include_router(operations.router, prefix=API_V1_PREFIX, responses=COMMON_RESPONSES)
 
 @app.get("/", tags=["System"])
 def root():

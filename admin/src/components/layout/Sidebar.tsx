@@ -9,6 +9,8 @@ import {
   Trophy,
   ChevronRight,
   Webhook,
+  Workflow,
+  GitBranch,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/utils/utils';
@@ -80,6 +82,13 @@ const navSections: NavSection[] = [
       { to: '/projects', icon: Briefcase, label: 'Projects', permission: 'read_content', variants: projectsVariants },
       { to: '/insights', icon: Lightbulb, label: 'Insights', permission: 'read_content', variants: insightsVariants },
       { to: '/case-studies', icon: Trophy, label: 'Case Studies', permission: 'read_content', variants: trophyVariants },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { to: '/operations', icon: Workflow, label: 'Console', permission: 'read_content', variants: dashboardVariants },
+      { to: '/operations/workflow', icon: GitBranch, label: 'Pipeline', permission: 'read_content', variants: dashboardVariants },
     ],
   },
   {
