@@ -15,7 +15,7 @@ Now, in **Week 7 (Milestone 2)**, our goal is to bring all of that power to the 
 
 ## The Daily Plan in Simple Words
 
-### Monday: The Operations Console & Workflow Views
+### Monday: The Operations Console & Workflow Views [COMPLETED]
 We will upgrade the main dashboard. Instead of just seeing one big list of everything, editors and admins will have specific, clear workspaces:
 *   **Drafts Workspace:** Stuff being written.
 *   **Review Queue:** Stuff waiting for an admin's approval.
@@ -23,7 +23,7 @@ We will upgrade the main dashboard. Instead of just seeing one big list of every
 *   **Published / Scheduled:** Stuff that is live or waiting for a timer.
 We will also add search bars, status filters, and author filters so you can easily find exactly what you are looking for.
 
-### Tuesday: Revision History & Visual Previews
+### Tuesday: Revision History & Visual Previews [COMPLETED]
 Before an admin approves an article, they need to know what changed. 
 *   **Side-by-Side Diff:** We will build a visual comparison tool (like track changes in Word) so reviewers can see exactly what was added, deleted, or changed between versions.
 *   **Live Preview:** We will add a "Website Preview" button. Even if an article is just a draft, the editor can click this to see exactly how it will look on the real public website, complete with author details and any validation warnings.
