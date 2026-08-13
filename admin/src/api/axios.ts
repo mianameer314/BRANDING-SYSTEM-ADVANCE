@@ -1,7 +1,6 @@
 import axios, { type AxiosRequestConfig, type AxiosError } from 'axios';
 import { env } from '@/config/env';
 import { API } from './endpoints';
-import { toast } from 'react-hot-toast';
 
 export const axiosInstance = axios.create({
  baseURL: env.apiBaseUrl,
