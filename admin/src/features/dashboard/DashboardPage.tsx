@@ -217,38 +217,39 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-8 pb-8">
-      {/* Main Header (Refresh Button Only) */}
-      <div className="relative flex flex-col sm:flex-row items-center justify-end gap-4 py-2 sm:py-6">
-        <div className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
-          <PermissionGuard permission="view_drafts">
-            <button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              title="Refresh Dashboard"
-              className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
-            >
-              <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
-            </button>
-          </PermissionGuard>
-        </div>
-      </div>
-
       <PermissionGuard permission="view_drafts">
-        {/* Summary Bar */}
-        <div className="flex justify-center w-full py-4 mb-4">
-          <div className="relative group overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-card to-card/50 px-16 py-10 text-center shadow-sm transition-all hover:shadow-md hover:border-primary/40 min-w-[320px]">
-            {/* Glow Accent */}
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Sleek Summary Banner */}
+        <div className="mb-8 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-card to-card shadow-sm transition-all hover:shadow-md hover:border-primary/40">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 sm:px-10">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 shadow-inner">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Total Managed Content</h2>
+                <p className="text-sm text-muted-foreground">Across all content types in the CMS</p>
+              </div>
+            </div>
             
-            <div className="relative z-10 flex flex-col items-center justify-center gap-3">
-              <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Total Managed Content</span>
-              <span className="text-6xl font-black text-foreground drop-shadow-sm">
+            <div className="flex items-center gap-6">
+              <div className="text-5xl font-black text-foreground drop-shadow-sm">
                 {isOperationsLoading ? (
-                  <span className="inline-block h-14 w-24 animate-pulse rounded-lg bg-accent" />
+                  <span className="inline-block h-12 w-24 animate-pulse rounded-lg bg-accent" />
                 ) : (
                   <CountUp end={overview?.total_content || 0} />
                 )}
-              </span>
+              </div>
+              
+              <div className="h-10 w-px bg-border/50 hidden sm:block"></div>
+              
+              <button
+                onClick={() => refetch()}
+                disabled={isFetching}
+                title="Refresh Dashboard"
+                className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
+              >
+                <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
+              </button>
             </div>
           </div>
         </div>
