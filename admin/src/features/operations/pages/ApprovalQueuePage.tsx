@@ -95,7 +95,7 @@ export function ApprovalQueuePage() {
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("age_desc");
   const [page, setPage] = useState(1);
-  const perPage = 20;
+  const perPage = 10;
 
   // Filters from URL
   const filters: ReviewQueueFilters = useMemo(() => ({
@@ -315,27 +315,25 @@ export function ApprovalQueuePage() {
             ))}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-6">
-                <button
-                  onClick={() => handlePageChange(page - 1)}
-                  disabled={page === 1 || isLoading}
-                  className="flex items-center justify-center p-2 rounded-lg border border-border bg-card text-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-sm font-medium text-foreground px-3">
-                  Page {page} of {totalPages}
-                </span>
-                <button
-                  onClick={() => handlePageChange(page + 1)}
-                  disabled={page === totalPages || isLoading}
-                  className="flex items-center justify-center p-2 rounded-lg border border-border bg-card text-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            )}
+            <div className="flex items-center justify-center gap-2 mt-8 pb-4">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1 || isLoading}
+                className="flex items-center justify-center p-2 rounded-lg border border-border bg-card text-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-sm font-medium text-foreground px-3">
+                Page {page} of {Math.max(1, totalPages)}
+              </span>
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page >= totalPages || isLoading}
+                className="flex items-center justify-center p-2 rounded-lg border border-border bg-card text-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         )}
       </div>
