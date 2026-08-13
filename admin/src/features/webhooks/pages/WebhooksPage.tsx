@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Activity, Zap, Shield, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 import { useWebhooks, useDeleteWebhook, useUpdateWebhook, useTestWebhook } from '../hooks';
@@ -11,6 +12,7 @@ import { useCreateWebhook } from '../hooks';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 export const WebhooksPage = () => {
+ const { setHeaderState } = useOutletContext<any>();
  const [page] = useState(1);
  const [isFormOpen, setIsFormOpen] = useState(false);
  const [isLogsOpen, setIsLogsOpen] = useState(false);
@@ -18,6 +20,14 @@ export const WebhooksPage = () => {
  const [newWebhookSecret, setNewWebhookSecret] = useState<string | null>(null);
  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
  const [webhookToDelete, setWebhookToDelete] = useState<number | null>(null);
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'Webhooks',
+     subtitle: 'Manage outbound integrations and event notifications.',
+     showBackButton: false
+   });
+ }, [setHeaderState]);
 
  const { data, isLoading } = useWebhooks({ page, per_page: 20 });
  const createWebhook = useCreateWebhook();
@@ -118,13 +128,7 @@ export const WebhooksPage = () => {
 
  return (
  <div className="p-6">
- <div className="mb-6 flex items-center justify-between">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Webhooks</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage outbound integrations and event notifications.
-        </p>
-      </div>
+ <div className="mb-6 flex items-center justify-end">
       <button
         onClick={handleOpenCreate}
         className="interactive-button-small"

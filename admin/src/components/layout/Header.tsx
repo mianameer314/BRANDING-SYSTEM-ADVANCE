@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Menu, User, LogOut, Users } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import DarkAsterisk from '@/assets/dark-astrisk.svg';
 
 const roleLabels: Record<string, string> = {
@@ -13,10 +14,12 @@ const roleLabels: Record<string, string> = {
 
 interface HeaderProps {
     title: string;
+    subtitle?: string;
+    showBackButton?: boolean;
     onMenuClick: () => void;
 }
 
-export function Header({ title, onMenuClick }: HeaderProps) {
+export function Header({ title, subtitle, showBackButton, onMenuClick }: HeaderProps) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -44,15 +47,35 @@ export function Header({ title, onMenuClick }: HeaderProps) {
             <div className="flex items-center gap-4">
                 <button
                     onClick={onMenuClick}
-                    className="rounded-lg p-1.5 text-primary-foreground hover:bg-primary-foreground/10 lg:hidden"
+                    className="rounded-lg p-1.5 text-primary-foreground hover:bg-primary-foreground/10 lg:hidden shrink-0"
                     aria-label="Open navigation"
                 >
                     <Menu size={20} />
                 </button>
-                <h1 className="text-lg font-bold text-primary-foreground flex items-center gap-2">
-                    <img src={DarkAsterisk} alt="Asterisk" className="h-5 w-5 animate-[spin_4s_linear_infinite]" />
-                    {title}
-                </h1>
+                <div className="flex items-center gap-3">
+                    <img src={DarkAsterisk} alt="Asterisk" className="h-6 w-6 shrink-0 animate-[spin_4s_linear_infinite] hidden sm:block" />
+                    
+                    {showBackButton && (
+                        <button 
+                            onClick={() => navigate(-1)}
+                            className="p-1.5 -ml-1.5 rounded-full text-primary-foreground hover:bg-primary-foreground/10 transition-colors group flex-shrink-0"
+                            title="Go Back"
+                        >
+                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+                        </button>
+                    )}
+                    
+                    <div className="flex flex-col">
+                        <h1 className="text-lg font-bold text-primary-foreground leading-tight">
+                            {title}
+                        </h1>
+                        {subtitle && (
+                            <span className="text-xs font-medium text-primary-foreground/80 leading-tight">
+                                {subtitle}
+                            </span>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Right: actions */}

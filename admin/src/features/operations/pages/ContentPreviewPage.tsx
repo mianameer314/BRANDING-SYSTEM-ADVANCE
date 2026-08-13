@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { operationsApi } from '@/features/operations/api';
 import { PreviewFrame } from '@/features/operations/components/PreviewFrame';
@@ -32,6 +32,16 @@ export function ContentPreviewPage() {
     queryFn: () => operationsApi.getPreviewData(contentType!, token!),
     enabled: !!token && !!contentType,
   });
+
+  const { setHeaderState } = useOutletContext<any>();
+
+  useEffect(() => {
+    setHeaderState({
+      title: 'Website Preview',
+      subtitle: 'Simulated Front-End Render',
+      showBackButton: true
+    });
+  }, [setHeaderState]);
 
   if (isLoading || !token) {
     return (
@@ -82,24 +92,7 @@ export function ContentPreviewPage() {
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4 mb-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors group"
-          >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          </button>
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-              <MonitorPlay className="w-6 h-6 text-primary" />
-              Website Preview
-            </h2>
-            <p className="text-muted-foreground text-xs uppercase tracking-wider font-semibold mt-1">
-              Simulated Front-End Render
-            </p>
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 border-b border-border/40 pb-4 mb-4 shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/operations/revisions/${contentType}/${contentId}`)}

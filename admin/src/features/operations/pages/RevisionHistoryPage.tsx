@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { operationsApi } from '@/features/operations/api';
 import { RevisionTimeline } from '@/features/operations/components/RevisionTimeline';
@@ -19,6 +19,16 @@ export function RevisionHistoryPage() {
     queryFn: () => operationsApi.getRevisions(contentType!, parseInt(contentId!)),
     enabled: !!contentType && !!contentId,
   });
+
+  const { setHeaderState } = useOutletContext<any>();
+
+  useEffect(() => {
+    setHeaderState({
+      title: 'Revision History',
+      subtitle: 'Track changes and compare versions.',
+      showBackButton: true
+    });
+  }, [setHeaderState]);
 
   if (isLoading) {
     return (
@@ -65,24 +75,7 @@ export function RevisionHistoryPage() {
   return (
     <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-6">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors group"
-          >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          </button>
-          <div>
-            <h2 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
-              <Clock className="w-7 h-7 text-primary" />
-              Revision History
-            </h2>
-            <p className="text-muted-foreground text-sm uppercase tracking-wider font-semibold mt-1">
-              {contentType} #{contentId}
-            </p>
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 border-b border-border/40 pb-6">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/operations/preview/${contentType}/${contentId}`)}

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useOutletContext } from 'react-router-dom';
 import { WorkflowColumn } from '../components/WorkflowColumn';
 import { OperatorToolbar } from '../components/OperatorToolbar';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,6 +9,7 @@ export function WorkflowOverviewPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const scrollRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  const { setHeaderState } = useOutletContext<any>();
 
   const filters: OperationsFilters = {
     search: searchParams.get('search') || '',
@@ -36,6 +37,14 @@ export function WorkflowOverviewPage() {
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ['operations'] });
   };
+
+  useEffect(() => {
+    setHeaderState({
+      title: 'Content Pipeline',
+      subtitle: 'Track and manage content through editorial stages.',
+      showBackButton: false
+    });
+  }, [setHeaderState]);
 
   useEffect(() => {
     const status = searchParams.get('status');

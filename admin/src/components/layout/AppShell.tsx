@@ -15,10 +15,19 @@ const pageTitles: Record<string, string> = {
  '/settings': 'Settings',
 };
 
+export interface HeaderState {
+  title: string;
+  subtitle?: string;
+  showBackButton?: boolean;
+}
+
 export function AppShell() {
  const [sidebarOpen, setSidebarOpen] = useState(false);
  const location = useLocation();
- const title = pageTitles[location.pathname] ?? 'O2Geeks CMS';
+ 
+ const [headerState, setHeaderState] = useState<HeaderState>({ 
+   title: pageTitles[location.pathname] ?? 'O2Geeks CMS' 
+ });
 
  return (
  <div className="flex h-screen overflow-hidden bg-background">
@@ -42,7 +51,12 @@ export function AppShell() {
 
  {/* Main content */}
  <div className="flex flex-1 flex-col overflow-hidden">
- <Header title={title} onMenuClick={() => setSidebarOpen(true)} />
+ <Header 
+    title={headerState.title} 
+    subtitle={headerState.subtitle}
+    showBackButton={headerState.showBackButton}
+    onMenuClick={() => setSidebarOpen(true)} 
+ />
   <main className="flex-1 overflow-y-auto p-6 bg-accent/30 relative">
      <AnimatePresence mode="wait">
        <motion.div 
@@ -53,7 +67,7 @@ export function AppShell() {
          transition={{ duration: 0.3, ease: 'easeOut' }}
          className="h-full"
        >
-         <Outlet />
+         <Outlet context={{ setHeaderState }} />
        </motion.div>
      </AnimatePresence>
   </main>

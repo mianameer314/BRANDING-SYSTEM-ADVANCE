@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useInsights, useDeleteInsight } from './hooks';
 import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -26,6 +27,7 @@ const INSIGHT_CATEGORIES = [
 export function InsightsPage() {
  const { filters, setFilter, resetFilters } = useUrlFilters();
  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+ const { setHeaderState } = useOutletContext<any>();
 
  const canApprove = usePermission('approve');
  const canPublish = usePermission('publish');
@@ -38,6 +40,14 @@ export function InsightsPage() {
 
  const { data, isLoading, isError, refetch } = useInsights(filters);
  const { mutateAsync: deleteInsight, isPending: isDeleting } = useDeleteInsight();
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'Insights',
+     subtitle: data ? `${data.total} ${data.total === 1 ? 'insight' : 'insights'} total` : 'Manage insight content',
+     showBackButton: false
+   });
+ }, [setHeaderState, data?.total]);
  
  const page = filters.page || 1;
  const perPage = filters.per_page || 10;
@@ -117,11 +127,8 @@ export function InsightsPage() {
 
  return (
  <div className="space-y-5">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-xl font-semibold text-foreground">Insights</h2>
- {data && <p className="mt-0.5 text-sm text-muted-foreground">{data.total} {data.total === 1 ? 'insight' : 'insights'} total</p>}
- </div>
+ {/* Page header (Actions Only) */}
+ <div className="flex items-center justify-end">
  <PermissionGuard permission="create">
  <Link
  to="/insights/create"

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useCaseStudies, useDeleteCaseStudy } from './hooks';
 import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -31,18 +32,27 @@ const CASE_STUDY_INDUSTRIES = [
 export function CaseStudiesPage() {
  const { filters, setFilter, resetFilters } = useUrlFilters();
  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+ const { setHeaderState } = useOutletContext<any>();
 
  const canApprove = usePermission('approve');
  const canPublish = usePermission('publish');
+
+ const { data, isLoading, isError, refetch } = useCaseStudies(filters);
+ const { mutateAsync: deleteCaseStudy, isPending: isDeleting } = useDeleteCaseStudy();
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'Case Studies',
+     subtitle: data ? `${data.total} ${data.total === 1 ? 'case study' : 'case studies'} total` : 'Manage case study content',
+     showBackButton: false
+   });
+ }, [setHeaderState, data?.total]);
 
  const isLocked = (status: string) => {
    if (status === 'approved') return !canApprove;
    if (['published', 'scheduled', 'unpublished', 'archived'].includes(status)) return !canPublish;
    return false;
  };
-
- const { data, isLoading, isError, refetch } = useCaseStudies(filters);
- const { mutateAsync: deleteCaseStudy, isPending: isDeleting } = useDeleteCaseStudy();
  
  const page = filters.page || 1;
  const perPage = filters.per_page || 10;
@@ -129,11 +139,8 @@ export function CaseStudiesPage() {
 
  return (
  <div className="space-y-5">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-xl font-semibold text-foreground">Case Studies</h2>
- {data && <p className="mt-0.5 text-sm text-muted-foreground">{data.total} {data.total === 1 ? 'case study' : 'case studies'} total</p>}
- </div>
+ {/* Page header (Actions Only) */}
+ <div className="flex items-center justify-end">
  <PermissionGuard permission="create">
  <Link
  to="/case-studies/create"

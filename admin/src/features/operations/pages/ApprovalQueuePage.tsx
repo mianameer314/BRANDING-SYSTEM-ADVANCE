@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight, RefreshCw } from "lucide-react";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -82,6 +82,15 @@ function ExpandedQueueItemView({ item, onClose, onViewFull, onApprove, onRequest
 export function ApprovalQueuePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
+  const { setHeaderState } = useOutletContext<any>();
+
+  useEffect(() => {
+    setHeaderState({
+      title: 'Review Queue',
+      subtitle: 'Approve or request changes on submitted content.',
+      showBackButton: false
+    });
+  }, [setHeaderState]);
 
   // State
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
@@ -228,12 +237,7 @@ export function ApprovalQueuePage() {
     <div className="flex h-[calc(100vh-8rem)] flex-col space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Review Queue</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Review and approve content submitted for publication
-          </p>
-        </div>
+        <div />
         <div className="flex items-center gap-3">
           <button
             onClick={handleRefresh}

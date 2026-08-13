@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useNews, useDeleteNews } from './hooks';
 import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -19,6 +20,7 @@ import { usePermission } from '@/features/auth/hooks/usePermission';
 export function NewsPage() {
  const { filters, setFilter, resetFilters } = useUrlFilters();
  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+ const { setHeaderState } = useOutletContext<any>();
 
  const canApprove = usePermission('approve');
  const canPublish = usePermission('publish');
@@ -31,6 +33,14 @@ export function NewsPage() {
 
  const { data, isLoading, isError, refetch } = useNews(filters);
  const { mutateAsync: deleteNews, isPending: isDeleting } = useDeleteNews();
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'News',
+     subtitle: data ? `${data.total} ${data.total === 1 ? 'article' : 'articles'} total` : 'Manage news content',
+     showBackButton: false
+   });
+ }, [setHeaderState, data?.total]);
 
  const page = filters.page || 1;
  const perPage = filters.per_page || 10;
@@ -129,16 +139,8 @@ export function NewsPage() {
 
  return (
  <div className="space-y-5">
- {/* Page header */}
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-xl font-semibold text-foreground">News</h2>
- {data && (
- <p className="mt-0.5 text-sm text-muted-foreground">
- {data.total} {data.total === 1 ? 'article' : 'articles'} total
- </p>
- )}
- </div>
+ {/* Page header (Actions Only) */}
+ <div className="flex items-center justify-end">
  <PermissionGuard permission="create">
  <Link
  to="/news/create"

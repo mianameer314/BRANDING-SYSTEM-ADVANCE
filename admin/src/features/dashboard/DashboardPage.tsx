@@ -17,7 +17,8 @@ import {
   Activity
 } from 'lucide-react';
 import { cn } from '@/utils/utils';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
+import { useEffect } from 'react';
 import { CountUp } from '@/components/ui/CountUp';
 import { useDashboardStats } from './hooks';
 import { useWorkflowOverview } from '@/features/operations/hooks';
@@ -66,7 +67,7 @@ function StatCard({ icon: Icon, label, stats, isLoading, color, to }: StatCardPr
       to={to}
       className="o2-card-3d group relative overflow-hidden rounded-xl border border-border bg-card p-6 hover:bg-accent flex flex-col justify-between"
     >
-      <div className={cn('absolute -right-4 -top-4 h-20 w-20 rounded-full blur-2xl opacity-20 group-hover:opacity-30 transition-opacity', color)} />
+      <div className={cn('absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-[0.05] group-hover:opacity-[0.08] transition-opacity', color)} />
 
       <div className="relative flex items-start justify-between">
         <div>
@@ -103,6 +104,15 @@ export function DashboardPage() {
   const { data: dashboardStats, isLoading: isDashboardLoading } = useDashboardStats();
   const { data: overview, isLoading: isOperationsLoading, refetch, isFetching } = useWorkflowOverview();
   const { user } = useAuth();
+  const { setHeaderState } = useOutletContext<any>();
+  
+  useEffect(() => {
+    setHeaderState({
+      title: 'Dashboard & Console',
+      subtitle: 'Monitor and manage the entire editorial workflow.',
+      showBackButton: false
+    });
+  }, [setHeaderState]);
   
   const canApprove = user?.permissions?.includes('approve');
   const canPublish = user?.permissions?.includes('publish');
@@ -207,14 +217,8 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-8 pb-8">
-      {/* Main Header */}
-      <div className="relative flex flex-col items-center text-center gap-4 py-2 sm:py-6">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard & Console</h2>
-          <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto">
-            Monitor and manage the entire editorial workflow.
-          </p>
-        </div>
+      {/* Main Header (Refresh Button Only) */}
+      <div className="relative flex flex-col sm:flex-row items-center justify-end gap-4 py-2 sm:py-6">
         <div className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
           <PermissionGuard permission="view_drafts">
             <button

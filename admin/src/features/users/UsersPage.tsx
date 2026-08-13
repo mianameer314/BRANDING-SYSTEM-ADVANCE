@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useUsers, useDeactivateUser, useUpdateUser } from './hooks';
 import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -32,10 +33,19 @@ export function UsersPage() {
  const [page, setPage] = useState(1);
  const [userToDeactivate, setUserToDeactivate] = useState<number | null>(null);
  
+ const { setHeaderState } = useOutletContext<any>();
  const { data, isLoading, isError, refetch } = useUsers({ page, per_page: PER_PAGE });
  const { mutateAsync: deactivateUser, isPending: isDeactivating } = useDeactivateUser();
  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
  const { user: currentUser } = useAuth();
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'Users',
+     subtitle: data ? `${data.total} ${data.total === 1 ? 'user' : 'users'} total` : 'Manage system users',
+     showBackButton: false
+   });
+ }, [setHeaderState, data?.total]);
 
  const handleDeactivate = async () => {
  if (!userToDeactivate) return;
@@ -149,15 +159,7 @@ export function UsersPage() {
 
  return (
  <div className="space-y-5">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-xl font-semibold text-foreground">Users</h2>
- {data && (
- <p className="mt-0.5 text-sm text-muted-foreground">
- {data.total} {data.total === 1 ? 'user' : 'users'} total
- </p>
- )}
- </div>
+ <div className="flex items-center justify-end">
  <Link
  to="/users/create"
  className="interactive-button-small"

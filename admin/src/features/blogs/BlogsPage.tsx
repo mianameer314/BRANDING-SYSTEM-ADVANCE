@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useBlogs, useDeleteBlog } from './hooks';
 import { DataTable, type ColumnDef } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -50,6 +51,7 @@ export function BlogsPage() {
 
  const canApprove = usePermission('approve');
  const canPublish = usePermission('publish');
+ const { setHeaderState } = useOutletContext<any>();
 
  const isLocked = (status: string) => {
    if (status === 'approved') return !canApprove;
@@ -59,6 +61,14 @@ export function BlogsPage() {
  
  const { data, isLoading, isError, refetch } = useBlogs(filters);
  const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteBlog();
+
+ useEffect(() => {
+   setHeaderState({
+     title: 'Blogs',
+     subtitle: data ? `${data.total} ${data.total === 1 ? 'article' : 'articles'} total` : 'Manage blog content',
+     showBackButton: false
+   });
+ }, [setHeaderState, data?.total]);
 
  const handleDelete = async () => {
  if (!itemToDelete) return;
@@ -172,16 +182,8 @@ export function BlogsPage() {
 
  return (
  <div className="space-y-5">
- {/* Page header */}
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-xl font-semibold text-foreground">Blogs</h2>
- {data && (
- <p className="mt-0.5 text-sm text-muted-foreground">
- {data.total} {data.total === 1 ? 'article' : 'articles'} total
- </p>
- )}
- </div>
+ {/* Page header (Actions Only) */}
+ <div className="flex items-center justify-end">
  <PermissionGuard permission="create">
  <Link
  to="/blogs/create"
