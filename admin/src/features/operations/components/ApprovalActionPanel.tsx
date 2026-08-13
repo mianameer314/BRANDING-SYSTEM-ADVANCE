@@ -83,34 +83,50 @@ export function ApprovalActionPanel({
 
       <div className="flex flex-col gap-2">
         {/* Approve Button */}
-        <button
-          onClick={() => setShowApproveDialog(true)}
-          disabled={isLoading || item.status === "approved"}
-          className={cn(
-            "w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all",
-            "bg-emerald-500/10 text-emerald-700 border border-emerald-200 hover:bg-emerald-500/20 hover:shadow-sm hover:-translate-y-0.5",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+        <div className="relative">
+          <button
+            onClick={() => setShowApproveDialog(true)}
+            disabled={isLoading || item.status === "approved" || item.status.toLowerCase() === "changes_requested"}
+            className={cn(
+              "peer w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all",
+              "bg-emerald-500/10 text-emerald-700 border border-emerald-200 hover:bg-emerald-500/20 hover:shadow-sm hover:-translate-y-0.5",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            )}
+          >
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span className="font-medium">Approve</span>
+            <span className="text-xs text-emerald-600/70">Publish ready</span>
+          </button>
+          {item.status.toLowerCase() === "changes_requested" && (
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-2 bg-foreground text-background text-xs font-medium rounded-lg shadow-lg opacity-0 invisible peer-hover:opacity-100 peer-hover:visible transition-all duration-200 z-50">
+              Awaiting author changes
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground rotate-45"></div>
+            </div>
           )}
-        >
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span className="font-medium">Approve</span>
-          <span className="text-xs text-emerald-600/70">Publish ready</span>
-        </button>
+        </div>
 
         {/* Request Changes Button */}
-        <button
-          onClick={() => setShowRequestChangesDialog(true)}
-          disabled={isLoading || item.status === "changes_requested"}
-          className={cn(
-            "w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all",
-            "bg-amber-500/10 text-amber-700 border border-amber-200 hover:bg-amber-500/20 hover:shadow-sm hover:-translate-y-0.5",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+        <div className="relative">
+          <button
+            onClick={() => setShowRequestChangesDialog(true)}
+            disabled={isLoading || item.status.toLowerCase() === "changes_requested"}
+            className={cn(
+              "peer w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all",
+              "bg-amber-500/10 text-amber-700 border border-amber-200 hover:bg-amber-500/20 hover:shadow-sm hover:-translate-y-0.5",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            )}
+          >
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span className="font-medium">Request Changes</span>
+            <span className="text-xs text-amber-600/70">Send back to author</span>
+          </button>
+          {item.status.toLowerCase() === "changes_requested" && (
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-2 bg-foreground text-background text-xs font-medium rounded-lg shadow-lg opacity-0 invisible peer-hover:opacity-100 peer-hover:visible transition-all duration-200 z-50">
+              Changes already requested
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground rotate-45"></div>
+            </div>
           )}
-        >
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span className="font-medium">Request Changes</span>
-          <span className="text-xs text-amber-600/70">Send back to author</span>
-        </button>
+        </div>
 
         {/* Reject Button */}
         <button

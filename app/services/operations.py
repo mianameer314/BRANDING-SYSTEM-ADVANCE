@@ -102,11 +102,16 @@ def approve_content(
     content = get_content_by_id(db, content_type, content_id)
 
     # Validate current status allows approval
-    current_status = content.status
-    if current_status not in ("in_review", "changes_requested"):
+    current_status = content.status.value if hasattr(content.status, "value") else content.status
+    if str(current_status).lower() == "changes_requested":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Cannot approve content in status '{current_status}'. Must be in_review or changes_requested.",
+            detail="Content is currently with the author for changes. It must be resubmitted for review before it can be approved.",
+        )
+    if str(current_status).lower() != "in_review":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot approve content in status '{current_status}'. Must be in_review.",
         )
 
     # Apply status transition to approved
@@ -175,12 +180,12 @@ def request_changes(
     """
     content = get_content_by_id(db, content_type, content_id)
 
-    # Validate current status allows change request
-    current_status = content.status
-    if current_status not in ("in_review", "approved"):
+    # Validate current status
+    current_status = content.status.value if hasattr(content.status, "value") else content.status
+    if str(current_status).lower() not in ("in_review", "approved", "published"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Cannot request changes on content in status '{current_status}'. Must be in_review or approved.",
+            detail=f"Cannot request changes for content in status '{current_status}'.",
         )
 
     # Apply status transition
@@ -235,9 +240,9 @@ def reject_content(
     """
     content = get_content_by_id(db, content_type, content_id)
 
-    # Validate current status allows rejection
-    current_status = content.status
-    if current_status not in ("in_review", "changes_requested", "approved", "draft"):
+    # Validate current status
+    current_status = content.status.value if hasattr(content.status, "value") else content.status
+    if str(current_status).lower() in ("archived", "published"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot reject content in status '{current_status}'.",
@@ -373,52 +378,29 @@ def get_review_queue(
         instance = db.query(model).filter(model.id == cid).first()
         warnings = []
         if instance:
-            if not getattr(instance, "cover_image", None):
-                warnings.append("Missing cover image")
+            from sqlalchemy.inspection import inspect
+            mapper = inspect(model)
+            
+            ignore_fields = {
+                "id", "slug", "status", "ai_generated", 
+                "published_at", "status_changed_at", 
+                "status_changed_by_id", "status_change_reason", 
+                "created_at", "updated_at"
+            }
+            
+            for column in mapper.columns:
+                if column.name in ignore_fields:
+                    continue
                 
-            if ct in ("blog", "insight"):
-                if not getattr(instance, "title", None): warnings.append("Missing title")
-                if not getattr(instance, "author", None): warnings.append("Missing author")
-                if not getattr(instance, "content", None): warnings.append("Missing content")
-                if not getattr(instance, "excerpt", None): warnings.append("Missing excerpt (optional but recommended)")
-                if not getattr(instance, "category", None): warnings.append("Missing category (optional)")
-                tags = getattr(instance, "tags", None)
-                if not tags or len(tags) == 0: warnings.append("Missing tags (optional)")
-
-            elif ct == "case_study":
-                if not getattr(instance, "title", None): warnings.append("Missing title")
-                if not getattr(instance, "client_name", None): warnings.append("Missing client name")
-                if not getattr(instance, "client_logo", None): warnings.append("Missing client logo (optional)")
-                if not getattr(instance, "industry", None): warnings.append("Missing industry (optional)")
-                if not getattr(instance, "challenge", None): warnings.append("Missing challenge")
-                if not getattr(instance, "solution", None): warnings.append("Missing solution")
-                if not getattr(instance, "results", None): warnings.append("Missing results")
-                metrics = getattr(instance, "metrics", None)
-                if not metrics or len(metrics) == 0: warnings.append("Missing metrics (optional)")
-                if not getattr(instance, "testimonial", None): warnings.append("Missing testimonial (optional)")
-                if not getattr(instance, "testimonial_author", None): warnings.append("Missing testimonial author (optional)")
-                gallery = getattr(instance, "gallery", None)
-                if not gallery or len(gallery) == 0: warnings.append("Missing gallery images (optional)")
-                technologies = getattr(instance, "technologies", None)
-                if not technologies or len(technologies) == 0: warnings.append("Missing technologies (optional)")
+                val = getattr(instance, column.name, None)
+                is_missing = val is None or (isinstance(val, (str, list, dict)) and not val)
                 
-            elif ct == "news":
-                if not getattr(instance, "headline", None): warnings.append("Missing headline")
-                if not getattr(instance, "summary", None): warnings.append("Missing summary")
-                if not getattr(instance, "source", None): warnings.append("Missing source (optional)")
-                
-            elif ct == "project":
-                if not getattr(instance, "name", None): warnings.append("Missing name")
-                if not getattr(instance, "client", None): warnings.append("Missing client (optional)")
-                if not getattr(instance, "description", None): warnings.append("Missing description")
-                if not getattr(instance, "short_desc", None): warnings.append("Missing short description (optional)")
-                if not getattr(instance, "category", None): warnings.append("Missing category (optional)")
-                if not getattr(instance, "project_url", None): warnings.append("Missing project URL (optional)")
-                gallery = getattr(instance, "gallery", None)
-                if not gallery or len(gallery) == 0: warnings.append("Missing gallery images")
-                technologies = getattr(instance, "technologies", None)
-                if not technologies or len(technologies) == 0: warnings.append("Missing technologies (optional)")
-                item["project_url"] = getattr(instance, "project_url", None)
+                if is_missing:
+                    field_name = column.name.replace("_", " ")
+                    if column.nullable:
+                        warnings.append(f"Missing {field_name} (optional)")
+                    else:
+                        warnings.append(f"Missing {field_name}")
 
             # Extra preview fields for UI
             preview = ""
