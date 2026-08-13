@@ -5,7 +5,7 @@ import { operationsApi } from '@/features/operations/api';
 import { PreviewFrame } from '@/features/operations/components/PreviewFrame';
 import { PreviewMetadataPanel } from '@/features/operations/components/PreviewMetadataPanel';
 import { ValidationWarnings } from '@/features/operations/components/ValidationWarnings';
-import { ArrowLeft, MonitorPlay, History } from 'lucide-react';
+import { History } from 'lucide-react';
 
 // Specific Previews
 import { BlogPreview } from '@/features/operations/components/preview/BlogPreview';

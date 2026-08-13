@@ -376,31 +376,48 @@ def get_review_queue(
             if not getattr(instance, "cover_image", None):
                 warnings.append("Missing cover image")
                 
-            if ct in ("blog", "insight", "case_study"):
-                if not getattr(instance, "title", None): warnings.append("Missing title")
-            elif ct == "news":
-                if not getattr(instance, "headline", None): warnings.append("Missing headline")
-            elif ct == "project":
-                if not getattr(instance, "name", None): warnings.append("Missing name")
-                
             if ct in ("blog", "insight"):
+                if not getattr(instance, "title", None): warnings.append("Missing title")
                 if not getattr(instance, "author", None): warnings.append("Missing author")
                 if not getattr(instance, "content", None): warnings.append("Missing content")
-                
+                if not getattr(instance, "excerpt", None): warnings.append("Missing excerpt (optional but recommended)")
+                if not getattr(instance, "category", None): warnings.append("Missing category (optional)")
+                tags = getattr(instance, "tags", None)
+                if not tags or len(tags) == 0: warnings.append("Missing tags (optional)")
+
             elif ct == "case_study":
+                if not getattr(instance, "title", None): warnings.append("Missing title")
                 if not getattr(instance, "client_name", None): warnings.append("Missing client name")
+                if not getattr(instance, "client_logo", None): warnings.append("Missing client logo (optional)")
+                if not getattr(instance, "industry", None): warnings.append("Missing industry (optional)")
                 if not getattr(instance, "challenge", None): warnings.append("Missing challenge")
                 if not getattr(instance, "solution", None): warnings.append("Missing solution")
                 if not getattr(instance, "results", None): warnings.append("Missing results")
+                metrics = getattr(instance, "metrics", None)
+                if not metrics or len(metrics) == 0: warnings.append("Missing metrics (optional)")
+                if not getattr(instance, "testimonial", None): warnings.append("Missing testimonial (optional)")
+                if not getattr(instance, "testimonial_author", None): warnings.append("Missing testimonial author (optional)")
+                gallery = getattr(instance, "gallery", None)
+                if not gallery or len(gallery) == 0: warnings.append("Missing gallery images (optional)")
+                technologies = getattr(instance, "technologies", None)
+                if not technologies or len(technologies) == 0: warnings.append("Missing technologies (optional)")
                 
             elif ct == "news":
+                if not getattr(instance, "headline", None): warnings.append("Missing headline")
                 if not getattr(instance, "summary", None): warnings.append("Missing summary")
+                if not getattr(instance, "source", None): warnings.append("Missing source (optional)")
                 
             elif ct == "project":
+                if not getattr(instance, "name", None): warnings.append("Missing name")
+                if not getattr(instance, "client", None): warnings.append("Missing client (optional)")
                 if not getattr(instance, "description", None): warnings.append("Missing description")
-                if not getattr(instance, "project_url", None): warnings.append("Missing project URL")
+                if not getattr(instance, "short_desc", None): warnings.append("Missing short description (optional)")
+                if not getattr(instance, "category", None): warnings.append("Missing category (optional)")
+                if not getattr(instance, "project_url", None): warnings.append("Missing project URL (optional)")
                 gallery = getattr(instance, "gallery", None)
                 if not gallery or len(gallery) == 0: warnings.append("Missing gallery images")
+                technologies = getattr(instance, "technologies", None)
+                if not technologies or len(technologies) == 0: warnings.append("Missing technologies (optional)")
                 item["project_url"] = getattr(instance, "project_url", None)
 
             # Extra preview fields for UI

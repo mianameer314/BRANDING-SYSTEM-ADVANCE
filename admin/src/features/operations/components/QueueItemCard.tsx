@@ -25,9 +25,10 @@ interface QueueItemCardProps {
   item: ReviewQueueItem;
   onExpand?: (item: ReviewQueueItem) => void;
   isExpanded?: boolean;
+  children?: React.ReactNode;
 }
 
-export function QueueItemCard({ item, onExpand, isExpanded = false }: QueueItemCardProps) {
+export function QueueItemCard({ item, onExpand, isExpanded = false, children }: QueueItemCardProps) {
   const typeColor = TYPE_COLORS[item.content_type] || "bg-muted text-muted-foreground";
   const typeLabel = TYPE_LABELS[item.content_type] || item.content_type.replace("_", " ");
 
@@ -46,8 +47,9 @@ export function QueueItemCard({ item, onExpand, isExpanded = false }: QueueItemC
     <div
       className={cn(
         "group relative flex flex-col gap-0 rounded-xl border bg-card transition-all duration-300 overflow-hidden",
-        "hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-border/80 hover:-translate-y-0.5",
-        isExpanded ? "border-secondary/40 ring-1 ring-secondary/10 shadow-md" : "border-border/60"
+        !isExpanded && "hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-border/80 hover:-translate-y-0.5",
+        isExpanded ? "border-secondary/40 ring-1 ring-secondary/10 shadow-md" : "border-border/60",
+        "cursor-pointer"
       )}
       onClick={() => onExpand?.(item)}
     >
@@ -150,6 +152,13 @@ export function QueueItemCard({ item, onExpand, isExpanded = false }: QueueItemC
           </button>
         </div>
       </div>
+      
+      {/* Expanded Content rendered inside the card */}
+      {isExpanded && (
+        <div className="cursor-default" onClick={(e) => e.stopPropagation()}>
+          {children}
+        </div>
+      )}
     </div>
   );
 }

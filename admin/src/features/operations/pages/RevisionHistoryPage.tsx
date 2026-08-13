@@ -5,7 +5,7 @@ import { operationsApi } from '@/features/operations/api';
 import { RevisionTimeline } from '@/features/operations/components/RevisionTimeline';
 import { RevisionSnapshotView } from '@/features/operations/components/RevisionSnapshotView';
 import { RevisionDiffViewer } from '@/features/operations/components/RevisionDiffViewer';
-import { ArrowLeft, Clock, LayoutDashboard, Copy } from 'lucide-react';
+import { LayoutDashboard, Copy } from 'lucide-react';
 
 export function RevisionHistoryPage() {
   const { contentType, contentId } = useParams<{ contentType: string; contentId: string }>();

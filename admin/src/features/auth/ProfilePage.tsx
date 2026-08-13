@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useUpdateProfile, useChangePassword } from './hooks';

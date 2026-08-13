@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useOutletContext } from "react-router-dom";
 import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight, RefreshCw } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -35,43 +36,41 @@ function ExpandedQueueItemView({ item, onClose, onViewFull, onApprove, onRequest
   const revisions = revisionsData?.items || revisionsData || [];
 
   return (
-    <div className="mt-4 animate-in slide-in-from-top-2 duration-200">
-      <div className="bg-card border border-border rounded-xl p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <QueueItemDetail
-              item={item}
-              onClose={onClose}
-              onViewFull={onViewFull}
-            />
+    <div className="animate-in slide-in-from-top-2 duration-300 border-t border-border/50 bg-background/30 p-5 sm:p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <QueueItemDetail
+            item={item}
+            onClose={onClose}
+            onViewFull={onViewFull}
+          />
 
-            <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-                <ClipboardCheck className="w-4 h-4" />
-                Timeline & History
-              </h4>
-              {isLoadingRevisions ? (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Loading timeline...
-                </div>
-              ) : (
-                <QueueItemTimeline
-                  timeline={[]}
-                  revisions={revisions}
-                />
-              )}
-            </div>
+          <div className="mt-8">
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
+              <ClipboardCheck className="w-4 h-4" />
+              Timeline & History
+            </h4>
+            {isLoadingRevisions ? (
+              <div className="text-sm text-muted-foreground flex items-center gap-2 py-4">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading timeline...
+              </div>
+            ) : (
+              <QueueItemTimeline
+                timeline={[]}
+                revisions={revisions}
+              />
+            )}
           </div>
+        </div>
 
-          <div className="lg:col-span-1">
-            <ApprovalActionPanel
-              item={item}
-              onApprove={onApprove}
-              onRequestChanges={onRequestChanges}
-              onReject={onReject}
-              isLoading={isMutating}
-            />
-          </div>
+        <div className="lg:col-span-1 border-l border-border/40 pl-0 lg:pl-6 pt-6 lg:pt-0 border-t lg:border-t-0">
+          <ApprovalActionPanel
+            item={item}
+            onApprove={onApprove}
+            onRequestChanges={onRequestChanges}
+            onReject={onReject}
+            isLoading={isMutating}
+          />
         </div>
       </div>
     </div>
@@ -182,38 +181,33 @@ export function ApprovalQueuePage() {
   const totalItems = data?.total || 0;
   const totalPages = Math.ceil(totalItems / perPage);
 
-  const handleApprove = async (item: ReviewQueueItem) => {
+  const handleApprove = async (payload: any) => {
     try {
-      await approveMutation.mutateAsync({
-        content_type: item.content_type,
-        content_id: item.id,
-      });
+      await approveMutation.mutateAsync(payload);
+      toast.success("Content approved successfully");
     } catch (err) {
       console.error("Failed to approve:", err);
+      toast.error("Failed to approve content");
     }
   };
 
-  const handleRequestChanges = async (item: ReviewQueueItem, comment: string) => {
+  const handleRequestChanges = async (payload: any) => {
     try {
-      await requestChangesMutation.mutateAsync({
-        content_type: item.content_type,
-        content_id: item.id,
-        comment,
-      });
+      await requestChangesMutation.mutateAsync(payload);
+      toast.success("Changes requested successfully");
     } catch (err) {
       console.error("Failed to request changes:", err);
+      toast.error("Failed to request changes");
     }
   };
 
-  const handleReject = async (item: ReviewQueueItem, comment: string) => {
+  const handleReject = async (payload: any) => {
     try {
-      await rejectMutation.mutateAsync({
-        content_type: item.content_type,
-        content_id: item.id,
-        comment,
-      });
+      await rejectMutation.mutateAsync(payload);
+      toast.success("Content rejected successfully");
     } catch (err) {
       console.error("Failed to reject:", err);
+      toast.error("Failed to reject content");
     }
   };
 
@@ -303,20 +297,20 @@ export function ApprovalQueuePage() {
                   item={item}
                   onExpand={handleToggleExpand}
                   isExpanded={expandedItemId === item.id}
-                />
-
-                {/* Expanded Detail View */}
-                {expandedItemId === item.id && (
-                  <ExpandedQueueItemView
-                    item={item}
-                    onClose={() => handleToggleExpand(item)}
-                    onViewFull={() => handleViewFull(item)}
-                    onApprove={handleApprove}
-                    onRequestChanges={handleRequestChanges}
-                    onReject={handleReject}
-                    isMutating={isMutating}
-                  />
-                )}
+                >
+                  {/* Expanded Detail View */}
+                  {expandedItemId === item.id && (
+                    <ExpandedQueueItemView
+                      item={item}
+                      onClose={() => handleToggleExpand(item)}
+                      onViewFull={() => handleViewFull(item)}
+                      onApprove={handleApprove}
+                      onRequestChanges={handleRequestChanges}
+                      onReject={handleReject}
+                      isMutating={isMutating}
+                    />
+                  )}
+                </QueueItemCard>
               </div>
             ))}
 
