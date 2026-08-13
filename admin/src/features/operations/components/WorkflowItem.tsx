@@ -3,7 +3,7 @@ import type { ReviewQueueItem } from '../types';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
-import { Lock, MonitorPlay, History } from 'lucide-react';
+import { Lock, Eye, Clock } from 'lucide-react';
 
 interface WorkflowItemProps {
   item: ReviewQueueItem;
@@ -77,20 +77,22 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center justify-between gap-2 mt-2">
           <Link
             to={`/operations/preview/${item.content_type}/${item.id}`}
-            className="interactive-button-small flex-1"
+            className="group/btn flex items-center justify-center gap-2 py-1.5 px-3 flex-1 text-[13px] font-bold text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-all shadow-sm hover:shadow"
+            onClick={(e) => e.stopPropagation()}
           >
-            <span className="label">Preview</span>
-            <MonitorPlay size={14} className="icon" />
+            <Eye size={14} className="text-muted-foreground transition-all duration-300 group-hover/btn:scale-125 group-hover/btn:text-foreground" />
+            Preview
           </Link>
           <Link
             to={`/operations/revisions/${item.content_type}/${item.id}`}
-            className="interactive-button-small flex-1"
+            className="group/btn flex items-center justify-center gap-2 py-1.5 px-3 flex-1 text-[13px] font-bold text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-all shadow-sm hover:shadow"
+            onClick={(e) => e.stopPropagation()}
           >
-            <span className="label">History</span>
-            <History size={14} className="icon" />
+            <Clock size={14} className="text-muted-foreground transition-all duration-300 group-hover/btn:scale-125 group-hover/btn:text-foreground" />
+            History
           </Link>
         </div>
       </div>

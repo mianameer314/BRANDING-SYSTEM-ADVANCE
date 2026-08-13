@@ -220,10 +220,10 @@ export function DashboardPage() {
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50 transition-colors"
+              title="Refresh Dashboard"
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
             >
-              <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
-              Refresh
+              <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
             </button>
           </PermissionGuard>
         </div>
@@ -304,7 +304,11 @@ export function DashboardPage() {
                 <div className="divide-y divide-border">
                   {overview.recent_activity.map((item) => {
                     const getEditRoute = (type: string) => {
-                      const map: Record<string, string> = { case_study: 'case-studies' };
+                      const map: Record<string, string> = { 
+                        case_study: 'case-studies',
+                        news: 'news',
+                        project: 'projects'
+                      };
                       return map[type] || type + 's';
                     };
                     const routePath = `/${getEditRoute(item.content_type)}/${item.slug}/edit`;

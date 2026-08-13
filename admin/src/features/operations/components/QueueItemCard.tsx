@@ -109,18 +109,18 @@ export function QueueItemCard({ item, onExpand, isExpanded = false }: QueueItemC
         <div className="flex items-center gap-2">
           <Link
             to={`/operations/preview/${item.content_type}/${item.id}`}
-            className="flex items-center gap-2 py-1.5 px-4 text-sm font-bold text-foreground bg-white hover:bg-muted/50 border border-border rounded-lg transition-all shadow-sm hover:shadow"
+            className="group/btn flex items-center gap-2 py-1.5 px-4 text-sm font-bold text-foreground bg-white hover:bg-muted/50 border border-border rounded-lg transition-all shadow-sm hover:shadow"
             onClick={(e) => e.stopPropagation()}
           >
-            <Eye size={16} className="text-muted-foreground" />
+            <Eye size={16} className="text-muted-foreground transition-all duration-300 group-hover/btn:scale-125 group-hover/btn:text-foreground" />
             Preview
           </Link>
           <Link
             to={`/operations/revisions/${item.content_type}/${item.id}`}
-            className="flex items-center gap-2 py-1.5 px-4 text-sm font-bold text-foreground bg-white hover:bg-muted/50 border border-border rounded-lg transition-all shadow-sm hover:shadow"
+            className="group/btn flex items-center gap-2 py-1.5 px-4 text-sm font-bold text-foreground bg-white hover:bg-muted/50 border border-border rounded-lg transition-all shadow-sm hover:shadow"
             onClick={(e) => e.stopPropagation()}
           >
-            <Clock size={16} className="text-muted-foreground" />
+            <Clock size={16} className="text-muted-foreground transition-all duration-300 group-hover/btn:scale-125 group-hover/btn:text-foreground" />
             History
           </Link>
           <div className="w-px h-6 bg-border mx-1"></div>

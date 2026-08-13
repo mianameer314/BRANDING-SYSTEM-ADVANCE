@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight } from "lucide-react";
+import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight, RefreshCw } from "lucide-react";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -238,10 +238,10 @@ export function ApprovalQueuePage() {
           <button
             onClick={handleRefresh}
             disabled={isLoading || isMutating}
-            className="interactive-button flex items-center gap-2"
+            title="Refresh Queue"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
           >
-            <Loader2 className={cn("w-4 h-4", isLoading && "animate-spin")} />
-            Refresh
+            <RefreshCw size={18} className={cn(isLoading && "animate-spin")} />
           </button>
         </div>
       </div>

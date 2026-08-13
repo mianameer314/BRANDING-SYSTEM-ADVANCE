@@ -5,6 +5,8 @@
  * Right column (narrower): metadata sidebar (status, category, image, etc.)
  */
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 interface ContentFormLayoutProps {
     title: string;
@@ -21,13 +23,25 @@ export function ContentFormLayout({
     sideColumn,
     headerAction,
 }: ContentFormLayoutProps) {
+    const navigate = useNavigate();
+
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-                    {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={() => navigate(-1)}
+                        type="button"
+                        className="p-2 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors group flex-shrink-0"
+                        title="Go Back"
+                    >
+                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+                        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+                    </div>
                 </div>
                 {headerAction && (
                     <div>{headerAction}</div>

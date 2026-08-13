@@ -23,10 +23,10 @@ export function OperatorToolbar({
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:opacity-50 transition-colors"
+          title="Refresh Pipeline"
+          className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
         >
-          <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-          <span className="hidden sm:inline">Refresh Pipeline</span>
+          <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
         </button>
       </div>
       
