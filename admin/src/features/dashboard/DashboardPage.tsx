@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils/utils';
 import { Link, useOutletContext } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { CountUp } from '@/components/ui/CountUp';
 import { useDashboardStats } from './hooks';
 import { useWorkflowOverview } from '@/features/operations/hooks';
@@ -106,6 +106,14 @@ export function DashboardPage() {
   const { user } = useAuth();
   const { setHeaderState } = useOutletContext<any>();
   
+  const [showRefreshed, setShowRefreshed] = useState(false);
+
+  const handleRefreshClick = () => {
+    refetch();
+    setShowRefreshed(true);
+    setTimeout(() => setShowRefreshed(false), 2000);
+  };
+
   useEffect(() => {
     setHeaderState({
       title: 'Dashboard & Console',
@@ -242,14 +250,24 @@ export function DashboardPage() {
               
               <div className="h-10 w-px bg-border/50 hidden sm:block"></div>
               
-              <button
-                onClick={() => refetch()}
-                disabled={isFetching}
-                title="Refresh Dashboard"
-                className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
-              >
-                <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={handleRefreshClick}
+                  disabled={isFetching}
+                  title="Refresh Dashboard"
+                  className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all relative z-10"
+                >
+                  <RefreshCw size={18} className={isFetching || showRefreshed ? 'animate-spin' : ''} />
+                </button>
+                <div 
+                  className={cn(
+                    "absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 bg-foreground text-background text-[10px] font-bold rounded pointer-events-none transition-all duration-300 ease-out",
+                    showRefreshed ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-90"
+                  )}
+                >
+                  Refreshed!
+                </div>
+              </div>
             </div>
           </div>
         </div>

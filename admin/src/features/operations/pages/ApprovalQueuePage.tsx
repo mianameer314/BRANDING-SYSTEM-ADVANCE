@@ -228,29 +228,15 @@ export function ApprovalQueuePage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div />
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading || isMutating}
-            title="Refresh Queue"
-            className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all"
-          >
-            <RefreshCw size={18} className={cn(isLoading && "animate-spin")} />
-          </button>
-        </div>
-      </div>
-
+    <div className="flex h-[calc(100vh-8rem)] flex-col space-y-6 pt-6">
       {/* Filter Bar */}
       <QueueFilterBar
         filters={filters}
         onChange={handleFilterChange}
         onReset={handleFilterReset}
         isLoading={isLoading}
-        totalCount={totalItems}
+        totalCount={data?.total || 0}
+        onRefresh={handleRefresh}
       />
 
       {/* Sort Bar */}

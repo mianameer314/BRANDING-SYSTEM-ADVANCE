@@ -1,6 +1,8 @@
-import { Filter, X } from "lucide-react";
+import { Filter, X, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { SearchInput } from "@/components/table/SearchInput";
 import { CustomSelect } from "@/components/shared/CustomSelect";
+import { cn } from "@/utils/utils";
 import type { ReviewQueueFilters } from "../types";
 
 interface QueueFilterBarProps {
@@ -9,6 +11,7 @@ interface QueueFilterBarProps {
   onReset: () => void;
   isLoading?: boolean;
   totalCount: number;
+  onRefresh?: () => void;
 }
 
 const CONTENT_TYPES = [
@@ -25,7 +28,15 @@ export const QueueFilterBar = ({
   onReset,
   isLoading = false,
   totalCount = 0,
+  onRefresh,
 }: QueueFilterBarProps) => {
+  const [showRefreshed, setShowRefreshed] = useState(false);
+
+  const handleRefreshClick = () => {
+    if (onRefresh) onRefresh();
+    setShowRefreshed(true);
+    setTimeout(() => setShowRefreshed(false), 2000);
+  };
   const hasActiveFilters =
     !!filters.content_type ||
     !!filters.author ||
@@ -91,6 +102,30 @@ export const QueueFilterBar = ({
               <X size={16} />
               <span className="hidden sm:inline">Clear</span>
             </button>
+          )}
+
+          {onRefresh && (
+            <>
+              <div className="h-6 w-px bg-border mx-1 hidden sm:block"></div>
+              <div className="relative">
+                <button
+                  onClick={handleRefreshClick}
+                  disabled={isLoading}
+                  title="Refresh Queue"
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-accent hover:bg-muted text-foreground transition-colors disabled:opacity-50 relative z-10"
+                >
+                  <RefreshCw size={14} className={isLoading || showRefreshed ? "animate-spin" : ""} />
+                </button>
+                <div 
+                  className={cn(
+                    "absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 bg-foreground text-background text-[10px] font-bold rounded pointer-events-none transition-all duration-300 ease-out",
+                    showRefreshed ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-90"
+                  )}
+                >
+                  Refreshed!
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
