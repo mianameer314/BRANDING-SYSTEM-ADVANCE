@@ -62,6 +62,7 @@ export function PublishLogTable({ items, isLoading, page, totalPages, onPageChan
               <tr>
                 <th className="px-6 py-4 font-medium">Delivered At</th>
                 <th className="px-6 py-4 font-medium">Content</th>
+                <th className="px-6 py-4 font-medium">Destination</th>
                 <th className="px-6 py-4 font-medium">Status</th>
                 <th className="px-6 py-4 font-medium">Duration</th>
                 <th className="px-6 py-4 font-medium">Retries</th>
@@ -75,12 +76,12 @@ export function PublishLogTable({ items, isLoading, page, totalPages, onPageChan
                     {format(new Date(log.delivered_at), "MMM d, HH:mm:ss")}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium capitalize">{log.content_type.replace('_', ' ')} #{log.content_id}</span>
-                      <span className="text-xs text-muted-foreground truncate max-w-[200px]" title={log.request_url}>
-                        {log.request_url}
-                      </span>
-                    </div>
+                    <span className="font-medium capitalize">{log.content_type.replace('_', ' ')} #{log.content_id}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-mono text-muted-foreground truncate block max-w-[200px]" title={log.request_url}>
+                      {log.request_url}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     {log.success ? (
