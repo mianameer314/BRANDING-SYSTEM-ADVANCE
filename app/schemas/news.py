@@ -17,6 +17,7 @@ class NewsCreate(BaseModel):
     source: Optional[str] = Field(None, max_length=255)
     is_featured: bool = False
     status: ContentStatus = ContentStatus.draft
+    published_at: Optional[datetime] = None
     ai_generated: bool = False
 
 
@@ -28,6 +29,7 @@ class NewsUpdate(BaseModel):
     source: Optional[str] = Field(None, max_length=255)
     is_featured: Optional[bool] = None
     status: Optional[ContentStatus] = None
+    published_at: Optional[datetime] = None
     ai_generated: Optional[bool] = None
 
 
@@ -41,6 +43,7 @@ class NewsOut(ContentInteractionMixin, BaseModel):
     source: Optional[str]
     is_featured: bool
     status: str
+    published_at: Optional[datetime] = None
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime

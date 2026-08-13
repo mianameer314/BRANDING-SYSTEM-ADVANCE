@@ -102,6 +102,7 @@ export default function ProjectFormPage() {
       completed_at: existing.completed_at ? existing.completed_at.split('T')[0] : '',
       cover_image: null,
       ai_generated: existing.ai_generated ?? false,
+      published_at: existing.published_at ? new Date(existing.published_at).toISOString().slice(0, 16) : '',
     } : undefined,
   });
 
@@ -124,6 +125,7 @@ export default function ProjectFormPage() {
   const onSubmit = async (data: ProjectFormData) => {
     const payload = {
       ...data,
+      published_at: data.published_at ? new Date(data.published_at).toISOString() : null,
       cover_image: coverImageFile,
       gallery: galleryFiles.length > 0 ? galleryFiles : undefined,
       existing_gallery: keptGalleryUrls !== null ? JSON.stringify(keptGalleryUrls) : undefined,
@@ -251,6 +253,7 @@ export default function ProjectFormPage() {
                   )}
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
+                <FormField type="datetime-local" label="Requested Publish Date" error={errors.published_at as any} {...register('published_at')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
                 <FormField label="Category" placeholder="e.g. Web Development" error={errors.category} {...register('category')} />
                 <TechInput error={errors.technologies} {...register('technologies')} />

@@ -27,6 +27,7 @@ class CaseStudyCreate(BaseModel):
     technologies: Optional[list[str]] = None
     is_featured: bool = False
     status: ContentStatus = ContentStatus.draft
+    published_at: Optional[datetime] = None
     ai_generated: bool = False
 
 
@@ -47,6 +48,7 @@ class CaseStudyUpdate(BaseModel):
     technologies: Optional[list[str]] = None
     is_featured: Optional[bool] = None
     status: Optional[ContentStatus] = None
+    published_at: Optional[datetime] = None
     ai_generated: Optional[bool] = None
 
 
@@ -69,6 +71,7 @@ class CaseStudyOut(ContentInteractionMixin, BaseModel):
     technologies: Optional[list[str]]
     is_featured: bool
     status: str
+    published_at: Optional[datetime] = None
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime

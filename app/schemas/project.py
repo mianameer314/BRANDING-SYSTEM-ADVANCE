@@ -22,6 +22,7 @@ class ProjectCreate(BaseModel):
     project_url: Optional[str] = Field(None, max_length=500)
     is_featured: bool = False
     status: ContentStatus = ContentStatus.draft
+    published_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     ai_generated: bool = False
 
@@ -39,6 +40,7 @@ class ProjectUpdate(BaseModel):
     project_url: Optional[str] = Field(None, max_length=500)
     is_featured: Optional[bool] = None
     status: Optional[ContentStatus] = None
+    published_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     ai_generated: Optional[bool] = None
 
@@ -58,6 +60,7 @@ class ProjectOut(ContentInteractionMixin, BaseModel):
     project_url: Optional[str]
     is_featured: bool
     status: str
+    published_at: Optional[datetime] = None
     completed_at: Optional[datetime]
     published_at: Optional[datetime]
     created_at: datetime

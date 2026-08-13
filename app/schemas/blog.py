@@ -19,6 +19,7 @@ class BlogCreate(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     tags: Optional[list[str]] = None
     status: ContentStatus = ContentStatus.draft
+    published_at: Optional[datetime] = None
     ai_generated: bool = False
 
 
@@ -32,6 +33,7 @@ class BlogUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     tags: Optional[list[str]] = None
     status: Optional[ContentStatus] = None
+    published_at: Optional[datetime] = None
     ai_generated: Optional[bool] = None
 
 
@@ -47,6 +49,7 @@ class BlogOut(ContentInteractionMixin, BaseModel):
     category: Optional[str]
     tags: Optional[list[str]]
     status: str
+    published_at: Optional[datetime] = None
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime

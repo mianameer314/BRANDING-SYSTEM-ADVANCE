@@ -28,7 +28,7 @@ Before an admin approves an article, they need to know what changed.
 *   **Side-by-Side Diff:** We will build a visual comparison tool (like track changes in Word) so reviewers can see exactly what was added, deleted, or changed between versions.
 *   **Live Preview:** We will add a "Website Preview" button. Even if an article is just a draft, the editor can click this to see exactly how it will look on the real public website, complete with author details and any validation warnings.
 
-### Wednesday: The Approval Queue
+### Wednesday: The Approval Queue [COMPLETED]
 We will build a dedicated "Inbox" for administrators. 
 *   Admins will see a list of everything marked "In Review".
 *   They will have clear action buttons: **Approve**, **Request Changes**, or **Reject**.

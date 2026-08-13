@@ -106,6 +106,7 @@ export default function CaseStudyFormPage() {
       is_featured: existing.is_featured,
       status: existing.status as any,
       ai_generated: existing.ai_generated ?? false,
+      published_at: existing.published_at ? new Date(existing.published_at).toISOString().slice(0, 16) : '',
       cover_image: null,
       client_logo: null,
     } : undefined,
@@ -137,6 +138,7 @@ export default function CaseStudyFormPage() {
   const onSubmit = async (data: CaseStudyFormData) => {
     const payload = {
       ...data,
+      published_at: data.published_at ? new Date(data.published_at).toISOString() : null,
       cover_image: coverImageFile,
       client_logo: clientLogoFile,
       gallery: galleryFiles.length > 0 ? galleryFiles : undefined,
@@ -288,6 +290,7 @@ export default function CaseStudyFormPage() {
                   )}
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
+                <FormField type="datetime-local" label="Requested Publish Date" error={errors.published_at as any} {...register('published_at')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
                 <TechInput error={errors.technologies} {...register('technologies')} />
                 <div className="flex items-center gap-3">

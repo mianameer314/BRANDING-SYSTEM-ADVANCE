@@ -85,7 +85,7 @@ export default function InsightFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<InsightFormData>({
     resolver: zodResolver(insightSchema),
-    defaultValues: { status: 'draft', ai_generated: false },
+    defaultValues: { status: 'draft', ai_generated: false, published_at: '' },
     values: existing ? {
       title: existing.title,
       author: existing.author,
@@ -96,6 +96,7 @@ export default function InsightFormPage() {
       status: existing.status as any,
       
       ai_generated: existing.ai_generated ?? false,
+      published_at: existing.published_at ? new Date(existing.published_at).toISOString().slice(0, 16) : '',
       cover_image: null,
     } : undefined,
   });
@@ -119,6 +120,7 @@ export default function InsightFormPage() {
   const onSubmit = async (data: InsightFormData) => {
     const payload = {
       ...data,
+      published_at: data.published_at ? new Date(data.published_at).toISOString() : null,
       cover_image: coverImageFile,
       remove_cover_image: removeCoverImage,
     };
@@ -244,6 +246,7 @@ export default function InsightFormPage() {
                   )}
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
+                <FormField type="datetime-local" label="Requested Publish Date" error={errors.published_at as any} {...register('published_at')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
                 <FormField label="Category" placeholder="e.g. Technology" error={errors.category} {...register('category')} />
                 <TagsInput error={errors.tags} {...register('tags')} />

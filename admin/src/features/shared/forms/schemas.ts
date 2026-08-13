@@ -13,6 +13,7 @@ export const baseContentSchema = z.object({
  status: z.enum(['draft', 'in_review', 'changes_requested', 'approved', 'scheduled', 'published', 'unpublished', 'archived']),
  status_reason: z.string().max(500, 'Max 500 characters').optional().or(z.literal('')),
  ai_generated: z.boolean(),
+ published_at: z.string().optional().nullable().or(z.literal('')),
 });
 
 // ── Blog ───────────────────────────────────────────────────────────────────

@@ -92,6 +92,7 @@ export default function NewsFormPage() {
       status: existing.status as any,
       
       ai_generated: existing.ai_generated ?? false,
+      published_at: existing.published_at ? new Date(existing.published_at).toISOString().slice(0, 16) : '',
       cover_image: null,
     } : undefined,
   });
@@ -110,6 +111,7 @@ export default function NewsFormPage() {
   const onSubmit = async (data: NewsFormData) => {
     const payload = {
       ...data,
+      published_at: data.published_at ? new Date(data.published_at).toISOString() : null,
       cover_image: coverImageFile,
       remove_cover_image: removeCoverImage,
     };
@@ -232,6 +234,7 @@ export default function NewsFormPage() {
                   )}
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
+                <FormField type="datetime-local" label="Requested Publish Date" error={errors.published_at as any} {...register('published_at')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
                 <div className="flex items-center gap-3">
                   <input id="is_featured" type="checkbox" className="h-4 w-4 rounded border-border bg-input text-primary focus:ring-primary" {...register('is_featured')} />
