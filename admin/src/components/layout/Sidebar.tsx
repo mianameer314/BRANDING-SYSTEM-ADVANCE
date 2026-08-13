@@ -1,4 +1,4 @@
-﻿import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -11,6 +11,8 @@ import {
   Webhook,
   GitBranch,
   ClipboardCheck,
+  Activity,
+  CalendarClock
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/utils/utils';
@@ -96,6 +98,8 @@ const navSections: NavSection[] = [
     items: [
       { to: '/operations/workflow', icon: GitBranch, label: 'Content Pipeline', permission: 'view_drafts', variants: dashboardVariants },
       { to: '/operations/queue', icon: ClipboardCheck, label: 'Review Queue', permission: 'approve', variants: queueVariants },
+      { to: '/operations/schedule', icon: CalendarClock, label: 'Schedule', permission: 'publish', variants: dashboardVariants },
+      { to: '/operations/logs', icon: Activity, label: 'Publish Logs', permission: 'manage_webhooks', variants: dashboardVariants },
     ],
   },
   {

@@ -5547,6 +5547,972 @@
         }
       }
     },
+    "/api/v1/operations/review-queue": {
+      "get": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Get Review Queue Endpoint",
+        "description": "Get paginated review queue (items with status in_review or changes_requested).",
+        "operationId": "get_review_queue_endpoint_api_v1_operations_review_queue_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content Type"
+            }
+          },
+          {
+            "name": "author",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Author"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "ai_generated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ai Generated"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewQueueResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operations/approve": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Approve Content Endpoint",
+        "description": "Approve content for publication.\n- Validates current status is 'in_review' or 'changes_requested'\n- Records audit event\n- Creates revision snapshot\n- Updates content status to 'approved'",
+        "operationId": "approve_content_endpoint_api_v1_operations_approve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operations/request-changes": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Request Changes Endpoint",
+        "description": "Request changes on content.\n- Requires comment explaining what needs to change\n- Records audit event\n- Updates content status to 'changes_requested'",
+        "operationId": "request_changes_endpoint_api_v1_operations_request_changes_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRequestAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operations/reject": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Reject Content Endpoint",
+        "description": "Reject content.\n- Requires comment explaining reason\n- Records audit event\n- Updates content status to 'archived'",
+        "operationId": "reject_content_endpoint_api_v1_operations_reject_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectionAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operations/schedule": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Schedule Content",
+        "description": "Schedule content for future publication.",
+        "operationId": "schedule_content_api_v1_operations_schedule_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleContentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Schedule Content Api V1 Operations Schedule Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/reschedule": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Reschedule Content",
+        "description": "Reschedule already scheduled content.",
+        "operationId": "reschedule_content_api_v1_operations_reschedule_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RescheduleContentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Reschedule Content Api V1 Operations Reschedule Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/cancel-schedule": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Cancel Schedule",
+        "description": "Cancel scheduled content and revert to approved.",
+        "operationId": "cancel_schedule_api_v1_operations_cancel_schedule_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Cancel Schedule Api V1 Operations Cancel Schedule Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/publish-logs": {
+      "get": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Get Publish Logs",
+        "description": "Get paginated webhook publish logs.",
+        "operationId": "get_publish_logs_api_v1_operations_publish_logs_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "event",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event"
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Publish Logs Api V1 Operations Publish Logs Get"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operations/retry-publish": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Retry Publish",
+        "description": "Retry a failed webhook delivery.",
+        "operationId": "retry_publish_api_v1_operations_retry_publish_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryPublishRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Retry Publish Api V1 Operations Retry Publish Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/resolve-failure": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Resolve Failure",
+        "description": "Manually mark a failed webhook log as resolved.",
+        "operationId": "resolve_failure_api_v1_operations_resolve_failure_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveFailureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Resolve Failure Api V1 Operations Resolve Failure Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/schedule-queue": {
+      "get": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Get Schedule Queue",
+        "description": "Get paginated schedule queue (approved and scheduled items).",
+        "operationId": "get_schedule_queue_api_v1_operations_schedule_queue_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content Type"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Schedule Queue Api V1 Operations Schedule Queue Get"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -5588,6 +6554,51 @@
   },
   "components": {
     "schemas": {
+      "ApprovalAction": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Content type (blog, news, project, insight, case_study)"
+          },
+          "content_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Content Id",
+            "description": "Content ID"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment",
+            "description": "Optional comment for approval"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Optional reason for approval"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id"
+        ],
+        "title": "ApprovalAction"
+      },
       "AuditEventOut": {
         "properties": {
           "id": {
@@ -5846,6 +6857,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
           }
         },
         "type": "object",
@@ -5860,9 +6875,9 @@
           "category",
           "tags",
           "status",
-          "published_at",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "ai_generated"
         ],
         "title": "BlogOut",
         "description": "Response model for a blog post."
@@ -5917,7 +6932,7 @@
               }
             ],
             "title": "Tags",
-            "description": "JSON array string, e.g. [\"python\",\"fastapi\"]"
+            "description": "JSON array string"
           },
           "status": {
             "$ref": "#/components/schemas/ContentStatus",
@@ -5934,6 +6949,11 @@
               }
             ],
             "title": "Status Reason"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "default": false
           },
           "cover_image": {
             "anyOf": [
@@ -6061,6 +7081,11 @@
             ],
             "title": "Status Reason"
           },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "default": false
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -6175,6 +7200,11 @@
             ],
             "title": "Status Reason"
           },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "default": false
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -6240,6 +7270,11 @@
               }
             ],
             "title": "Status Reason"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "default": false
           },
           "cover_image": {
             "anyOf": [
@@ -6366,6 +7401,11 @@
             "title": "Completed At",
             "description": "ISO datetime string"
           },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "default": false
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -6490,7 +7530,7 @@
               }
             ],
             "title": "Tags",
-            "description": "JSON array string, e.g. [\"python\",\"fastapi\"]"
+            "description": "JSON array string"
           },
           "status": {
             "anyOf": [
@@ -6513,6 +7553,17 @@
               }
             ],
             "title": "Status Reason"
+          },
+          "ai_generated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Generated"
           },
           "cover_image": {
             "anyOf": [
@@ -6686,6 +7737,17 @@
             ],
             "title": "Status Reason"
           },
+          "ai_generated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Generated"
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -6846,6 +7908,17 @@
             ],
             "title": "Status Reason"
           },
+          "ai_generated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Generated"
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -6937,6 +8010,17 @@
               }
             ],
             "title": "Status Reason"
+          },
+          "ai_generated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Generated"
           },
           "cover_image": {
             "anyOf": [
@@ -7090,6 +8174,17 @@
             "title": "Completed At",
             "description": "ISO datetime string"
           },
+          "ai_generated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Generated"
+          },
           "cover_image": {
             "anyOf": [
               {
@@ -7156,6 +8251,35 @@
         },
         "type": "object",
         "title": "Body_update_resource_api_v1_resources__resource_id__put"
+      },
+      "CancelScheduleRequest": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "content_id": {
+            "type": "integer",
+            "title": "Content Id"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id"
+        ],
+        "title": "CancelScheduleRequest"
       },
       "CaseStudyGeneratedContent": {
         "properties": {
@@ -7426,6 +8550,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
           }
         },
         "type": "object",
@@ -7447,9 +8575,9 @@
           "technologies",
           "is_featured",
           "status",
-          "published_at",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "ai_generated"
         ],
         "title": "CaseStudyOut",
         "description": "Response model for a case study."
@@ -7473,6 +8601,46 @@
         ],
         "title": "ChangePasswordRequest",
         "description": "Request to change password."
+      },
+      "ChangeRequestAction": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Content type (blog, news, project, insight, case_study)"
+          },
+          "content_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Content Id",
+            "description": "Content ID"
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Comment",
+            "description": "Required comment explaining what needs to change"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Optional predefined reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id",
+          "comment"
+        ],
+        "title": "ChangeRequestAction"
       },
       "CommentCreate": {
         "properties": {
@@ -7611,6 +8779,17 @@
               }
             ],
             "title": "Actor Id"
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
           },
           "source": {
             "type": "string",
@@ -8125,6 +9304,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
           }
         },
         "type": "object",
@@ -8139,9 +9322,9 @@
           "category",
           "tags",
           "status",
-          "published_at",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "ai_generated"
         ],
         "title": "InsightOut",
         "description": "Response model for an insight article."
@@ -8366,6 +9549,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
           }
         },
         "type": "object",
@@ -8378,9 +9565,9 @@
           "source",
           "is_featured",
           "status",
-          "published_at",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "ai_generated"
         ],
         "title": "NewsOut",
         "description": "Response model for a news article."
@@ -8990,18 +10177,6 @@
             "type": "string",
             "title": "Status"
           },
-          "completed_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Completed At"
-          },
           "published_at": {
             "anyOf": [
               {
@@ -9014,6 +10189,18 @@
             ],
             "title": "Published At"
           },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -9023,6 +10210,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
           }
         },
         "type": "object",
@@ -9041,12 +10232,105 @@
           "is_featured",
           "status",
           "completed_at",
-          "published_at",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "ai_generated"
         ],
         "title": "ProjectOut",
         "description": "Response model for a project showcase."
+      },
+      "RejectionAction": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Content type (blog, news, project, insight, case_study)"
+          },
+          "content_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Content Id",
+            "description": "Content ID"
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Comment",
+            "description": "Required comment explaining rejection reason"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Optional predefined reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id",
+          "comment"
+        ],
+        "title": "RejectionAction"
+      },
+      "RescheduleContentRequest": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "content_id": {
+            "type": "integer",
+            "title": "Content Id"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scheduled At"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id",
+          "scheduled_at"
+        ],
+        "title": "RescheduleContentRequest"
+      },
+      "ResolveFailureRequest": {
+        "properties": {
+          "log_id": {
+            "type": "integer",
+            "title": "Log Id"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "log_id",
+          "comment"
+        ],
+        "title": "ResolveFailureRequest"
       },
       "ResourceOut": {
         "properties": {
@@ -9144,6 +10428,217 @@
         },
         "type": "object",
         "title": "RestoreRevisionRequest"
+      },
+      "RetryPublishRequest": {
+        "properties": {
+          "log_id": {
+            "type": "integer",
+            "title": "Log Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "log_id"
+        ],
+        "title": "RetryPublishRequest"
+      },
+      "ReviewQueueItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "status_changed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Changed At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "cover_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover Image"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated"
+          },
+          "validation_warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Warnings"
+          },
+          "content_preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Preview"
+          },
+          "media_status": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Status"
+          },
+          "project_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "content_type",
+          "slug",
+          "title",
+          "status",
+          "author",
+          "created_at",
+          "updated_at",
+          "ai_generated"
+        ],
+        "title": "ReviewQueueItem"
+      },
+      "ReviewQueueResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewQueueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "ReviewQueueResponse"
+      },
+      "ScheduleContentRequest": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Type of content (blog, news, etc)"
+          },
+          "content_id": {
+            "type": "integer",
+            "title": "Content Id"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scheduled At"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id",
+          "scheduled_at"
+        ],
+        "title": "ScheduleContentRequest"
       },
       "Token": {
         "properties": {

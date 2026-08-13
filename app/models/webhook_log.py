@@ -13,7 +13,7 @@ class WebhookLog(Base):
     __tablename__ = "webhook_logs"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    webhook_id: Mapped[int] = mapped_column(Integer, ForeignKey("webhooks.id", ondelete="CASCADE"), index=True)
+    webhook_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("webhooks.id", ondelete="SET NULL"), index=True, nullable=True)
     
     event: Mapped[str] = mapped_column(String(50), nullable=False)
     content_type: Mapped[str] = mapped_column(String(30), nullable=False)
@@ -34,6 +34,12 @@ class WebhookLog(Base):
     
     delivery_id: Mapped[str | None] = mapped_column(String(36), nullable=True, unique=True, index=True)
     dedup_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    resolved_by_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    resolution_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("webhook_id", "dedup_key", name="uq_webhook_log_webhook_dedup"),

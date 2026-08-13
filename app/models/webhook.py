@@ -36,4 +36,4 @@ class Webhook(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    logs = relationship("WebhookLog", back_populates="webhook", cascade="all, delete-orphan")
+    logs = relationship("WebhookLog", back_populates="webhook")

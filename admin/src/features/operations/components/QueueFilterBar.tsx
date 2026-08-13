@@ -12,6 +12,7 @@ interface QueueFilterBarProps {
   isLoading?: boolean;
   totalCount: number;
   onRefresh?: () => void;
+  hideAiFilter?: boolean;
 }
 
 const CONTENT_TYPES = [
@@ -29,6 +30,7 @@ export const QueueFilterBar = ({
   isLoading = false,
   totalCount = 0,
   onRefresh,
+  hideAiFilter = false,
 }: QueueFilterBarProps) => {
   const [showRefreshed, setShowRefreshed] = useState(false);
 
@@ -82,15 +84,17 @@ export const QueueFilterBar = ({
             className="text-sm border border-input rounded-md bg-card text-foreground py-2 px-3 focus:outline-none focus:ring-2 focus:ring-primary w-[160px] shadow-sm hover:bg-accent/50 transition-colors"
           />
 
-          <label className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              checked={!!filters.ai_generated}
-              onChange={(e) => onChange("ai_generated", e.target.checked)}
-              className="h-4 w-4 rounded border-input border-primary/20 text-primary focus:ring-primary"
-            />
-            <span className="hidden sm:inline">AI Generated</span>
-          </label>
+          {!hideAiFilter && (
+            <label className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!filters.ai_generated}
+                onChange={(e) => onChange("ai_generated", e.target.checked)}
+                className="h-4 w-4 rounded border-input border-primary/20 text-primary focus:ring-primary"
+              />
+              <span className="hidden sm:inline">AI Generated</span>
+            </label>
+          )}
 
           {hasActiveFilters && (
             <button

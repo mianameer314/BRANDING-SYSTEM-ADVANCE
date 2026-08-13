@@ -16,6 +16,22 @@ scheduler = AsyncIOScheduler(jobstores=jobstores, timezone="UTC")
 def start_scheduler():
     """Start the APScheduler instance."""
     if not scheduler.running:
+        # Register jobs here
+        scheduler.add_job(
+            "app.services.operations:check_scheduled_content",
+            "interval",
+            minutes=1,
+            id="check_scheduled_content",
+            replace_existing=True
+        )
+        scheduler.add_job(
+            "app.services.operations:cleanup_old_webhook_logs",
+            "cron",
+            hour=0,
+            minute=0,
+            id="cleanup_old_webhook_logs",
+            replace_existing=True
+        )
         scheduler.start()
         logger.info("APScheduler started successfully.")
 

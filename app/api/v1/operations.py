@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select, func, literal_column, union_all, desc
 
-from app.api.deps import DbDep
+from app.api.deps import DbDep, get_db
 from app.core.permissions import require_permission
 from app.models.user import User
 from app.models.blog import Blog
@@ -16,6 +16,43 @@ from app.models.project import Project
 from app.models.insight import Insight
 from app.models.case_study import CaseStudy
 from app.models.webhook_log import WebhookLog
+
+
+from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field
+from fastapi import HTTPException, BackgroundTasks
+from sqlalchemy.orm import Session
+from app.api.deps import get_current_user
+
+class ScheduleContentRequest(BaseModel):
+    content_type: str = Field(..., description="Type of content (blog, news, etc)")
+    content_id: int
+    scheduled_at: datetime
+    comment: Optional[str] = None
+
+class RescheduleContentRequest(BaseModel):
+    content_type: str
+    content_id: int
+    scheduled_at: datetime
+    comment: Optional[str] = None
+
+class CancelScheduleRequest(BaseModel):
+    content_type: str
+    content_id: int
+    comment: Optional[str] = None
+
+class PublishNowRequest(BaseModel):
+    content_type: str
+    content_id: int
+
+class RetryPublishRequest(BaseModel):
+    log_id: int
+
+class ResolveFailureRequest(BaseModel):
+    log_id: int
+    comment: str
+
 
 router = APIRouter(prefix="/operations", tags=["Operations Console"])
 
@@ -315,3 +352,186 @@ def reject_content_endpoint(
         idempotency.save(db, 200, response)
         
     return response
+
+
+@router.post("/publish-now")
+def publish_now_endpoint(
+    data: PublishNowRequest,
+    db: DbDep,
+    current_user: User = Depends(require_permission("publish")),
+    idempotency: IdempotencyDep = None,
+):
+    """
+    Publish content immediately.
+    - Transitions from approved/scheduled directly to published
+    - Fires webhook instantly
+    """
+    from app.services.operations import publish_now
+    content = publish_now(
+        db,
+        content_type=data.content_type,
+        content_id=data.content_id,
+        actor_id=current_user.id,
+    )
+    response = {"content_type": data.content_type, "content_id": data.content_id, "status": content.status, "message": "Content published successfully"}
+    
+    if idempotency:
+        idempotency.save(db, 200, response)
+        
+    return response
+
+
+@router.post("/schedule", response_model=dict)
+def schedule_content(
+    request: ScheduleContentRequest,
+    current_user: User = Depends(require_permission("publish")),
+    db: Session = Depends(get_db),
+):
+    """Schedule content for future publication."""
+    try:
+        from app.services.operations import schedule_content as s_schedule
+        content = s_schedule(
+            db,
+            content_type=request.content_type,
+            content_id=request.content_id,
+            actor_id=current_user.id,
+            scheduled_at=request.scheduled_at,
+            comment=request.comment,
+        )
+        return {"message": "Content scheduled", "status": content.status, "scheduled_at": content.scheduled_at}
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/reschedule", response_model=dict)
+def reschedule_content(
+    request: RescheduleContentRequest,
+    current_user: User = Depends(require_permission("publish")),
+    db: Session = Depends(get_db),
+):
+    """Reschedule already scheduled content."""
+    try:
+        from app.services.operations import reschedule_content as s_reschedule
+        content = s_reschedule(
+            db,
+            content_type=request.content_type,
+            content_id=request.content_id,
+            actor_id=current_user.id,
+            new_scheduled_at=request.scheduled_at,
+            comment=request.comment,
+        )
+        return {"message": "Content rescheduled", "status": content.status, "scheduled_at": content.scheduled_at}
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/cancel-schedule", response_model=dict)
+def cancel_schedule(
+    request: CancelScheduleRequest,
+    current_user: User = Depends(require_permission("publish")),
+    db: Session = Depends(get_db),
+):
+    """Cancel scheduled content and revert to approved."""
+    try:
+        from app.services.operations import cancel_schedule as s_cancel
+        content = s_cancel(
+            db,
+            content_type=request.content_type,
+            content_id=request.content_id,
+            actor_id=current_user.id,
+            comment=request.comment,
+        )
+        return {"message": "Schedule cancelled", "status": content.status}
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/publish-logs", response_model=dict)
+def get_publish_logs(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    event: Optional[str] = None,
+    content_type: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: User = Depends(require_permission("manage_webhooks")),
+    db: Session = Depends(get_db),
+):
+    """Get paginated webhook publish logs."""
+    from app.services.operations import get_publish_logs as s_get_logs
+    return s_get_logs(
+        db,
+        page=page,
+        per_page=per_page,
+        event=event,
+        content_type=content_type,
+        status=status,
+    )
+
+
+@router.post("/retry-publish", response_model=dict)
+def retry_publish(
+    request: RetryPublishRequest,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(require_permission("manage_webhooks")),
+    db: Session = Depends(get_db),
+):
+    """Retry a failed webhook delivery."""
+    from app.services.operations import retry_publish as s_retry
+    from app.services.webhook_dispatcher import dispatch_publish_event
+    
+    log_entry, payload = s_retry(db, log_id=request.log_id, actor_id=current_user.id)
+    
+    # We run the actual dispatch in background to not block the API
+    background_tasks.add_task(
+        dispatch_publish_event, 
+        content_type=log_entry.content_type, 
+        content_id=log_entry.content_id, 
+        payload=payload
+    )
+    
+    return {"message": "Retry dispatched", "retry_count": log_entry.retry_count}
+
+
+@router.post("/resolve-failure", response_model=dict)
+def resolve_failure(
+    request: ResolveFailureRequest,
+    current_user: User = Depends(require_permission("manage_webhooks")),
+    db: Session = Depends(get_db),
+):
+    """Manually mark a failed webhook log as resolved."""
+    from app.services.operations import resolve_failure as s_resolve
+    
+    log_entry = s_resolve(
+        db,
+        log_id=request.log_id,
+        actor_id=current_user.id,
+        comment=request.comment
+    )
+    
+    return {"message": "Failure resolved", "resolved_at": log_entry.resolved_at}
+
+@router.get("/schedule-queue", response_model=dict)
+def get_schedule_queue(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    content_type: Optional[str] = None,
+    search: Optional[str] = None,
+    current_user: User = Depends(require_permission("publish")),
+    db: Session = Depends(get_db),
+):
+    """Get paginated schedule queue (approved and scheduled items)."""
+    from app.services.operations import get_schedule_queue as s_get_schedule
+    return s_get_schedule(
+        db,
+        page=page,
+        per_page=per_page,
+        content_type=content_type,
+        search=search,
+    )
+# trigger reload

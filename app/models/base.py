@@ -24,6 +24,9 @@ class ContentMixin:
     status_changed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    scheduled_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, index=True
+    )
     status_changed_by_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status_change_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

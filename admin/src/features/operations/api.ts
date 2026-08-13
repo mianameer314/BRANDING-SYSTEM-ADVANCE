@@ -108,4 +108,40 @@ export const operationsApi = {
     const response = await api.get(`/preview/${contentType}`, { params: { token } });
     return response.data;
   },
+
+  // --- New Methods ---
+  scheduleContent: async (data: any) => {
+    const response = await api.post("/operations/schedule", data);
+    return response.data;
+  },
+  publishNow: async (data: any) => {
+    const response = await api.post("/operations/publish-now", data);
+    return response.data;
+  },
+  rescheduleContent: async (data: any) => {
+    const response = await api.post("/operations/reschedule", data);
+    return response.data;
+  },
+  cancelSchedule: async (data: any) => {
+    const response = await api.post("/operations/cancel-schedule", data);
+    return response.data;
+  },
+  getScheduleQueue: async (params: any) => {
+    const q = new URLSearchParams(params).toString();
+    const response = await api.get(`/operations/schedule-queue?${q}`);
+    return response.data;
+  },
+  getPublishLogs: async (params: any) => {
+    const q = new URLSearchParams(params).toString();
+    const response = await api.get(`/operations/publish-logs?${q}`);
+    return response.data;
+  },
+  retryPublish: async (logId: number) => {
+    const response = await api.post("/operations/retry-publish", { log_id: logId });
+    return response.data;
+  },
+  resolveFailure: async (logId: number, comment: string) => {
+    const response = await api.post("/operations/resolve-failure", { log_id: logId, comment });
+    return response.data;
+  },
 };
