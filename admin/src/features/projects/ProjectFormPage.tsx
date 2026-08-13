@@ -256,7 +256,7 @@ export default function ProjectFormPage() {
                   )}
                 />
                 <FormTextarea label="Short Description" rows={3} placeholder="Brief summary (max 300 chars)" error={errors.short_desc} {...register('short_desc')} />
-                <GalleryUploadField label="Project Gallery" currentGalleryUrls={isEdit ? existing?.gallery || [] : []} onFilesChange={setGalleryFiles} onKeptUrlsChange={setKeptGalleryUrls} />
+                <GalleryUploadField currentGalleryUrls={isEdit ? existing?.gallery : null} onGalleryChange={({ existingUrls, newFiles }) => { setKeptGalleryUrls(existingUrls); setGalleryFiles(newFiles); }} />
                 <hr className="border-border my-4" />
                 <ResourceAttachments contentType="project" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
