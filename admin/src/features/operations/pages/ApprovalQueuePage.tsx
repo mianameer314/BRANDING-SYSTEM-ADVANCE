@@ -93,7 +93,7 @@ export function ApprovalQueuePage() {
 
   // State
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState("age");
+  const [sortBy, setSortBy] = useState("age_desc");
   const [page, setPage] = useState(1);
   const perPage = 20;
 
