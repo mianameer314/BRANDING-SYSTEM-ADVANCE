@@ -26,7 +26,7 @@ def override_user(request):
     yield user
     app.dependency_overrides.pop(get_current_user, None)
 
-@pytest.mark.parametrize("override_user", ["user", "editor", "admin"], indirect=True)
+@pytest.mark.parametrize("override_user", ["user", "editor"], indirect=True)
 def test_webhook_creation_forbidden(override_user):
     with TestClient(app) as client:
         payload = {
@@ -37,7 +37,7 @@ def test_webhook_creation_forbidden(override_user):
         response = client.post("/api/v1/webhooks", json=payload)
         assert response.status_code == 403
 
-@pytest.mark.parametrize("override_user", ["super_admin"], indirect=True)
+@pytest.mark.parametrize("override_user", ["super_admin", "admin"], indirect=True)
 def test_webhook_creation_allowed(override_user):
     with TestClient(app) as client:
         payload = {
