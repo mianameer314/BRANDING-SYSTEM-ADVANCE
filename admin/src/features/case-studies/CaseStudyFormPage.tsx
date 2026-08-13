@@ -30,6 +30,7 @@ import { LivePreviewModal } from '@/components/preview/LivePreviewModal';
 import { GenerateDraftModal } from '@/features/ai/GenerateDraftModal';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { NavigationGuard } from '@/components/shared/NavigationGuard';
 import { uploadPendingResources } from '@/features/resources/utils';
 
 export default function CaseStudyFormPage() {
@@ -54,6 +55,22 @@ export default function CaseStudyFormPage() {
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const shouldPreviewAfterSave = useRef(false);
+  const isNavigatingAway = useRef(false);
+
+  const submitForm = async (): Promise<boolean> => {
+    isNavigatingAway.current = true;
+    let success = false;
+    await handleSubmit(async (data) => {
+      try {
+        await onSubmit(data);
+        success = true;
+      } catch (e) {
+        success = false;
+      }
+    })();
+    isNavigatingAway.current = false;
+    return success;
+  };
 
   const handleLivePreview = () => setIsLivePreviewOpen(true);
 
@@ -164,7 +181,7 @@ export default function CaseStudyFormPage() {
           return;
         }
         reset(data);
-        navigate('/case-studies');
+        if (!isNavigatingAway.current) navigate('/case-studies');
       } else {
         const newContent = await createMutation.mutateAsync(payload);
         if (pendingResources.length > 0) {
@@ -195,11 +212,12 @@ export default function CaseStudyFormPage() {
           return;
         }
         reset(data);
-        navigate('/case-studies');
+        if (!isNavigatingAway.current) navigate('/case-studies');
       }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Something went wrong';
       toast.error(msg);
+      throw err;
     }
   };
 
@@ -212,6 +230,7 @@ export default function CaseStudyFormPage() {
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Failed to delete case study';
       toast.error(msg);
+      throw err;
     } finally {
       setIsDeleteModalOpen(false);
     }
@@ -222,12 +241,19 @@ export default function CaseStudyFormPage() {
     return <div className="p-8 text-center text-destructive">Failed to load case study for editing.</div>;
   }
 
-  if (isEdit && isLoading) {
-    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading case study details...</div>;
-  }
+  const isFormDirty =
+    isDirty ||
+    !!coverImageFile ||
+    removeCoverImage ||
+    !!clientLogoFile ||
+    removeClientLogo ||
+    galleryFiles.length > 0 ||
+    keptGalleryUrls !== null ||
+    pendingResources.length > 0;
 
   return (
     <>
+      <NavigationGuard isDirty={isFormDirty} onSave={submitForm} />
       <div className="mx-auto max-w-5xl space-y-6">
         <form onSubmit={handleSubmit(onSubmit)}>
           <ContentFormLayout
@@ -299,7 +325,7 @@ export default function CaseStudyFormPage() {
                 </div>
                 <ImageUploadField label="Cover Image" currentImageUrl={isEdit ? existing?.cover_image : null} onFileChange={setCoverImageFile} onRemoveChange={setRemoveCoverImage} />
                 <ImageUploadField label="Client Logo" currentImageUrl={isEdit ? existing?.client_logo : null} onFileChange={setClientLogoFile} onRemoveChange={setRemoveClientLogo} />
-                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isDirty || !!coverImageFile || removeCoverImage || pendingResources.length > 0} isEdit={isEdit} cancelTo="/case-studies" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
+                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isFormDirty} isEdit={isEdit} cancelTo="/case-studies" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
               </>
             }
           />

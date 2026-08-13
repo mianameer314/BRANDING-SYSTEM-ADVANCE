@@ -11,6 +11,8 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/providers/AuthProvider';
+import { NavigationGuard } from '@/components/shared/NavigationGuard';
+import { useRef } from 'react';
 
 const createUserSchema = z.object({
  full_name: z.string().min(2, 'Name is too short'),
@@ -43,6 +45,8 @@ export function UserFormPage() {
 
  const schema = isEdit ? updateUserSchema : createUserSchema;
 
+ const isNavigatingAway = useRef(false);
+
  const {
  register,
  handleSubmit,
@@ -68,19 +72,35 @@ export function UserFormPage() {
  }
  }, [isEdit, existingUser, reset]);
 
+ const submitForm = async (): Promise<boolean> => {
+   isNavigatingAway.current = true;
+   let success = false;
+   await handleSubmit(async (data) => {
+     try {
+       await onSubmit(data);
+       success = true;
+     } catch (e) {
+       success = false;
+     }
+   })();
+   isNavigatingAway.current = false;
+   return success;
+ };
+
  const onSubmit = async (data: any) => {
  try {
  if (isEdit) {
  await updateUser({ id: Number(id), data });
  toast.success('User updated successfully');
- navigate('/users');
+ if (!isNavigatingAway.current) navigate('/users');
  } else {
  await createUser(data);
  toast.success('User created successfully');
- navigate('/users');
+ if (!isNavigatingAway.current) navigate('/users');
  }
  } catch (err: any) {
  toast.error(err?.response?.data?.detail ?? 'Failed to save user');
+ throw err;
  }
  };
 
@@ -90,6 +110,8 @@ export function UserFormPage() {
  if (isEdit && isError) return <ErrorState />;
 
  return (
+ <>
+ <NavigationGuard isDirty={isDirty} onSave={submitForm} />
  <div className="mx-auto max-w-2xl space-y-6">
  <div className="flex items-center gap-4">
  <Link
@@ -177,5 +199,6 @@ export function UserFormPage() {
  />
  </form>
  </div>
+ </>
  );
 }

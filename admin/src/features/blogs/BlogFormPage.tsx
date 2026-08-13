@@ -28,6 +28,7 @@ import { LivePreviewModal } from '@/components/preview/LivePreviewModal';
 import { GenerateDraftModal } from '@/features/ai/GenerateDraftModal';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { NavigationGuard } from '@/components/shared/NavigationGuard';
 import { uploadPendingResources } from '@/features/resources/utils';
 
 export default function BlogFormPage() {
@@ -48,6 +49,22 @@ export default function BlogFormPage() {
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const shouldPreviewAfterSave = useRef(false);
+  const isNavigatingAway = useRef(false);
+  
+  const submitForm = async (): Promise<boolean> => {
+    isNavigatingAway.current = true;
+    let success = false;
+    await handleSubmit(async (data) => {
+      try {
+        await onSubmit(data);
+        success = true;
+      } catch (e) {
+        success = false;
+      }
+    })();
+    isNavigatingAway.current = false;
+    return success;
+  };
 
   const handleLivePreview = () => setIsLivePreviewOpen(true);
 
@@ -141,7 +158,7 @@ export default function BlogFormPage() {
           return;
         }
         reset(data);
-        navigate('/blogs');
+        if (!isNavigatingAway.current) navigate('/blogs');
       } else {
         const newContent = await createMutation.mutateAsync(payload);
         if (pendingResources.length > 0) {
@@ -172,11 +189,12 @@ export default function BlogFormPage() {
           return;
         }
         reset(data);
-        navigate('/blogs');
+        if (!isNavigatingAway.current) navigate('/blogs');
       }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Something went wrong';
       toast.error(msg);
+      throw err;
     }
   };
 
@@ -189,22 +207,22 @@ export default function BlogFormPage() {
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Failed to delete blog';
       toast.error(msg);
+      throw err;
     } finally {
       setIsDeleteModalOpen(false);
     }
   };
+
+  const isFormDirty = isDirty || !!coverImageFile || removeCoverImage || pendingResources.length > 0;
 
   if (isEdit && isLoading) return <LoadingState message="Loading blog..." />;
   if (isEdit && isError) {
     return <div className="p-8 text-center text-destructive">Failed to load blog for editing.</div>;
   }
 
-  if (isEdit && isLoading) {
-    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading blog details...</div>;
-  }
-
   return (
     <>
+      <NavigationGuard isDirty={isFormDirty} onSave={submitForm} />
       <div className="mx-auto max-w-5xl space-y-6">
         <form onSubmit={handleSubmit(onSubmit)}>
           <ContentFormLayout

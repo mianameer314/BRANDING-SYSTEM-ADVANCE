@@ -28,6 +28,7 @@ import { LivePreviewModal } from '@/components/preview/LivePreviewModal';
 import { GenerateDraftModal } from '@/features/ai/GenerateDraftModal';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { NavigationGuard } from '@/components/shared/NavigationGuard';
 import { uploadPendingResources } from '@/features/resources/utils';
 
 export default function InsightFormPage() {
@@ -48,6 +49,22 @@ export default function InsightFormPage() {
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const shouldPreviewAfterSave = useRef(false);
+  const isNavigatingAway = useRef(false);
+
+  const submitForm = async (): Promise<boolean> => {
+    isNavigatingAway.current = true;
+    let success = false;
+    await handleSubmit(async (data) => {
+      try {
+        await onSubmit(data);
+        success = true;
+      } catch (e) {
+        success = false;
+      }
+    })();
+    isNavigatingAway.current = false;
+    return success;
+  };
 
   const handleLivePreview = () => setIsLivePreviewOpen(true);
 
@@ -142,7 +159,7 @@ export default function InsightFormPage() {
           return;
         }
         reset(data);
-        navigate('/insights');
+        if (!isNavigatingAway.current) navigate('/insights');
       } else {
         const newContent = await createMutation.mutateAsync(payload);
         if (pendingResources.length > 0) {
@@ -173,11 +190,12 @@ export default function InsightFormPage() {
           return;
         }
         reset(data);
-        navigate('/insights');
+        if (!isNavigatingAway.current) navigate('/insights');
       }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Something went wrong';
       toast.error(msg);
+      throw err;
     }
   };
 
@@ -190,6 +208,7 @@ export default function InsightFormPage() {
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Failed to delete insight';
       toast.error(msg);
+      throw err;
     } finally {
       setIsDeleteModalOpen(false);
     }
@@ -200,12 +219,11 @@ export default function InsightFormPage() {
     return <div className="p-8 text-center text-destructive">Failed to load insight for editing.</div>;
   }
 
-  if (isEdit && isLoading) {
-    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading insight details...</div>;
-  }
+  const isFormDirty = isDirty || !!coverImageFile || removeCoverImage || pendingResources.length > 0;
 
   return (
     <>
+      <NavigationGuard isDirty={isFormDirty} onSave={submitForm} />
       <div className="mx-auto max-w-5xl space-y-6">
         <form onSubmit={handleSubmit(onSubmit)}>
           <ContentFormLayout
@@ -251,7 +269,7 @@ export default function InsightFormPage() {
                 <FormField label="Category" placeholder="e.g. Technology" error={errors.category} {...register('category')} />
                 <TagsInput error={errors.tags} {...register('tags')} />
                 <ImageUploadField label="Cover Image" currentImageUrl={isEdit ? existing?.cover_image : null} onFileChange={setCoverImageFile} onRemoveChange={setRemoveCoverImage} />
-                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isDirty || !!coverImageFile || removeCoverImage || pendingResources.length > 0} isEdit={isEdit} cancelTo="/insights" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
+                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isFormDirty} isEdit={isEdit} cancelTo="/insights" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
               </>
             }
           />

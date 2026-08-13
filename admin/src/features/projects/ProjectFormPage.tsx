@@ -29,6 +29,7 @@ import { LivePreviewModal } from '@/components/preview/LivePreviewModal';
 import { GenerateDraftModal } from '@/features/ai/GenerateDraftModal';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { NavigationGuard } from '@/components/shared/NavigationGuard';
 import { uploadPendingResources } from '@/features/resources/utils';
 
 export default function ProjectFormPage() {
@@ -51,6 +52,22 @@ export default function ProjectFormPage() {
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const shouldPreviewAfterSave = useRef(false);
+  const isNavigatingAway = useRef(false);
+
+  const submitForm = async (): Promise<boolean> => {
+    isNavigatingAway.current = true;
+    let success = false;
+    await handleSubmit(async (data) => {
+      try {
+        await onSubmit(data);
+        success = true;
+      } catch (e) {
+        success = false;
+      }
+    })();
+    isNavigatingAway.current = false;
+    return success;
+  };
 
   const handleLivePreview = () => setIsLivePreviewOpen(true);
 
@@ -149,7 +166,7 @@ export default function ProjectFormPage() {
           return;
         }
         reset(data);
-        navigate('/projects');
+        if (!isNavigatingAway.current) navigate('/projects');
       } else {
         const newContent = await createMutation.mutateAsync(payload);
         if (pendingResources.length > 0) {
@@ -169,7 +186,7 @@ export default function ProjectFormPage() {
           shouldPreviewAfterSave.current = false;
           try {
             setIsGeneratingToken(true);
-            const token = await generatePreviewToken({ content_type: 'project', content_id: existing?.id || 0 });
+            const token = await generatePreviewToken({ content_type: 'project', content_id: newContent.id });
             window.open(`${env.frontendUrl}/preview/projects?token=${token}`, '_blank');
           } catch (_error) {
             toast.error('Failed to generate preview token');
@@ -179,11 +196,12 @@ export default function ProjectFormPage() {
           return;
         }
         reset(data);
-        navigate('/projects');
+        if (!isNavigatingAway.current) navigate('/projects');
       }
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Something went wrong';
       toast.error(msg);
+      throw err;
     }
   };
 
@@ -196,6 +214,7 @@ export default function ProjectFormPage() {
     } catch (err: any) {
       const msg = err?.response?.data?.detail ?? 'Failed to delete project';
       toast.error(msg);
+      throw err;
     } finally {
       setIsDeleteModalOpen(false);
     }
@@ -206,12 +225,17 @@ export default function ProjectFormPage() {
     return <div className="p-8 text-center text-destructive">Failed to load project for editing.</div>;
   }
 
-  if (isEdit && isLoading) {
-    return <div className="flex h-[50vh] items-center justify-center text-muted-foreground">Loading project details...</div>;
-  }
+  const isFormDirty =
+    isDirty ||
+    !!coverImageFile ||
+    removeCoverImage ||
+    galleryFiles.length > 0 ||
+    keptGalleryUrls !== null ||
+    pendingResources.length > 0;
 
   return (
     <>
+      <NavigationGuard isDirty={isFormDirty} onSave={submitForm} />
       <div className="mx-auto max-w-5xl space-y-6">
         <form onSubmit={handleSubmit(onSubmit)}>
           <ContentFormLayout
@@ -232,7 +256,7 @@ export default function ProjectFormPage() {
                   )}
                 />
                 <FormTextarea label="Short Description" rows={3} placeholder="Brief summary (max 300 chars)" error={errors.short_desc} {...register('short_desc')} />
-                <GalleryUploadField currentGalleryUrls={isEdit ? existing?.gallery : null} onGalleryChange={({ existingUrls, newFiles }) => { setKeptGalleryUrls(existingUrls); setGalleryFiles(newFiles); }} />
+                <GalleryUploadField label="Project Gallery" currentGalleryUrls={isEdit ? existing?.gallery || [] : []} onFilesChange={setGalleryFiles} onKeptUrlsChange={setKeptGalleryUrls} />
                 <hr className="border-border my-4" />
                 <ResourceAttachments contentType="project" contentId={existing?.id} onPendingFilesChange={setPendingResources} disabled={isSubmitting || isUploadingResources} />
                 {isEdit && existing && (
@@ -264,7 +288,7 @@ export default function ProjectFormPage() {
                   <label htmlFor="is_featured" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">Featured Project</label>
                 </div>
                 <ImageUploadField label="Cover Image" currentImageUrl={isEdit ? existing?.cover_image : null} onFileChange={setCoverImageFile} onRemoveChange={setRemoveCoverImage} />
-                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isDirty || !!coverImageFile || removeCoverImage || pendingResources.length > 0} isEdit={isEdit} cancelTo="/projects" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
+                <FormActions isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending || isUploadingResources || isGeneratingToken} isDirty={isFormDirty} isEdit={isEdit} cancelTo="/projects" onDelete={isEdit ? () => setIsDeleteModalOpen(true) : undefined} onLivePreview={handleLivePreview} onSecurePreview={isEdit ? handleSecurePreview : undefined} />
               </>
             }
           />
