@@ -22,7 +22,8 @@ const SORT_OPTIONS = [
   { value: "age_desc", label: "Age (Newest First)" },
   { value: "content_type", label: "Content Type" },
   { value: "author", label: "Author" },
-  { value: "requested_date", label: "Requested Date" },
+  { value: "requested_date_asc", label: "Requested Date (Closest to Today)" },
+  { value: "requested_date_desc", label: "Requested Date (Furthest in Future)" },
 ];
 
 function ExpandedQueueItemView({ item, onClose, onViewFull, onApprove, onRequestChanges, onReject, isMutating }: any) {
@@ -153,11 +154,16 @@ export function ApprovalQueuePage() {
           return a.content_type.localeCompare(b.content_type);
         case "author":
           return a.author.localeCompare(b.author);
-        case "requested_date":
+        case "requested_date_asc":
           if (!a.published_at && !b.published_at) return 0;
           if (!a.published_at) return 1;
           if (!b.published_at) return -1;
           return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
+        case "requested_date_desc":
+          if (!a.published_at && !b.published_at) return 0;
+          if (!a.published_at) return 1;
+          if (!b.published_at) return -1;
+          return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
         default:
           return 0;
       }
