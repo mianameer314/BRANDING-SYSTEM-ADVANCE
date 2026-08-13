@@ -14,6 +14,8 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1 import ai, audit, auth, blogs, case_studies, insights, interactions, news, operations, preview, projects, resources, stats, users, webhooks
 from app.api.idempotency import IdempotentReplayException, idempotency_exception_handler
 from app.core.config import settings
+from app.core.scheduler import start_scheduler, stop_scheduler, scheduler
+from app.tasks.publish_scheduled import register_tasks as register_publish_tasks
 
 from sqlalchemy import text
 from app.db.session import SessionLocal
@@ -304,8 +306,21 @@ async def startup_rate_limiter():
     await init_rate_limiter()
 
 
+@app.on_event("startup")
+def startup_scheduler():
+    """Register tasks and start the background scheduler."""
+    register_publish_tasks(scheduler)
+    start_scheduler()
+
+
 @app.on_event("shutdown")
 async def shutdown_rate_limiter():
     """Gracefully close Redis connection on shutdown."""
     from app.rate_limit.core import close_rate_limiter
     await close_rate_limiter()
+
+
+@app.on_event("shutdown")
+def shutdown_scheduler_event():
+    """Gracefully stop the background scheduler."""
+    stop_scheduler()

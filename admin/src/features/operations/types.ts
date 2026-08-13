@@ -21,7 +21,8 @@ export interface ReviewQueueItem {
   author: string;
   created_at: string;
   updated_at: string;
-  status_changed_at: string | null;
+  status_changed_at?: string;
+  published_at?: string;
   cover_image: string | null;
   ai_generated: boolean;
   requested_publish_date?: string;

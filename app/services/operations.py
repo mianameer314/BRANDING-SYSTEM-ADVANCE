@@ -6,6 +6,9 @@ from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import false
+from sqlalchemy import select, func, literal_column, union_all, desc, or_, and_
+from sqlalchemy.orm import Session
 
 from app.models.blog import Blog
 from app.models.case_study import CaseStudy
@@ -106,12 +109,26 @@ def approve_content(
             detail=f"Cannot approve content in status '{current_status}'. Must be in_review or changes_requested.",
         )
 
-    # Apply status transition
-    new_status = apply_content_status_transition(content, "approved")
+    # Apply status transition to approved
+    apply_content_status_transition(content, "approved")
+    
+    # Check if we should schedule or publish it immediately
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    
+    if content.published_at and content.published_at > now:
+        # Schedule it
+        new_status = apply_content_status_transition(content, "scheduled")
+        action_reason = comment or reason or "Approved and scheduled for future publication"
+    else:
+        # Publish it immediately
+        new_status = apply_content_status_transition(content, "published")
+        action_reason = comment or reason or "Approved and published immediately"
+
     apply_content_status_metadata(
         content,
         actor_id=actor_id,
-        reason=comment or reason or "Approved for publication",
+        reason=action_reason,
     )
 
     # Record audit event
@@ -274,8 +291,7 @@ def get_review_queue(
     """
     Get paginated review queue (items with status in_review or changes_requested).
     """
-    from sqlalchemy import select, func, literal_column, union_all, desc, or_, and_
-    from sqlalchemy.orm import Session
+   
 
     models_mapping = CONTENT_MODELS
 
@@ -291,7 +307,7 @@ def get_review_queue(
             if author_col is not None:
                 filters.append(author_col.ilike(f"%{author}%"))
             else:
-                from sqlalchemy import false
+                
                 filters.append(false())
         if ai_generated is not None:
             filters.append(model.ai_generated == ai_generated)
@@ -329,6 +345,7 @@ def get_review_queue(
             model.created_at.label("created_at"),
             model.updated_at.label("updated_at"),
             model.status_changed_at.label("status_changed_at"),
+            model.published_at.label("published_at"),
             model.cover_image.label("cover_image"),
             model.ai_generated.label("ai_generated"),
         )

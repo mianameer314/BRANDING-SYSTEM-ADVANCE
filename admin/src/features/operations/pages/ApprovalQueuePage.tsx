@@ -154,7 +154,10 @@ export function ApprovalQueuePage() {
         case "author":
           return a.author.localeCompare(b.author);
         case "requested_date":
-          return 0;
+          if (!a.published_at && !b.published_at) return 0;
+          if (!a.published_at) return 1;
+          if (!b.published_at) return -1;
+          return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
         default:
           return 0;
       }

@@ -38,6 +38,7 @@ class ReviewQueueItem(BaseModel):
     created_at: datetime
     updated_at: datetime
     status_changed_at: datetime | None = None
+    published_at: datetime | None = None
     cover_image: str | None = None
     ai_generated: bool
     validation_warnings: list[str] = Field(default_factory=list)
