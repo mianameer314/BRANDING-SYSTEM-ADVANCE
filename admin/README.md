@@ -30,6 +30,10 @@ This is the frontend Admin Dashboard for the O2Geeks Branding System Headless CM
 10. **Preview Integration**: Built a robust Preview API generating secure JWT tokens for cross-origin preview functionality. Added real-time Iframe `window.postMessage` live-preview capabilities directly into all CMS form editors, with a fully responsive layout.
 11. **Live Preview Cross-Origin Optimization**: Engineered Blob-based file transfers over the `window.postMessage` bridge for instantaneous, cross-origin image rendering during Live Previews.
 12. **AI Draft Auto-Population**: Fully integrated a production-ready AI Content Assistant module. It dynamically generates structured draft content using OpenRouter, securely parsing strictly-typed JSON schemas via Zod, and elegantly populates form fields across Blogs, News, Projects, Insights, and Case Studies.
+13. **Revision History**: Explore full historical changes with a split-screen side-by-side JSON payload differ to easily identify exactly what an author changed.
+14. **Approval Workflow Queue**: Dedicated interfaces for content moderation, enabling reviewers to safely approve, reject, or request changes while tracking decision history.
+15. **Content Scheduling & Auto-Publishing**: Operators can schedule approved content to automatically transition to published at a precise future date across their local timezone.
+16. **Publish Logs & Integration Recovery**: A complete incident management dashboard tracking webhook delivery attempts, response codes, and errors. Operators can duplicate and manually retry failed webhooks, mark permanent failures as manually resolved, and rely on automated 30-day log retention.
 
 ---
 

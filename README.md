@@ -25,6 +25,11 @@ The **O2Geeks Branding System** is an enterprise-grade, decoupled Headless CMS a
 * **Content Locking & Audit Trails**: Content locks prevent unauthorized edits after approval. Every state change is tracked in an immutable revision history.
 * **Resilient Integrations**: Support for API Idempotency (safe retries) and a webhook dispatch system for real-time `content.published` events.
 
+**Key Milestone 2 Features (Operations Console MVP):**
+* **Revision History & Diffing**: Side-by-side payload comparison to easily review changes between content versions.
+* **Review Queue & Approvals**: Streamlined editorial moderation with explicit Approve, Request Changes, and Reject actions tied directly to user roles.
+* **Scheduling & Publish Logs**: Precision timezone-aware content scheduling powered by APScheduler. Enterprise webhook delivery tracking with manual retry actions, incident resolution, and automated 30-day data retention policies.
+
 ```text
   ┌────────────────────────┐      ┌────────────────────────┐
   │   Nuxt 3 Website       │      │  React Admin Dashboard │
@@ -183,6 +188,7 @@ For full historical background on the step-by-step development process, explore 
 * [Week 4 (Days 14-18) — Previews, AI Auto-Population & Staging Deployment](daily%20work%20updates/week4_complete.md)
 * [Week 5 (Days 19-23) — UI Synchronization, Production Bug Fixes & Project Documentation](daily%20work%20updates/week5_complete.md)
 * [Week 6 (Milestone 1) — Controlled Editorial Backend, Content Lifecycle, Revision History, Idempotency, and Webhooks](daily%20work%20updates/week6_complete.md)
+* [Week 7 (Milestone 2) — Operations Console MVP, Approval Queue, Scheduling, and Integration Publish Logs](daily%20work%20updates/week7/)
 
 
 ---
