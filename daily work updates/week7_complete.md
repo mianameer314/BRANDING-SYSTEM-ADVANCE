@@ -83,3 +83,12 @@ Today we transformed the editorial approval process into a centralized, robust, 
 ### 4. Enterprise Role-Based Access Control (RBAC)
 - **API Guardrails:** Secured all approval endpoints (`/operations/approve`, `/operations/reject`, etc.) using FastAPI dependency injection (`ApproveDep`), strictly enforcing that only users with the `approve` permission can mutate content states.
 - **Frontend Defenses:** Synchronized the backend RBAC with the UI, ensuring action panels remain strictly disabled or hidden for unauthorized users.
+
+### 5. Strict Editorial Workflow Enforcement
+- **Status Loop Protection:** Hardened the backend status validation engine (`operations.py`) to prevent unauthorized leaps in the content lifecycle. Content in `changes_requested` can no longer be directly approved; it must be edited and re-submitted to `in_review`, enforcing a strict and logical editorial loop.
+- **Dynamic Schema Inspection:** Refactored the core operation endpoints to utilize SQLAlchemy's `inspect()` utility. Instead of relying on hardcoded field validation for each content type, the system now dynamically reads the database schema at runtime. This ensures maximum adaptability and prevents technical debt as new content models are introduced.
+
+### 6. Unsaved Changes Navigation Guard
+- **React-Router Interception:** Engineered a sleek, reusable `<NavigationGuard />` component and deployed it across all 6 content creation and editing interfaces (Blogs, Case Studies, Insights, News, Projects, Users). It hooks into `useBlocker` and React Hook Form's `isDirty` state to seamlessly intercept accidental navigation (e.g., clicking a sidebar link or hitting the back button).
+- **Three-Way Action Modal:** Presents users with a professional, bespoke modal offering three safe exits: **Keep Editing** (cancels navigation), **Leave without saving** (discards changes), and **Save & Update** (submits data and automatically resumes navigation on success).
+- **Bulletproof Browser Protection:** Layered the React interception with a native browser `beforeunload` listener. This guarantees that hard exits—such as refreshing the page, closing the browser tab, or typing a new URL—are also caught and halted by the operating system, ensuring zero accidental data loss under any circumstance.

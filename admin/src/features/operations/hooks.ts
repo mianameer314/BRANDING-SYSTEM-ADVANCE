@@ -1,11 +1,12 @@
-﻿import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { operationsApi } from "./api";
 import type { ReviewQueueFilters, ApprovalActionPayload, ChangeRequestPayload, RejectionPayload } from "./types";
 
-export function useWorkflowOverview() {
+export function useWorkflowOverview(enabled: boolean = true) {
   return useQuery({
     queryKey: ["operations", "workflow-overview"],
     queryFn: () => operationsApi.getWorkflowOverview(),
+    enabled,
   });
 }
 

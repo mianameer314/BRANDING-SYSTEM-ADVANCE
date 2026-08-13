@@ -15,7 +15,7 @@ class UserRole(str, Enum):
 
 ROLE_PERMISSIONS = {
     "super_admin": {"read_content", "create", "update", "delete", "approve", "publish", "interact", "manage_users", "view_drafts", "manage_webhooks"},
-    "admin":       {"read_content", "create", "update", "delete", "approve", "publish", "interact", "view_drafts"},
+    "admin":       {"read_content", "create", "update", "delete", "approve", "publish", "interact", "view_drafts", "manage_webhooks"},
     "editor":      {"read_content", "create", "update", "interact", "view_drafts"},
     "user":        {"read_content", "interact"},
     "viewer":      {"read_content"},

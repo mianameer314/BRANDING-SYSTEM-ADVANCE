@@ -62,8 +62,10 @@ axiosInstance.interceptors.response.use(
  
  if (axios.isAxiosError(error)) {
  if (error.response?.status === 403) {
- toast.error('You do not have permission to perform this action.');
- return Promise.reject(error);
+  // We intentionally do not show a global toast for 403 errors here.
+  // Background queries should fail silently (and render an error state in the UI if needed),
+  // while explicit user actions (mutations) will catch the error and show a toast themselves.
+  return Promise.reject(error);
  }
 
  if (error.response?.status === 401 && originalRequest) {

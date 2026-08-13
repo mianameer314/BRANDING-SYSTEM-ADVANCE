@@ -101,9 +101,11 @@ function StatCard({ icon: Icon, label, stats, isLoading, color, to }: StatCardPr
 }
 
 export function DashboardPage() {
-  const { data: dashboardStats, isLoading: isDashboardLoading } = useDashboardStats();
-  const { data: overview, isLoading: isOperationsLoading, refetch, isFetching } = useWorkflowOverview();
   const { user } = useAuth();
+  const hasViewDrafts = user?.permissions?.includes('view_drafts') ?? false;
+
+  const { data: dashboardStats, isLoading: isDashboardLoading } = useDashboardStats();
+  const { data: overview, isLoading: isOperationsLoading, refetch, isFetching } = useWorkflowOverview(hasViewDrafts);
   const { setHeaderState } = useOutletContext<any>();
   
   const [showRefreshed, setShowRefreshed] = useState(false);
