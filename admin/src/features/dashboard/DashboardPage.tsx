@@ -242,7 +242,7 @@ export function DashboardPage() {
             </div>
             
             <div className="flex items-center gap-6">
-              <div className="text-5xl font-black text-foreground drop-shadow-sm">
+              <div className="text-5xl font-black text-foreground drop-shadow-sm animate-color-cycle transition-colors duration-1000">
                 {isOperationsLoading ? (
                   <span className="inline-block h-12 w-24 animate-pulse rounded-lg bg-accent" />
                 ) : (

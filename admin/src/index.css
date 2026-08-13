@@ -272,3 +272,17 @@
     transform: translateY(0) scale(1);
   }
 }
+
+@keyframes contentColorCycle {
+  0%, 100% { color: var(--primary); }
+  20% { color: var(--info); }
+  40% { color: var(--success); }
+  60% { color: var(--warning); }
+  80% { color: var(--destructive); }
+}
+
+@layer utilities {
+  .animate-color-cycle {
+    animation: contentColorCycle 10s infinite alternate ease-in-out;
+  }
+}
