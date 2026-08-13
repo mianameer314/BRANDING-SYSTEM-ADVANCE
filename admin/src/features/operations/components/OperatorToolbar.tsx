@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react';
+
 import { OperationsFilterBar, type OperationsFilters } from './OperationsFilterBar';
 
 interface OperatorToolbarProps {

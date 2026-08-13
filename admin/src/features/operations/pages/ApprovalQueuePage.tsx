@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useOutletContext } from "react-router-dom";
-import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight, RefreshCw } from "lucide-react";
+import { Loader2, ChevronLeft, ClipboardCheck, ChevronRight } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ import { ApprovalActionPanel } from "../components/ApprovalActionPanel";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { cn } from "@/utils/utils";
 import type { ReviewQueueItem, ReviewQueueFilters } from "../types";
 import { useReviewQueue, useApproveContent, useRequestChanges, useRejectContent } from "../hooks";
 
