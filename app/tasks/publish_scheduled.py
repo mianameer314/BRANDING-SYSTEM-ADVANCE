@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models import Blog, News, Project, Insight, CaseStudy
-from app.models.audit import AuditLog
+from app.models.audit_event import AuditEvent
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +39,11 @@ def publish_scheduled_content():
                 item.status_change_reason = "Automatically published on schedule"
                 
                 # Log audit event
-                audit_log = AuditLog(
-                    content_type=ct,
-                    content_id=item.id,
-                    action="published",
-                    user_id=None, # System action
+                audit_log = AuditEvent(
+                    subject_type=ct,
+                    subject_id=item.id,
+                    event_type="content_published",
+                    actor_id=None, # System action
                     details={"reason": "Automatically published on schedule", "published_at": item.published_at.isoformat()}
                 )
                 db.add(audit_log)
