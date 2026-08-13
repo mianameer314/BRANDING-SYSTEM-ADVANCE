@@ -21,6 +21,7 @@ export const createBlog = (data: BlogFormData): Promise<BlogOut> => {
  tags: tagsStringToJson(data.tags),
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  });
  return axiosInstance.post<BlogOut>(API.blogs.create, fd).then((r) => r.data);
@@ -36,6 +37,7 @@ export const updateBlog = (id: number, data: Partial<BlogFormData> & { remove_co
  tags: tagsStringToJson(data.tags),
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  remove_cover_image: data.remove_cover_image ? 'true' : undefined,
  });

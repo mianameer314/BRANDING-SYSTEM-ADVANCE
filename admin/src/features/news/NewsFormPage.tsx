@@ -83,13 +83,15 @@ export default function NewsFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
-    defaultValues: { status: 'draft', is_featured: false },
+    defaultValues: { status: 'draft', is_featured: false, ai_generated: false },
     values: existing ? {
       headline: existing.headline,
       summary: existing.summary,
       source: existing.source ?? '',
       is_featured: existing.is_featured,
       status: existing.status as any,
+      
+      ai_generated: existing.ai_generated ?? false,
       cover_image: null,
     } : undefined,
   });
@@ -97,6 +99,7 @@ export default function NewsFormPage() {
   const handleApplyDraft = (generated: NewsGeneratedContent) => {
     setValue('headline', generated.headline, { shouldDirty: true });
     setValue('summary', generated.summary, { shouldDirty: true });
+    setValue('ai_generated', true, { shouldDirty: true });
     setIsAIModalOpen(false);
   };
 

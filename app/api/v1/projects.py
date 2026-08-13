@@ -97,6 +97,7 @@ def create_project(
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
     completed_at: str | None = Form(None, description="ISO datetime string"),
+    ai_generated: bool = Form(False),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
     gallery: list[UploadFile] = File(None, description="Gallery images (multiple files)", json_schema_extra={"items": {"type": "string", "format": "binary"}}),
     idempotency: IdempotencyDep = None,
@@ -160,6 +161,7 @@ def create_project(
             is_featured=is_featured,
             status=status,
             completed_at=parsed_completed,
+            ai_generated=ai_generated,
         )
 
         project = project_service.create_project(db, data, status_actor_id=admin.id, status_reason=status_reason)
@@ -196,6 +198,7 @@ def update_project(
     status: ContentStatus | None = Form(None),
     status_reason: str | None = Form(None, max_length=500),
     completed_at: str | None = Form(None, description="ISO datetime string"),
+    ai_generated: bool | None = Form(None),
     cover_image: UploadFile | None = File(None, description="New cover image"),
     gallery: list[UploadFile] | None = File(None),
     existing_gallery: str | None = Form(None),
@@ -315,6 +318,8 @@ def update_project(
             
         if status is not None:
             update_kwargs["status"] = status
+        if ai_generated is not None:
+            update_kwargs["ai_generated"] = ai_generated
 
         data = ProjectUpdate(**update_kwargs)
         project = project_service.update_project(db, project_id, data, status_actor_id=admin.id, status_reason=status_reason)

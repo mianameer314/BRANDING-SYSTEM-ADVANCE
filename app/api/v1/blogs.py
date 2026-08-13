@@ -141,12 +141,10 @@ def create_blog(
     content: str = Form(...),
     excerpt: str | None = Form(None, max_length=300),
     category: str | None = Form(None, max_length=100),
-    tags: str | None = Form(
-        None,
-        description='JSON array string, e.g. ["python","fastapi"]',
-    ),
+    tags: str | None = Form(None, description="JSON array string"),
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool = Form(False),
     cover_image: UploadFile | None = File(
         None,
         description="Cover image",
@@ -175,6 +173,7 @@ def create_blog(
             tags=parse_tags(tags),
             status=status,
             cover_image=cover_image_url,
+            ai_generated=ai_generated,
         )
 
         blog = blog_service.create_blog(db, data, status_actor_id=admin.id, status_reason=status_reason)
@@ -213,12 +212,10 @@ def update_blog(
     content: str | None = Form(None),
     excerpt: str | None = Form(None),
     category: str | None = Form(None),
-    tags: str | None = Form(
-        None,
-        description='JSON array string, e.g. ["python","fastapi"]',
-    ),
+    tags: str | None = Form(None, description="JSON array string"),
     status: ContentStatus | None = Form(None),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool | None = Form(None),
     cover_image: UploadFile | None = File(None),
     remove_cover_image: bool = Form(False),
     idempotency: IdempotencyDep = None,
@@ -277,6 +274,8 @@ def update_blog(
 
         if status is not None:
             update_data["status"] = status
+        if ai_generated is not None:
+            update_data["ai_generated"] = ai_generated
 
         blog = blog_service.update_blog(
             db=db,

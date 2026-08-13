@@ -88,7 +88,7 @@ export default function ProjectFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
-    defaultValues: { status: 'draft', is_featured: false },
+    defaultValues: { status: 'draft', is_featured: false, ai_generated: false },
     values: existing ? {
       name: existing.name,
       client: existing.client ?? '',
@@ -101,6 +101,7 @@ export default function ProjectFormPage() {
       status: existing.status as any,
       completed_at: existing.completed_at ? existing.completed_at.split('T')[0] : '',
       cover_image: null,
+      ai_generated: existing.ai_generated ?? false,
     } : undefined,
   });
 
@@ -112,6 +113,7 @@ export default function ProjectFormPage() {
     if (generated.technologies && generated.technologies.length > 0) {
       setValue('technologies', generated.technologies.join(', '), { shouldDirty: true });
     }
+    setValue('ai_generated', true, { shouldDirty: true });
     setIsAIModalOpen(false);
   };
 

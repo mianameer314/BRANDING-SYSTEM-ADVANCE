@@ -19,6 +19,7 @@ export const createNews = (data: NewsFormData): Promise<NewsOut> => {
  is_featured: data.is_featured,
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  });
  return axiosInstance.post<NewsOut>(API.news.create, fd).then((r) => r.data);
@@ -32,6 +33,7 @@ export const updateNews = (id: number, data: Partial<NewsFormData> & { remove_co
  is_featured: data.is_featured,
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  remove_cover_image: data.remove_cover_image ? 'true' : undefined,
  });

@@ -80,6 +80,7 @@ export interface BlogOut extends LifecycleAuditFields {
  cover_image: string | null;
  category: string | null;
  tags: string[] | null;
+ ai_generated: boolean;
  status: ContentStatus;
  published_at: string | null;
  created_at: string;
@@ -103,6 +104,7 @@ export interface NewsOut extends LifecycleAuditFields {
  summary: string;
  cover_image: string | null;
  source: string | null;
+ ai_generated: boolean;
  is_featured: boolean;
  status: ContentStatus;
  published_at: string | null;
@@ -132,6 +134,7 @@ export interface ProjectOut extends LifecycleAuditFields {
  technologies: string[] | null;
  category: string | null;
  project_url: string | null;
+ ai_generated: boolean;
  is_featured: boolean;
  status: ContentStatus;
  completed_at: string | null;
@@ -160,6 +163,7 @@ export interface InsightOut extends LifecycleAuditFields {
  cover_image: string | null;
  category: string | null;
  tags: string[] | null;
+ ai_generated: boolean;
  status: ContentStatus;
  published_at: string | null;
  created_at: string;
@@ -196,6 +200,7 @@ export interface CaseStudyOut extends LifecycleAuditFields {
  cover_image: string | null;
  gallery: string[] | null;
  technologies: string[] | null;
+ ai_generated: boolean;
  is_featured: boolean;
  status: ContentStatus;
  published_at: string | null;

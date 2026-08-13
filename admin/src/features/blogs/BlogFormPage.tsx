@@ -42,7 +42,7 @@ export default function BlogFormPage() {
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [removeCoverImage, setRemoveCoverImage] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  
+
   const [pendingResources, setPendingResources] = useState<File[]>([]);
   const [isLivePreviewOpen, setIsLivePreviewOpen] = useState(false);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
@@ -61,7 +61,7 @@ export default function BlogFormPage() {
       }
       return;
     }
-    
+
     try {
       setIsGeneratingToken(true);
       const token = await generatePreviewToken({ content_type: 'blog', content_id: existing.id });
@@ -85,7 +85,7 @@ export default function BlogFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<BlogFormData>({
     resolver: zodResolver(blogSchema),
-    defaultValues: { status: 'draft' },
+    defaultValues: { status: 'draft', ai_generated: false },
     values: existing ? {
       title: existing.title,
       author: existing.author,
@@ -94,6 +94,7 @@ export default function BlogFormPage() {
       category: existing.category ?? '',
       tags: existing.tags?.join(', ') ?? '',
       status: existing.status as any,
+      ai_generated: existing.ai_generated ?? false,
       cover_image: null,
     } : undefined,
   });
@@ -106,6 +107,7 @@ export default function BlogFormPage() {
     if (generated.tags && generated.tags.length > 0) {
       setValue('tags', generated.tags.join(', '), { shouldDirty: true });
     }
+    setValue('ai_generated', true, { shouldDirty: true });
     setIsAIModalOpen(false);
   };
 
@@ -153,7 +155,7 @@ export default function BlogFormPage() {
         } else {
           toast.success('Blog created successfully');
         }
-        
+
         if (shouldPreviewAfterSave.current) {
           shouldPreviewAfterSave.current = false;
           try {
@@ -217,8 +219,8 @@ export default function BlogFormPage() {
                 <FormField label="Title" required error={errors.title} {...register('title')} />
                 <FormField label="Author" required error={errors.author} {...register('author')} />
                 <Controller name="content" control={control} render={({ field }) => (
-                    <FormRichText label="Content" required error={errors.content} value={field.value} onChange={field.onChange} />
-                  )}
+                  <FormRichText label="Content" required error={errors.content} value={field.value} onChange={field.onChange} />
+                )}
                 />
                 <FormTextarea label="Excerpt" rows={3} placeholder="A short summary (max 300 chars)" error={errors.excerpt} {...register('excerpt')} />
                 <hr className="border-border my-4" />
@@ -237,8 +239,8 @@ export default function BlogFormPage() {
             sideColumn={
               <>
                 <Controller name="status" control={control} render={({ field }) => (
-                    <StatusSelect value={field.value} onChange={field.onChange} currentStatus={existing?.status} userRole={user?.role ?? 'editor'} error={errors.status} />
-                  )}
+                  <StatusSelect value={field.value} onChange={field.onChange} currentStatus={existing?.status} userRole={user?.role ?? 'editor'} error={errors.status} />
+                )}
                 />
                 <FormTextarea label="Status change reason" rows={2} placeholder="Why is this status changing?" error={errors.status_reason} {...register('status_reason')} />
                 {isEdit && existing && <LifecycleDetails audit={existing} />}
@@ -251,7 +253,7 @@ export default function BlogFormPage() {
           />
           <ConfirmModal isOpen={isDeleteModalOpen} title="Delete Blog Post?" message="This action cannot be undone. This will permanently delete this blog post and its cover image." confirmText="Delete" isLoading={deleteMutation.isPending} onConfirm={handleDelete} onCancel={() => setIsDeleteModalOpen(false)} />
         </form>
-        
+
         <LivePreviewModal isOpen={isLivePreviewOpen} onClose={() => setIsLivePreviewOpen(false)} contentType="blog" data={{ ...watch(), cover_image: coverImageFile || (removeCoverImage ? null : existing?.cover_image) }} />
 
         <GenerateDraftModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} onApply={handleApplyDraft} contentType="blog" />

@@ -91,7 +91,7 @@ export default function CaseStudyFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<CaseStudyFormData>({
     resolver: zodResolver(caseStudySchema),
-    defaultValues: { status: 'draft', is_featured: false, metrics: [] },
+    defaultValues: { status: 'draft', is_featured: false, ai_generated: false, metrics: [] },
     values: existing ? {
       title: existing.title,
       client_name: existing.client_name,
@@ -105,6 +105,7 @@ export default function CaseStudyFormPage() {
       technologies: existing.technologies?.join(', ') ?? '',
       is_featured: existing.is_featured,
       status: existing.status as any,
+      ai_generated: existing.ai_generated ?? false,
       cover_image: null,
       client_logo: null,
     } : undefined,
@@ -125,6 +126,7 @@ export default function CaseStudyFormPage() {
     }
     if (generated.testimonial) setValue('testimonial', generated.testimonial, { shouldDirty: true });
     if (generated.testimonial_author) setValue('testimonial_author', generated.testimonial_author, { shouldDirty: true });
+    setValue('ai_generated', true, { shouldDirty: true });
     setIsAIModalOpen(false);
   };
 

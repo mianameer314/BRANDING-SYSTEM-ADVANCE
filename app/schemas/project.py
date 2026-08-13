@@ -23,6 +23,7 @@ class ProjectCreate(BaseModel):
     is_featured: bool = False
     status: ContentStatus = ContentStatus.draft
     completed_at: Optional[datetime] = None
+    ai_generated: bool = False
 
 
 class ProjectUpdate(BaseModel):
@@ -39,6 +40,7 @@ class ProjectUpdate(BaseModel):
     is_featured: Optional[bool] = None
     status: Optional[ContentStatus] = None
     completed_at: Optional[datetime] = None
+    ai_generated: Optional[bool] = None
 
 
 class ProjectOut(ContentInteractionMixin, BaseModel):
@@ -60,6 +62,7 @@ class ProjectOut(ContentInteractionMixin, BaseModel):
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    ai_generated: bool
 
     class Config:
         from_attributes = True

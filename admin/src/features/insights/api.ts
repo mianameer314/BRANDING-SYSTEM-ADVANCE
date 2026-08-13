@@ -21,6 +21,7 @@ export const createInsight = (data: InsightFormData): Promise<InsightOut> => {
  tags: tagsStringToJson(data.tags),
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  });
  return axiosInstance.post<InsightOut>(API.insights.create, fd).then((r) => r.data);
@@ -36,6 +37,7 @@ export const updateInsight = (id: number, data: Partial<InsightFormData> & { rem
  tags: tagsStringToJson(data.tags),
  status: data.status,
  status_reason: data.status_reason,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  remove_cover_image: data.remove_cover_image ? 'true' : undefined,
  });

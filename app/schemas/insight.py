@@ -19,6 +19,7 @@ class InsightCreate(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     tags: Optional[list[str]] = None
     status: ContentStatus = ContentStatus.draft
+    ai_generated: bool = False
 
 
 class InsightUpdate(BaseModel):
@@ -31,6 +32,7 @@ class InsightUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     tags: Optional[list[str]] = None
     status: Optional[ContentStatus] = None
+    ai_generated: Optional[bool] = None
 
 
 class InsightOut(ContentInteractionMixin, BaseModel):
@@ -48,6 +50,7 @@ class InsightOut(ContentInteractionMixin, BaseModel):
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    ai_generated: bool
 
     class Config:
         from_attributes = True

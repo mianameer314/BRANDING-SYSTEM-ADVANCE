@@ -24,6 +24,7 @@ export const createProject = (data: ProjectFormData): Promise<ProjectOut> => {
  status: data.status,
  status_reason: data.status_reason,
  completed_at: data.completed_at ?? '',
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  gallery: data.gallery ?? undefined,
  });
@@ -43,6 +44,7 @@ export const updateProject = (id: number, data: Partial<ProjectFormData> & { exi
  status: data.status,
  status_reason: data.status_reason,
  completed_at: data.completed_at,
+ ai_generated: data.ai_generated,
  cover_image: data.cover_image ?? undefined,
  gallery: data.gallery ?? undefined,
  existing_gallery: data.existing_gallery,

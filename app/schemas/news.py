@@ -17,6 +17,7 @@ class NewsCreate(BaseModel):
     source: Optional[str] = Field(None, max_length=255)
     is_featured: bool = False
     status: ContentStatus = ContentStatus.draft
+    ai_generated: bool = False
 
 
 class NewsUpdate(BaseModel):
@@ -27,6 +28,7 @@ class NewsUpdate(BaseModel):
     source: Optional[str] = Field(None, max_length=255)
     is_featured: Optional[bool] = None
     status: Optional[ContentStatus] = None
+    ai_generated: Optional[bool] = None
 
 
 class NewsOut(ContentInteractionMixin, BaseModel):
@@ -42,6 +44,7 @@ class NewsOut(ContentInteractionMixin, BaseModel):
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    ai_generated: bool
 
     class Config:
         from_attributes = True

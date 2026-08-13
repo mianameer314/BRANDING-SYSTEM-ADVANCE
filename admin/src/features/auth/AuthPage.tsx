@@ -193,7 +193,7 @@ export function AuthPage() {
                                     required
                                     value={regFullName}
                                     onChange={(e) => setRegFullName(e.target.value)}
-                                    placeholder="John Doe"
+                                    placeholder="Enter your name"
                                     className="w-full rounded-xl border border-border bg-accent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
@@ -205,7 +205,7 @@ export function AuthPage() {
                                     required
                                     value={regEmail}
                                     onChange={(e) => setRegEmail(e.target.value)}
-                                    placeholder="you@o2geeks.com"
+                                    placeholder="Enter your email"
                                     className="w-full rounded-xl border border-border bg-accent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>

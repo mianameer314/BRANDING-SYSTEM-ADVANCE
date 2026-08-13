@@ -27,7 +27,7 @@ export function RevisionSnapshotView({ revision, latestVersion, onRestoreSuccess
       toast.success(`Successfully restored version ${revision.version}`);
       setShowRestoreModal(false);
       onRestoreSuccess();
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to restore revision');
     } finally {
       setIsRestoring(false);

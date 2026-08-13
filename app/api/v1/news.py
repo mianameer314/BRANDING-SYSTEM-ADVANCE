@@ -90,6 +90,7 @@ def create_news(
     is_featured: bool = Form(False),
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool = Form(False),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
     idempotency: IdempotencyDep = None,
 ):
@@ -114,6 +115,7 @@ def create_news(
             source=source,
             is_featured=is_featured,
             status=status,
+            ai_generated=ai_generated,
         )
 
         news = news_service.create_news(db, data, status_actor_id=admin.id, status_reason=status_reason)
@@ -145,6 +147,7 @@ def update_news(
     is_featured: bool | None = Form(None),
     status: ContentStatus | None = Form(None),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool | None = Form(None),
     cover_image: UploadFile | None = File(None, description="New cover image (replaces existing)"),
     remove_cover_image: bool = Form(False),
     idempotency: IdempotencyDep = None,
@@ -200,6 +203,8 @@ def update_news(
             
         if status is not None:
             update_kwargs["status"] = status
+        if ai_generated is not None:
+            update_kwargs["ai_generated"] = ai_generated
             
         data = NewsUpdate(**update_kwargs)
         news = news_service.update_news(db, news_id, data, status_actor_id=admin.id, status_reason=status_reason)

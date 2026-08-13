@@ -92,6 +92,7 @@ def create_insight(
     tags: str | None = Form(None, description="JSON array string"),
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool = Form(False),
     cover_image: UploadFile | None = File(None, description="Cover image (JPG/PNG/WebP, max 5MB)"),
     idempotency: IdempotencyDep = None,
 ):
@@ -133,6 +134,7 @@ def create_insight(
             category=category,
             tags=parsed_tags,
             status=status,
+            ai_generated=ai_generated,
         )
 
         insight = insight_service.create_insight(db, data, status_actor_id=admin.id, status_reason=status_reason)
@@ -166,6 +168,7 @@ def update_insight(
     tags: str | None = Form(None, description="JSON array string"),
     status: ContentStatus | None = Form(None),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool | None = Form(None),
     cover_image: UploadFile | None = File(None, description="New cover image (replaces existing)"),
     remove_cover_image: bool = Form(False),
     idempotency: IdempotencyDep = None,
@@ -241,6 +244,8 @@ def update_insight(
             
         if status is not None:
             update_kwargs["status"] = status
+        if ai_generated is not None:
+            update_kwargs["ai_generated"] = ai_generated
             
         data = InsightUpdate(**update_kwargs)
         insight = insight_service.update_insight(db, insight_id, data, status_actor_id=admin.id, status_reason=status_reason)

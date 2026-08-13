@@ -99,6 +99,7 @@ def create_case_study(
     is_featured: bool = Form(False),
     status: ContentStatus = Form(ContentStatus.draft),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool = Form(False),
     cover_image: UploadFile | None = File(None, description="Cover image"),
     client_logo: UploadFile | None = File(None, description="Client logo image"),
     gallery: list[UploadFile] = File(None, description="Gallery images (multiple files)", json_schema_extra={"items": {"type": "string", "format": "binary"}}),
@@ -170,6 +171,7 @@ def create_case_study(
             technologies=parsed_techs,
             is_featured=is_featured,
             status=status,
+            ai_generated=ai_generated,
         )
 
         case_study = case_study_service.create_case_study(db, data, status_actor_id=admin.id, status_reason=status_reason)
@@ -208,6 +210,7 @@ def update_case_study(
     is_featured: bool | None = Form(None),
     status: ContentStatus | None = Form(None),
     status_reason: str | None = Form(None, max_length=500),
+    ai_generated: bool | None = Form(None),
     cover_image: UploadFile | None = File(None),
     client_logo: UploadFile | None = File(None, description="New client logo"),
     gallery: list[UploadFile] | None = File(None),
@@ -346,6 +349,8 @@ def update_case_study(
             
         if status is not None:
             update_kwargs["status"] = status
+        if ai_generated is not None:
+            update_kwargs["ai_generated"] = ai_generated
 
         data = CaseStudyUpdate(**update_kwargs)
         case_study = case_study_service.update_case_study(db, case_study_id, data, status_actor_id=admin.id, status_reason=status_reason)

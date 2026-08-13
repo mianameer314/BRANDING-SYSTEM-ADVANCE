@@ -85,7 +85,7 @@ export default function InsightFormPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<InsightFormData>({
     resolver: zodResolver(insightSchema),
-    defaultValues: { status: 'draft' },
+    defaultValues: { status: 'draft', ai_generated: false },
     values: existing ? {
       title: existing.title,
       author: existing.author,
@@ -94,6 +94,8 @@ export default function InsightFormPage() {
       category: existing.category ?? '',
       tags: existing.tags?.join(', ') ?? '',
       status: existing.status as any,
+      
+      ai_generated: existing.ai_generated ?? false,
       cover_image: null,
     } : undefined,
   });
@@ -106,6 +108,7 @@ export default function InsightFormPage() {
     if (generated.tags && generated.tags.length > 0) {
       setValue('tags', generated.tags.join(', '), { shouldDirty: true });
     }
+    setValue('ai_generated', true, { shouldDirty: true });
     setIsAIModalOpen(false);
   };
 

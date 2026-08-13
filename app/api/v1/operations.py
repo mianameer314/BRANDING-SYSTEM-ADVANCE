@@ -45,7 +45,9 @@ def build_union_query(models_mapping, filters=None):
             author_col.label("author"),
             model.created_at.label("created_at"),
             model.updated_at.label("updated_at"),
-            model.status_changed_at.label("status_changed_at")
+            model.status_changed_at.label("status_changed_at"),
+            model.cover_image.label("cover_image"),
+            model.ai_generated.label("ai_generated")
         )
         if filters:
             stmt = stmt.where(*filters(model))
@@ -182,3 +184,134 @@ def get_workflow_items(
         "page": page,
         "per_page": per_page
     }
+
+# ─── Approval Workflow Endpoints ───
+
+from app.api.idempotency import IdempotencyDep
+from app.core.permissions import require_permission
+from app.schemas.operations import (
+    ApprovalAction,
+    ChangeRequestAction,
+    RejectionAction,
+    ReviewQueueParams,
+    ReviewQueueResponse,
+)
+from app.services.operations import (
+    approve_content,
+    get_review_queue,
+    reject_content,
+    request_changes,
+)
+
+ApproveDep = Annotated[User, Depends(require_permission("approve"))]
+
+
+@router.get("/review-queue", response_model=ReviewQueueResponse)
+def get_review_queue_endpoint(
+    db: DbDep,
+    user: ReadDep,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    content_type: str | None = Query(None),
+    author: str | None = Query(None),
+    search: str | None = Query(None),
+    ai_generated: bool | None = Query(None),
+):
+    """Get paginated review queue (items with status in_review or changes_requested)."""
+    return get_review_queue(
+        db,
+        page=page,
+        per_page=per_page,
+        content_type=content_type,
+        author=author,
+        search=search,
+        ai_generated=ai_generated,
+    )
+
+
+@router.post("/approve")
+def approve_content_endpoint(
+    data: ApprovalAction,
+    db: DbDep,
+    reviewer: ApproveDep,
+    idempotency: IdempotencyDep = None,
+):
+    """
+    Approve content for publication.
+    - Validates current status is 'in_review' or 'changes_requested'
+    - Records audit event
+    - Creates revision snapshot
+    - Updates content status to 'approved'
+    """
+    content = approve_content(
+        db,
+        content_type=data.content_type,
+        content_id=data.content_id,
+        actor_id=reviewer.id,
+        comment=data.comment,
+        reason=data.reason,
+    )
+    response = {"content_type": data.content_type, "content_id": data.content_id, "status": content.status, "message": "Content approved"}
+    
+    if idempotency:
+        idempotency.save(db, 200, response)
+        
+    return response
+
+
+@router.post("/request-changes")
+def request_changes_endpoint(
+    data: ChangeRequestAction,
+    db: DbDep,
+    reviewer: ApproveDep,
+    idempotency: IdempotencyDep = None,
+):
+    """
+    Request changes on content.
+    - Requires comment explaining what needs to change
+    - Records audit event
+    - Updates content status to 'changes_requested'
+    """
+    content = request_changes(
+        db,
+        content_type=data.content_type,
+        content_id=data.content_id,
+        actor_id=reviewer.id,
+        comment=data.comment,
+        reason=data.reason,
+    )
+    response = {"content_type": data.content_type, "content_id": data.content_id, "status": content.status, "message": "Changes requested"}
+    
+    if idempotency:
+        idempotency.save(db, 200, response)
+        
+    return response
+
+
+@router.post("/reject")
+def reject_content_endpoint(
+    data: RejectionAction,
+    db: DbDep,
+    reviewer: ApproveDep,
+    idempotency: IdempotencyDep = None,
+):
+    """
+    Reject content.
+    - Requires comment explaining reason
+    - Records audit event
+    - Updates content status to 'archived'
+    """
+    content = reject_content(
+        db,
+        content_type=data.content_type,
+        content_id=data.content_id,
+        actor_id=reviewer.id,
+        comment=data.comment,
+        reason=data.reason,
+    )
+    response = {"content_type": data.content_type, "content_id": data.content_id, "status": content.status, "message": "Content rejected and archived"}
+    
+    if idempotency:
+        idempotency.save(db, 200, response)
+        
+    return response

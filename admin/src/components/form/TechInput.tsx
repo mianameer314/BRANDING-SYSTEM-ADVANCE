@@ -9,16 +9,16 @@ import type { InputHTMLAttributes } from 'react';
 import type { FieldError } from 'react-hook-form';
 
 interface TechInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
- error?: FieldError;
+    error?: FieldError;
 }
 
 export function TechInput({ error, ...inputProps }: TechInputProps) {
- return (
- <TagsInput
- label="Technologies"
- placeholder="e.g. React, FastAPI, PostgreSQL"
- error={error}
- {...inputProps}
- />
- );
+    return (
+        <TagsInput
+            label="Technologies"
+            placeholder="e.g. React, FastAPI, PostgreSQL"
+            error={error}
+            {...inputProps}
+        />
+    );
 }

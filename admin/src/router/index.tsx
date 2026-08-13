@@ -33,6 +33,7 @@ import { WebhooksPage } from '@/features/webhooks/pages/WebhooksPage';
 import { WorkflowOverviewPage } from '@/features/operations/pages/WorkflowOverviewPage';
 import { ContentPreviewPage } from '@/features/operations/pages/ContentPreviewPage';
 import { RevisionHistoryPage } from '@/features/operations/pages/RevisionHistoryPage';
+import { ApprovalQueuePage } from '@/features/operations/pages/ApprovalQueuePage';
 
 export const router = createBrowserRouter([
  {
@@ -79,6 +80,7 @@ export const router = createBrowserRouter([
  
  { path: 'operations', element: <Navigate to="/dashboard" replace /> },
  { path: 'operations/workflow', element: <PermissionRoute permission="read_content"><WorkflowOverviewPage /></PermissionRoute> },
+ { path: 'operations/queue', element: <PermissionRoute permission="approve"><ApprovalQueuePage /></PermissionRoute> },
  { path: 'operations/preview/:contentType/:contentId', element: <PermissionRoute permission="read_content"><ContentPreviewPage /></PermissionRoute> },
  { path: 'operations/revisions/:contentType/:contentId', element: <PermissionRoute permission="read_content"><RevisionHistoryPage /></PermissionRoute> },
  

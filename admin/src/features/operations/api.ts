@@ -1,9 +1,16 @@
-import { axiosInstance as api } from '@/api/axios';
-import type { WorkflowOverviewData, ReviewQueueResponse } from './types';
+import { axiosInstance as api } from "@/api/axios";
+import type { 
+  WorkflowOverviewData, 
+  ReviewQueueResponse, 
+  ApprovalActionPayload,
+  ChangeRequestPayload,
+  RejectionPayload,
+  ReviewQueueFilters,
+} from "./types";
 
 export const operationsApi = {
   getWorkflowOverview: async (): Promise<WorkflowOverviewData> => {
-    const response = await api.get('/operations/workflow-overview');
+    const response = await api.get("/operations/workflow-overview");
     return response.data;
   },
 
@@ -21,19 +28,59 @@ export const operationsApi = {
     });
     
     if (contentType) {
-      params.append('content_type', contentType);
+      params.append("content_type", contentType);
     }
     if (status) {
-      params.append('status', status);
+      params.append("status", status);
     }
     if (search) {
-      params.append('search', search);
+      params.append("search", search);
     }
     if (author) {
-      params.append('author', author);
+      params.append("author", author);
     }
     
     const response = await api.get(`/operations/items?${params.toString()}`);
+    return response.data;
+  },
+
+  // --- Review Queue (Approval Queue) ---
+  getReviewQueue: async (filters: ReviewQueueFilters = {}): Promise<ReviewQueueResponse> => {
+    const params = new URLSearchParams({
+      page: (filters.page || 1).toString(),
+      per_page: (filters.per_page || 20).toString(),
+    });
+    
+    if (filters.content_type) {
+      params.append("content_type", filters.content_type);
+    }
+    if (filters.author) {
+      params.append("author", filters.author);
+    }
+    if (filters.search) {
+      params.append("search", filters.search);
+    }
+    if (filters.ai_generated !== undefined) {
+      params.append("ai_generated", filters.ai_generated.toString());
+    }
+    
+    const response = await api.get(`/operations/review-queue?${params.toString()}`);
+    return response.data;
+  },
+
+  // --- Approval Actions ---
+  approveContent: async (data: ApprovalActionPayload) => {
+    const response = await api.post("/operations/approve", data);
+    return response.data;
+  },
+
+  requestChanges: async (data: ChangeRequestPayload) => {
+    const response = await api.post("/operations/request-changes", data);
+    return response.data;
+  },
+
+  rejectContent: async (data: RejectionPayload) => {
+    const response = await api.post("/operations/reject", data);
     return response.data;
   },
 
@@ -50,7 +97,7 @@ export const operationsApi = {
     
   // --- Preview ---
   getPreviewToken: async (contentType: string, contentId: number) => {
-    const response = await api.post<{ token: string }>(`/preview/generate`, {
+    const response = await api.post<{ token: string }>("/preview/generate", {
       content_type: contentType,
       content_id: contentId
     });

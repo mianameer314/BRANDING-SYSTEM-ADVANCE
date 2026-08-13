@@ -16,12 +16,12 @@ interface RevisionHistoryProps {
 }
 
 function formatDate(value: string) {
- const date = new Date(value);
- return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
 function actionLabel(action: string) {
- return action.replace(/_/g, ' '); // replace _ with space
+  return action.replace(/_/g, ' '); // replace _ with space
 
 }
 
@@ -55,10 +55,10 @@ function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionIt
   const { data: user, isLoading } = useUser(revision.actor_id || 0);
 
   const changedByDisplay = revision.actor_id
-    ? isLoading 
-      ? `Loading...` 
-      : user 
-        ? user.full_name 
+    ? isLoading
+      ? `Loading...`
+      : user
+        ? user.full_name
         : `Unknown User (ID: ${revision.actor_id})`
     : 'System';
 
@@ -92,71 +92,71 @@ function RevisionItem({ revision, canRestore, onRestore, isPending }: RevisionIt
 }
 
 export function RevisionHistory({ contentType, contentId, onRestoreSuccess }: RevisionHistoryProps) {
- const canRestore = usePermission('publish');
- const queryClient = useQueryClient();
- const [restoreReason, setRestoreReason] = useState('');
- const [modalRevision, setModalRevision] = useState<ContentRevision | null>(null);
- const { data, isLoading, isError } = useQuery({
-   queryKey: ['revisions', contentType, contentId],
-   queryFn: () => listRevisions(contentType, contentId),
- });
- const restoreMutation = useMutation({
-   mutationFn: (revision: ContentRevision) => restoreRevision(contentType, contentId, revision.version, restoreReason),
-   onSuccess: () => {
-     queryClient.invalidateQueries({ queryKey: ['revisions', contentType, contentId] });
-     queryClient.invalidateQueries({ queryKey: [contentType] });
-     queryClient.invalidateQueries({ queryKey: [`${contentType}s`] });
-     setRestoreReason('');
-     toast.success('Revision restored and a new history entry was created.');
-     onRestoreSuccess?.();
-   },
-   onError: (error: any) => toast.error(error?.response?.data?.detail ?? 'Could not restore revision.'),
- });
+  const canRestore = usePermission('publish');
+  const queryClient = useQueryClient();
+  const [restoreReason, setRestoreReason] = useState('');
+  const [modalRevision, setModalRevision] = useState<ContentRevision | null>(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['revisions', contentType, contentId],
+    queryFn: () => listRevisions(contentType, contentId),
+  });
+  const restoreMutation = useMutation({
+    mutationFn: (revision: ContentRevision) => restoreRevision(contentType, contentId, revision.version, restoreReason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['revisions', contentType, contentId] });
+      queryClient.invalidateQueries({ queryKey: [contentType] });
+      queryClient.invalidateQueries({ queryKey: [`${contentType}s`] });
+      setRestoreReason('');
+      toast.success('Revision restored and a new history entry was created.');
+      onRestoreSuccess?.();
+    },
+    onError: (error: any) => toast.error(error?.response?.data?.detail ?? 'Could not restore revision.'),
+  });
 
- const restore = (revision: ContentRevision) => {
-   setModalRevision(revision);
- };
+  const restore = (revision: ContentRevision) => {
+    setModalRevision(revision);
+  };
 
- const confirmRestore = () => {
-   if (modalRevision) {
-     restoreMutation.mutate(modalRevision);
-     setModalRevision(null);
-   }
- };
+  const confirmRestore = () => {
+    if (modalRevision) {
+      restoreMutation.mutate(modalRevision);
+      setModalRevision(null);
+    }
+  };
 
- return (
- <section className="rounded-xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
- <div className="flex items-center gap-2">
- <History className="h-4 w-4 text-primary" />
- <h2 className="font-medium text-foreground">Revision history</h2>
- </div>
- <p className="mt-1 text-xs text-muted-foreground">Every save is retained as an immutable snapshot.</p>
- {canRestore && <textarea value={restoreReason} onChange={(event) => setRestoreReason(event.target.value)} maxLength={500} rows={2} placeholder="Reason if you restore a prior version (optional)" className="mt-3 w-full rounded-md border border-border bg-white p-2 text-xs outline-none focus:border-primary" />}
- {isLoading && <p className="mt-3 text-xs text-muted-foreground">Loading revision history…</p>}
- {isError && <p className="mt-3 text-xs text-destructive">Revision history could not be loaded.</p>}
- {!isLoading && !isError && data?.items.length === 0 && <p className="mt-3 text-xs text-muted-foreground">No revisions recorded yet.</p>}
- <ul className="mt-3 max-h-[500px] grid grid-cols-1 gap-4 sm:grid-cols-2 overflow-y-auto pr-2">
- {data?.items.map((revision) => (
-  <RevisionItem key={revision.id} revision={revision} canRestore={canRestore} onRestore={restore} isPending={restoreMutation.isPending} />
- ))}
- </ul>
+  return (
+    <section className="rounded-xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <div className="flex items-center gap-2">
+        <History className="h-4 w-4 text-primary" />
+        <h2 className="font-medium text-foreground">Revision history</h2>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">Every save is retained as an immutable snapshot.</p>
+      {canRestore && <textarea value={restoreReason} onChange={(event) => setRestoreReason(event.target.value)} maxLength={500} rows={2} placeholder="Reason if you restore a prior version (optional)" className="mt-3 w-full rounded-md border border-border bg-white p-2 text-xs outline-none focus:border-primary" />}
+      {isLoading && <p className="mt-3 text-xs text-muted-foreground">Loading revision history…</p>}
+      {isError && <p className="mt-3 text-xs text-destructive">Revision history could not be loaded.</p>}
+      {!isLoading && !isError && data?.items.length === 0 && <p className="mt-3 text-xs text-muted-foreground">No revisions recorded yet.</p>}
+      <ul className="mt-3 max-h-[500px] grid grid-cols-1 gap-4 sm:grid-cols-2 overflow-y-auto pr-2">
+        {data?.items.map((revision) => (
+          <RevisionItem key={revision.id} revision={revision} canRestore={canRestore} onRestore={restore} isPending={restoreMutation.isPending} />
+        ))}
+      </ul>
 
- {modalRevision && createPortal(
-  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-  <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl relative z-10">
-  <h3 className="text-lg font-semibold text-foreground">Confirm Restore</h3>
-  <p className="mt-2 text-sm text-muted-foreground">
-  Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.
-  </p>
-  <div className="mt-6 flex justify-end gap-3">
-  <button type="button" onClick={() => setModalRevision(null)} className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Cancel</button>
-  <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Restore</button>
-  </div>
-  </div>
-  </div>,
-  document.body
- )}
+      {modalRevision && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-sm rounded-lg border border-border bg-white p-6 shadow-xl relative z-10">
+            <h3 className="text-lg font-semibold text-foreground">Confirm Restore</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Restore version {modalRevision.version}? The current content will be replaced, but it will remain in history.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={() => setModalRevision(null)} className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-zinc-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Cancel</button>
+              <button type="button" onClick={confirmRestore} disabled={restoreMutation.isPending} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0">Restore</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
- </section>
- );
+    </section>
+  );
 }
