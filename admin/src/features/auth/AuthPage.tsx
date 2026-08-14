@@ -16,6 +16,15 @@ import { OtpInput } from './components/OtpInput';
 
 type AuthView = 'login' | 'register' | 'otp' | 'forgot' | 'reset';
 
+function validatePassword(password: string): string | null {
+    if (password.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter.';
+    if (!/\d/.test(password)) return 'Password must contain at least one digit.';
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return 'Password must contain at least one symbol.';
+    return null;
+}
+
 export function AuthPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -61,7 +70,6 @@ export function AuthPage() {
     const { mutate: forgotMutate, isPending: isForgotPending } = useForgotPassword();
     const [forgotEmail, setForgotEmail] = useState('');
     const [forgotError, setForgotError] = useState('');
-    const [forgotSuccess, setForgotSuccess] = useState('');
 
     // Reset Password
     const { mutate: resetMutate, isPending: isResetPending } = useResetPassword();
@@ -110,8 +118,9 @@ export function AuthPage() {
             return;
         }
 
-        if (regPassword.length < 8) {
-            setRegError('Password must be at least 8 characters.');
+        const passwordError = validatePassword(regPassword);
+        if (passwordError) {
+            setRegError(passwordError);
             return;
         }
 
@@ -209,8 +218,9 @@ export function AuthPage() {
             return;
         }
 
-        if (resetPassword.length < 8) {
-            setResetError('Password must be at least 8 characters.');
+        const passwordError = validatePassword(resetPassword);
+        if (passwordError) {
+            setResetError(passwordError);
             return;
         }
 

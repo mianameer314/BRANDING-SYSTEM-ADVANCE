@@ -102,11 +102,11 @@ class Settings(BaseSettings):
     # ==========================================================
     # Email / FastAPI-Mail
     # ==========================================================
-    MAIL_USERNAME: str = ""
-    MAIL_PASSWORD: str = ""
-    MAIL_FROM: str = ""
+    MAIL_USERNAME: str = "dummy"
+    MAIL_PASSWORD: str = "dummy"
+    MAIL_FROM: str = "noreply@example.com"
     MAIL_PORT: int = 587
-    MAIL_SERVER: str = ""
+    MAIL_SERVER: str = "smtp.example.com"
     MAIL_FROM_NAME: str = "O2geek Headless CMS"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False

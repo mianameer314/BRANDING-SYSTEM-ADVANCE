@@ -5,6 +5,15 @@ import { useUpdateProfile, useChangePassword } from './hooks';
 import axios from 'axios';
 import { Mail, User, Lock, Eye, EyeOff, ArrowUpRight } from 'lucide-react';
 
+function validatePassword(password: string): string | null {
+    if (password.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter.';
+    if (!/\d/.test(password)) return 'Password must contain at least one digit.';
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return 'Password must contain at least one symbol.';
+    return null;
+}
+
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
   const { setHeaderState } = useOutletContext<any>();
@@ -77,8 +86,9 @@ export function ProfilePage() {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setPasswordError('New password must be at least 8 characters.');
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      setPasswordError(passwordError);
       return;
     }
 
