@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useUpdateProfile, useChangePassword } from './hooks';
 import axios from 'axios';
@@ -7,7 +7,6 @@ import { Mail, User, Lock, Eye, EyeOff, ArrowUpRight } from 'lucide-react';
 
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
-  const navigate = useNavigate();
   const { setHeaderState } = useOutletContext<any>();
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
   const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword();
