@@ -611,6 +611,7 @@ def get_publish_logs(
             "event": item.event,
             "content_type": item.content_type,
             "content_id": item.content_id,
+            "request_url": getattr(item, "request_url", ""),
             "success": item.success,
             "response_status": getattr(item, "response_status", None),
             "response_body": getattr(item, "response_body", None),
