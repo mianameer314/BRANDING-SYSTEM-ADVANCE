@@ -6,10 +6,11 @@ interface OtpInputProps {
     onComplete: (otp: string) => void;
     onChange?: (otp: string) => void;
     hasError?: boolean;
+    isSuccess?: boolean;
     disabled?: boolean;
 }
 
-export function OtpInput({ length = 6, onComplete, onChange, hasError, disabled }: OtpInputProps) {
+export function OtpInput({ length = 6, onComplete, onChange, hasError, isSuccess, disabled }: OtpInputProps) {
     const [otp, setOtp] = useState<string[]>(Array(length).fill(''));
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -93,10 +94,13 @@ export function OtpInput({ length = 6, onComplete, onChange, hasError, disabled 
                     className={cn(
                         "w-12 h-14 text-center text-xl font-bold rounded-lg border-2 bg-slate-900 transition-all duration-300",
                         "focus:outline-none focus:ring-2 focus:ring-o2-green/50",
-                        digit ? "border-o2-green text-o2-green" : "border-slate-700 text-slate-300",
+                        !isSuccess && !hasError && !disabled && "hover:border-o2-green/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]",
+                        digit && !isSuccess ? "border-o2-green text-o2-green animate-in zoom-in-95 duration-200" : "border-slate-700 text-slate-300",
                         hasError && "border-red-500 text-red-500 focus:ring-red-500/50",
-                        disabled && "opacity-50 cursor-not-allowed"
+                        isSuccess && "border-o2-green bg-o2-green text-slate-900 shadow-[0_0_20px_rgba(34,197,94,0.4)] translate-y-[-2px]",
+                        disabled && !isSuccess && "opacity-50 cursor-not-allowed"
                     )}
+                    style={isSuccess ? { transitionDelay: `${index * 100}ms`, transitionProperty: 'all' } : undefined}
                 />
             ))}
         </div>

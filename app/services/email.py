@@ -22,6 +22,7 @@ conf = ConnectionConfig(
     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
     USE_CREDENTIALS=settings.USE_CREDENTIALS,
     VALIDATE_CERTS=settings.VALIDATE_CERTS,
+    SUPPRESS_SEND=1 if settings.APP_ENV == "testing" else 0,
 )
 
 fm = FastMail(conf)

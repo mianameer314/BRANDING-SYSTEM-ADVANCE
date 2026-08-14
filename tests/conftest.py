@@ -141,6 +141,11 @@ patcher5.start()
 patcher6 = unittest.mock.patch("app.api.v1.case_studies.get_storage_service", return_value=mock_storage_service)
 patcher6.start()
 
+# Patch email sending to prevent connection errors during tests
+from unittest.mock import AsyncMock
+email_patcher = unittest.mock.patch("app.services.email.fm.send_message", new_callable=AsyncMock)
+email_patcher.start()
+
 @pytest.fixture(scope="module")
 def client(admin_user, cleanup_db):
     # Default dependency override uses admin user

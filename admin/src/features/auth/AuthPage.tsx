@@ -149,12 +149,16 @@ export function AuthPage() {
         verifyMutate(
             { email: regEmail, otp_code: code },
             {
-                onSuccess: async (tokens) => {
-                    setOtpSuccess('Verified! Redirecting...');
-                    setTimeout(async () => {
-                        await authLogin(tokens);
-                        navigate('/dashboard', { replace: true });
-                    }, 1000);
+                onSuccess: async () => {
+                    setOtpSuccess('Verified! Redirecting to login...');
+                    setTimeout(() => {
+                        setRegEmail('');
+                        setRegPassword('');
+                        setRegConfirmPassword('');
+                        setRegFullName('');
+                        setOtpSuccess('');
+                        setView('login');
+                    }, 2500); // Wait for the cascading animation to finish
                 },
                 onError: (err) => {
                     if (axios.isAxiosError(err)) {
@@ -580,6 +584,7 @@ export function AuthPage() {
                                         length={6} 
                                         onComplete={handleVerifyOtp} 
                                         hasError={!!otpError}
+                                        isSuccess={!!otpSuccess}
                                         disabled={isVerifyPending || !!otpSuccess}
                                     />
 
