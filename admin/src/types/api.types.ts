@@ -21,6 +21,26 @@ export interface ChangePasswordRequest {
  new_password: string;
 }
 
+export interface VerifyEmailRequest {
+ email: string;
+ otp_code: string;
+}
+
+export interface ResendOtpRequest {
+ email: string;
+ purpose: string;
+}
+
+export interface ForgotPasswordRequest {
+ email: string;
+}
+
+export interface ResetPasswordRequest {
+ email: string;
+ otp_code: string;
+ new_password: string;
+}
+
 export interface TokenResponse {
  access_token: string;
  refresh_token: string;

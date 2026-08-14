@@ -8,6 +8,7 @@ from app.models.insight import Insight
 from app.models.news import News
 from app.models.project import Project
 from app.models.user import User
+from app.models.otp import OTP
 from app.models.favorite import Favorite
 from app.models.like import Like
 from app.models.comment import Comment
@@ -20,6 +21,7 @@ from app.models.api_idempotency_record import ApiIdempotencyRecord
 
 __all__ = [
     "User",
+    "OTP",
     "Blog",
     "News",
     "Project",

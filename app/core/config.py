@@ -99,6 +99,20 @@ class Settings(BaseSettings):
     WEBHOOK_TIMEOUT: int = 10
     WEBHOOK_USER_AGENT: str = "O2Geeks-Webhook/1.0"
 
+    # ==========================================================
+    # Email / FastAPI-Mail
+    # ==========================================================
+    MAIL_USERNAME: str = ""
+    MAIL_PASSWORD: str = ""
+    MAIL_FROM: str = ""
+    MAIL_PORT: int = 587
+    MAIL_SERVER: str = ""
+    MAIL_FROM_NAME: str = "O2geek Headless CMS"
+    MAIL_STARTTLS: bool = True
+    MAIL_SSL_TLS: bool = False
+    USE_CREDENTIALS: bool = True
+    VALIDATE_CERTS: bool = True
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

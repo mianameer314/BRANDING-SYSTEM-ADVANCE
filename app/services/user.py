@@ -43,7 +43,8 @@ def register_user(db: Session, data: UserRegister) -> User:
         hashed_password=hash_password(data.password),
         full_name=data.full_name,
         role=UserRole.user.value,
-        is_active=True,
+        is_active=False,
+        email_verified=False,
     )
 
     db.add(user)

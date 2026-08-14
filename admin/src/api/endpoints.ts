@@ -12,6 +12,10 @@ export const API = {
  refresh: '/auth/refresh',
  me: '/auth/me',
  changePassword: '/auth/change-password',
+ verifyEmail: '/auth/verify-email',
+ resendOtp: '/auth/resend-otp',
+ forgotPassword: '/auth/forgot-password',
+ resetPassword: '/auth/reset-password',
  },
  blogs: {
  list: '/blogs',

@@ -22,6 +22,8 @@ python-slugify
 requests
 httpx
 APScheduler>=3.10.0
+fastapi-mail>=1.4.1
+email-validator>=2.1.0
 
 # ── Storage / Media ──────────────────────────────────────────
 Pillow

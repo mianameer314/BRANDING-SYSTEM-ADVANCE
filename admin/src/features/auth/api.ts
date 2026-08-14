@@ -6,7 +6,11 @@ import type {
  UserOut, 
  RegisterRequest, 
  UpdateProfileRequest, 
- ChangePasswordRequest 
+ ChangePasswordRequest,
+ VerifyEmailRequest,
+ ResendOtpRequest,
+ ForgotPasswordRequest,
+ ResetPasswordRequest
 } from '@/types/api.types';
 
 export async function login(credentials: LoginRequest): Promise<TokenResponse> {
@@ -31,4 +35,24 @@ export async function updateProfile(payload: UpdateProfileRequest): Promise<User
 
 export async function changePassword(payload: ChangePasswordRequest): Promise<void> {
  await axiosInstance.post(API.auth.changePassword, payload);
+}
+
+export async function verifyEmail(data: VerifyEmailRequest): Promise<TokenResponse> {
+    const response = await axiosInstance.post<TokenResponse>(API.auth.verifyEmail, data);
+    return response.data;
+}
+
+export async function resendOtp(data: ResendOtpRequest): Promise<{ message: string }> {
+    const response = await axiosInstance.post<{ message: string }>(API.auth.resendOtp, data);
+    return response.data;
+}
+
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
+    const response = await axiosInstance.post<{ message: string }>(API.auth.forgotPassword, data);
+    return response.data;
+}
+
+export async function resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+    const response = await axiosInstance.post<{ message: string }>(API.auth.resetPassword, data);
+    return response.data;
 }
