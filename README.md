@@ -226,7 +226,7 @@ cd admin && npm run build
 
 | Area | Document |
 |------|----------|
-| **API Reference** | [Authentication](docs/api/authentication.md) · [Blogs](docs/api/blogs.md) · [Projects](docs/api/projects.md) · [Case Studies](docs/api/case_studies.md) · [News](docs/api/news.md) · [Insights](docs/api/insights.md) · [Resources](docs/api/resources.md) · [Interactions](docs/api/interactions.md) · [Preview](docs/api/preview.md) · [AI Generation](docs/api/ai.md) · [Webhooks](docs/api/webhooks.md) · [Users](docs/api/users.md) |
+| **API Reference** | [Authentication](docs/api/authentication.md) · [Auth](docs/api/auth.md) · [Blogs](docs/api/blogs.md) · [Projects](docs/api/projects.md) · [Case Studies](docs/api/case_studies.md) · [News](docs/api/news.md) · [Insights](docs/api/insights.md) · [Resources](docs/api/resources.md) · [Interactions](docs/api/interactions.md) · [Preview](docs/api/preview.md) · [AI Generation](docs/api/ai.md) · [Webhooks](docs/api/webhooks.md) · [Users](docs/api/users.md) · [Audit & Revisions](docs/api/audit.md) · [Operations Console](docs/api/operations.md) · [Stats](docs/api/stats.md) |
 | **Admin Guide** | [Content Manager User Guide](docs/admin/admin-user-guide.md) |
 | **Developer Guide** | [Architecture & Conventions](docs/developer/developer-guide.md) |
 | **Deployment** | [Railway + Vercel Deployment](docs/deployment/deployment-guide.md) · [Git & Monitoring Workflow](docs/deployment/git_and_monitoring_workflow.md) |
