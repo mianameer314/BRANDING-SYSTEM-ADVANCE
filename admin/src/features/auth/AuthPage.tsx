@@ -558,8 +558,8 @@ export function AuthPage() {
                                         className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-secondary shadow-lg shadow-primary/20 transition-all duration-200 active:scale-95 hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60 disabled:pointer-events-none"
                                     >
                                         {isRegisterPending ? (
-                                            <><span className="h-4 w-4 animate-spin rounded-full border-2 border-secondary/30 border-t-secondary" /> Creating…</>
-                                        ) : 'CONTINUE'}
+                                            <><span className="h-4 w-4 animate-spin rounded-full border-2 border-secondary/30 border-t-secondary" /> Sending OTP…</>
+                                        ) : 'SEND OTP'}
                                     </button>
                                 </form>
 
