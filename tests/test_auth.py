@@ -8,18 +8,23 @@ def test_register(client):
         "full_name": "New User"
     })
     assert response.status_code == 201
-    assert response.json()["email"] == unique_email
+    assert "Verification code sent" in response.json()["message"]
 
-def test_login(client):
-    # We must register a user before logging in, or use a known user.
-    # Since DB might be wiped between modules, let's use the normal_user from fixtures?
-    # No, fixtures don't insert to DB automatically. Let's register one here.
+def test_login(client, db_session):
+    from app.models.user import User
     email = f"login_{uuid.uuid4().hex[:8]}@example.com"
     client.post("/api/v1/auth/register", json={
         "email": email,
         "password": "Password123!",
         "full_name": "Login User"
     })
+    
+    # Manually activate the user since they require OTP verification
+    user = db_session.query(User).filter(User.email == email).first()
+    user.is_active = True
+    user.email_verified = True
+    db_session.commit()
+
     response = client.post("/api/v1/auth/login", json={
         "email": email,
         "password": "Password123!"

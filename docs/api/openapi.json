@@ -12,7 +12,7 @@
           "Authentication"
         ],
         "summary": "Register",
-        "description": "Public user registration.",
+        "description": "Public user registration. Creates unverified user and sends OTP.",
         "operationId": "register_api_v1_auth_register_post",
         "requestBody": {
           "content": {
@@ -29,9 +29,238 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserOut"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify Email",
+        "description": "Verify email via OTP and return tokens.",
+        "operationId": "verify_email_api_v1_auth_verify_email_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-otp": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Resend Otp",
+        "operationId": "resend_otp_api_v1_auth_resend_otp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendOtpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Forgot Password",
+        "operationId": "forgot_password_api_v1_auth_forgot_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset Password",
+        "operationId": "reset_password_api_v1_auth_reset_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -5934,6 +6163,87 @@
         }
       }
     },
+    "/api/v1/operations/publish-now": {
+      "post": {
+        "tags": [
+          "Operations Console"
+        ],
+        "summary": "Publish Now Endpoint",
+        "description": "Publish content immediately.\n- Transitions from approved/scheduled directly to published\n- Fires webhook instantly",
+        "operationId": "publish_now_endpoint_api_v1_operations_publish_now_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishNowRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g., Validation Error or Duplicate Data)"
+          },
+          "401": {
+            "description": "Unauthorized (Missing or Invalid JWT Token)"
+          },
+          "403": {
+            "description": "Forbidden (Insufficient Permissions or Deactivated Account)"
+          },
+          "404": {
+            "description": "Not Found (The requested resource does not exist)"
+          },
+          "429": {
+            "description": "Too Many Requests (Rate limit exceeded for this endpoint)"
+          },
+          "500": {
+            "description": "Internal Server Error (Unexpected system failure)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/operations/schedule": {
       "post": {
         "tags": [
@@ -8927,6 +9237,20 @@
         ],
         "title": "FavoriteOut"
       },
+      "ForgotPasswordRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "ForgotPasswordRequest"
+      },
       "GenerateContentRequest": {
         "properties": {
           "content_type": {
@@ -10239,6 +10563,24 @@
         "title": "ProjectOut",
         "description": "Response model for a project showcase."
       },
+      "PublishNowRequest": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "content_id": {
+            "type": "integer",
+            "title": "Content Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "content_id"
+        ],
+        "title": "PublishNowRequest"
+      },
       "RejectionAction": {
         "properties": {
           "content_type": {
@@ -10313,6 +10655,50 @@
           "scheduled_at"
         ],
         "title": "RescheduleContentRequest"
+      },
+      "ResendOtpRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "purpose"
+        ],
+        "title": "ResendOtpRequest"
+      },
+      "ResetPasswordRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "otp_code": {
+            "type": "string",
+            "title": "Otp Code"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "otp_code",
+          "new_password"
+        ],
+        "title": "ResetPasswordRequest"
       },
       "ResolveFailureRequest": {
         "properties": {
@@ -10891,6 +11277,25 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VerifyEmailRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "otp_code": {
+            "type": "string",
+            "title": "Otp Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "otp_code"
+        ],
+        "title": "VerifyEmailRequest"
       },
       "WebhookCreate": {
         "properties": {

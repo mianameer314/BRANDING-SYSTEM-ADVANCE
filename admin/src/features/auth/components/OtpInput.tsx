@@ -92,12 +92,13 @@ export function OtpInput({ length = 6, onComplete, onChange, hasError, isSuccess
                     onChange={(e) => handleChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     className={cn(
-                        "w-12 h-14 text-center text-xl font-bold rounded-lg border-2 bg-slate-900 transition-all duration-300",
-                        "focus:outline-none focus:ring-2 focus:ring-o2-green/50",
-                        !isSuccess && !hasError && !disabled && "hover:border-o2-green/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]",
-                        digit && !isSuccess ? "border-o2-green text-o2-green animate-in zoom-in-95 duration-200" : "border-slate-700 text-slate-300",
-                        hasError && "border-red-500 text-red-500 focus:ring-red-500/50",
-                        isSuccess && "border-o2-green bg-o2-green text-slate-900 shadow-[0_0_20px_rgba(34,197,94,0.4)] translate-y-[-2px]",
+                        "w-12 h-14 text-center text-xl font-bold rounded-lg border-2 bg-white text-black transition-all duration-300",
+                        "border-o2-green/50 shadow-[0_0_10px_rgba(34,197,94,0.2)]", // constant light green glow
+                        "focus:outline-none focus:ring-2 focus:ring-o2-green/80",
+                        !isSuccess && !hasError && !disabled && "hover:border-o2-green hover:shadow-[0_0_15px_rgba(34,197,94,0.4)]",
+                        digit && !isSuccess ? "border-o2-green text-black animate-in zoom-in-95 duration-200" : "",
+                        hasError && "border-red-500 text-red-500 focus:ring-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]",
+                        isSuccess && "border-o2-green bg-o2-green text-white shadow-[0_0_20px_rgba(34,197,94,0.6)] translate-y-[-2px]",
                         disabled && !isSuccess && "opacity-50 cursor-not-allowed"
                     )}
                     style={isSuccess ? { transitionDelay: `${index * 100}ms`, transitionProperty: 'all' } : undefined}
