@@ -34,7 +34,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_otps_email'), 'otps', ['email'], unique=False)
     op.create_index(op.f('ix_otps_id'), 'otps', ['id'], unique=False)
     op.create_index(op.f('ix_otps_purpose'), 'otps', ['purpose'], unique=False)
-    op.add_column('users', sa.Column('email_verified', sa.Boolean(), nullable=False))
+    op.add_column('users', sa.Column('email_verified', sa.Boolean(), server_default=sa.text('false'), nullable=False))
     # ### end Alembic commands ###
 
 
