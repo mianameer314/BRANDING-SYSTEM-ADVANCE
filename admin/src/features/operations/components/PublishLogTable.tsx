@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { Loader2, AlertCircle, CheckCircle2, RotateCw, Check } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, RotateCw, Check, ExternalLink } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
@@ -79,9 +79,16 @@ export function PublishLogTable({ items, isLoading, page, totalPages, onPageChan
                     <span className="font-medium capitalize">{log.content_type.replace('_', ' ')} #{log.content_id}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm font-mono text-muted-foreground truncate block max-w-[200px]" title={log.request_url}>
-                      {log.request_url}
-                    </span>
+                    <a 
+                      href={log.request_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group" 
+                      title={log.request_url}
+                    >
+                      <span>View</span>
+                      <ExternalLink className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    </a>
                   </td>
                   <td className="px-6 py-4">
                     {log.success ? (
