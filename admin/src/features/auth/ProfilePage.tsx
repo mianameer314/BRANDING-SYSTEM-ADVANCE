@@ -3,7 +3,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useUpdateProfile, useChangePassword } from './hooks';
 import axios from 'axios';
-import { Mail, User, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, User, Lock, Eye, EyeOff, ArrowUpRight } from 'lucide-react';
 
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
@@ -110,9 +110,15 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl py-8 px-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="mx-auto max-w-5xl py-8 px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">Personal Information</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Update your basic profile details and preferences.
+            </p>
+          </div>
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex-1 flex flex-col">
           <form onSubmit={handleProfileSubmit} className="space-y-6 flex-1 flex flex-col">
             {/* Email (Read Only) */}
@@ -187,7 +193,7 @@ export function ProfilePage() {
               <button
                 type="submit"
                 disabled={isUpdating || fullName === user?.full_name}
-                className="interactive-button-small disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
+                className="interactive-button-small disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isUpdating ? (
                   <span className="label flex items-center gap-2">
@@ -195,7 +201,10 @@ export function ProfilePage() {
                     Saving…
                   </span>
                 ) : (
-                  <span className="label">Save Profile</span>
+                  <>
+                    <ArrowUpRight className="icon w-5 h-5" />
+                    <span className="label">Save Changes</span>
+                  </>
                 )}
               </button>
             </div>
@@ -205,7 +214,7 @@ export function ProfilePage() {
 
       <div className="space-y-6 flex flex-col h-full">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Change Password</h2>
+            <h2 className="text-xl font-semibold text-foreground">Security</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Update your account password. You will be logged out after changing it.
             </p>
@@ -310,15 +319,18 @@ export function ProfilePage() {
               <button
                 type="submit"
                 disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
-                className="interactive-button-small disabled:opacity-50 disabled:active:scale-100 disabled:hover:translate-y-0"
+                className="interactive-button-small disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isChangingPassword ? (
                   <span className="label flex items-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                    Updating Password…
+                    Updating…
                   </span>
                 ) : (
-                  <span className="label">Update Password</span>
+                  <>
+                    <ArrowUpRight className="icon w-5 h-5" />
+                    <span className="label">Update Password</span>
+                  </>
                 )}
               </button>
             </div>
@@ -327,15 +339,6 @@ export function ProfilePage() {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center">
-        <button
-          type="button"
-          onClick={() => navigate('/dashboard')}
-          className="interactive-button-small w-auto px-8"
-        >
-          <span className="label">Go back to dashboard</span>
-        </button>
-      </div>
     </div>
   );
 }
