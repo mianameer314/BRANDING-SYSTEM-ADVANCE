@@ -44,7 +44,7 @@ htmlcov/
 *.sqlite3
 
 # Uploaded Media
-storage/
+/storage/
 
 # Workspace IDE & OS Files
 .vscode/
