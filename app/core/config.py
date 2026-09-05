@@ -31,6 +31,13 @@ class Settings(BaseSettings):
                     f"DATABASE_URL contains an unresolved template variable: {v}. "
                     "In Railway, please copy the direct connection URL from your Postgres service variables."
                 )
+            # Handle accidental double-paste (e.g. .../railwaypostgresql://...)
+            if v.count("://") > 1:
+                pos = v.rfind("postgresql://")
+                if pos == -1:
+                    pos = v.rfind("postgres://")
+                if pos > 0:
+                    v = v[pos:]
             if v.startswith("postgres://"):
                 v = "postgresql://" + v[len("postgres://"):]
         return v
