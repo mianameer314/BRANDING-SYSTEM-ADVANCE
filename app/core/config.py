@@ -3,6 +3,7 @@ Application configuration.
 Loads all configuration from environment variables (.env locally, Railway Variables in production).
 """
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,20 @@ class Settings(BaseSettings):
     # Database
     # ==========================================================
     DATABASE_URL: str
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        if isinstance(v, str):
+            v = v.strip().strip("'\"")
+            if v.startswith("${{"):
+                raise ValueError(
+                    f"DATABASE_URL contains an unresolved template variable: {v}. "
+                    "In Railway, please copy the direct connection URL from your Postgres service variables."
+                )
+            if v.startswith("postgres://"):
+                v = "postgresql://" + v[len("postgres://"):]
+        return v
 
     # ==========================================================
     # JWT
@@ -67,6 +82,18 @@ class Settings(BaseSettings):
     # Redis
     # ==========================================================
     REDIS_URL: str
+
+    @field_validator("REDIS_URL", mode="before")
+    @classmethod
+    def validate_redis_url(cls, v: str) -> str:
+        if isinstance(v, str):
+            v = v.strip().strip("'\"")
+            if v.startswith("${{"):
+                raise ValueError(
+                    f"REDIS_URL contains an unresolved template variable: {v}. "
+                    "In Railway, please copy the direct connection URL from your Redis service variables."
+                )
+        return v
 
     # ==========================================================
     # AI Content Generation (OpenRouter)
