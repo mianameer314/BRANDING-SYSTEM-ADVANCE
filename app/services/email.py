@@ -2,6 +2,7 @@
 Email service using fastapi-mail.
 Handles sending OTPs for registration and password resets.
 """
+import asyncio
 import logging
 from pathlib import Path
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -60,7 +61,7 @@ async def send_otp_email(email_to: EmailStr, otp_code: str, purpose: str):
     )
 
     try:
-        await fm.send_message(message)
+        await asyncio.wait_for(fm.send_message(message), timeout=7.0)
         logger.info(f"OTP email ({purpose}) sent to {email_to}")
     except Exception as e:
         logger.error(f"Failed to send email to {email_to}: {str(e)}")
