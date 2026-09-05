@@ -284,7 +284,10 @@ def bootstrap_admin():
                 db.commit()
                 logger.info("Bootstrap: Admin user created (%s)", settings.ADMIN_EMAIL)
             else:
-                logger.info("Bootstrap: Admin user already exists (%s)", existing_admin.email)
+                existing_admin.hashed_password = hash_password(settings.ADMIN_PASSWORD)
+                existing_admin.is_active = True
+                db.commit()
+                logger.info("Bootstrap: Admin user credentials synced (%s)", existing_admin.email)
         finally:
             db.close()
     except Exception as e:
