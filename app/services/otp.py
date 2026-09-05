@@ -1,6 +1,7 @@
 """
 OTP service for generating and validating one-time passwords.
 """
+import logging
 import random
 import string
 from datetime import datetime, timedelta, timezone
@@ -9,6 +10,8 @@ from sqlalchemy import desc
 
 from app.models.otp import OTP
 from app.services.email import send_otp_email
+
+logger = logging.getLogger(__name__)
 
 def generate_otp_code(length: int = 6) -> str:
     """Generate a random N-digit OTP code."""
@@ -45,7 +48,14 @@ async def create_and_send_otp(db: Session, email: str, purpose: str) -> OTP:
     db.refresh(new_otp)
     
     # Send Email
-    await send_otp_email(email_to=email, otp_code=otp_code, purpose=purpose)
+    logger.info("Generated OTP for %s (%s): %s", email, purpose, otp_code)
+    try:
+        await send_otp_email(email_to=email, otp_code=otp_code, purpose=purpose)
+    except Exception as e:
+        logger.warning(
+            "Could not send email to %s via SMTP (%s). Falling back to logger. OTP code: %s",
+            email, e, otp_code
+        )
     
     return new_otp
 
