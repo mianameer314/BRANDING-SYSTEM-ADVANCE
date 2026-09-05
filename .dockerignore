@@ -7,3 +7,8 @@ __pycache__/
 storage/
 media/
 daily work updates/
+admin/
+o2geeks-website-v2/
+docs/
+*.md
+*.tex
